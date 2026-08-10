@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {Link} from "react-router-dom";
 
 export function HomePage() {
   //user이름, 임신주수, 케어카드 정보를 db로 받아야 함
@@ -50,10 +51,10 @@ export function HomePage() {
           <p className="text-white font-medium">오늘의 체크인</p>
         </div>
       ) : (
-        //체크인이 안됐을 때
-        <div className="flex flex-row items-center justify-center w-[329px] h-[66px] bg-[#484C52] rounded-[15px] text-[16px] hover:shadow-md active:scale-95 ">
+        //체크인이 안됐을 때 (누르면 체크인 페이지로 이동)
+        <Link to="/checkin" className="flex flex-row items-center justify-center w-[329px] h-[66px] bg-[#484C52] rounded-[15px] text-[16px] hover:shadow-md active:scale-95 ">
           <p className="text-white font-medium">오늘의 체크인</p>
-        </div>
+        </Link>
       )}
 
       {/*오늘의 케어카드*/}
