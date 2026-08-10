@@ -1,0 +1,49 @@
+name: Continuous Integration
+
+# dev 브랜치로 Pull Request 작성 시 실행합니다.
+on:
+  pull_request:
+    branches:
+      - dev
+
+# 워크플로에서 저장소 콘텐츠를 읽을 수 있는 최소 권한만 허용합니다.
+permissions:
+  contents: read
+
+# 같은 브랜치에서 새로운 커밋이 올라오면 이전 CI 실행을 취소합니다.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+
+    # GitHub에서 제공하는 최신 Ubuntu 환경에서 실행합니다.
+    runs-on: ubuntu-latest
+
+    # 비정상적으로 오래 실행되는 작업을 방지합니다.
+    timeout-minutes: 10
+
+    steps:
+      # Pull Request의 소스 코드를 실행 환경으로 가져옵니다.
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # 로컬 개발 환경과 동일한 Node.js 24를 설치합니다.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+          # package-lock.json을 기준으로 npm 다운로드 캐시를 사용합니다.
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # package-lock.json에 기록된 정확한 버전으로 의존성을 설치합니다.
+      - name: Install dependencies
+        run: npm ci
+
+      # TypeScript 타입 검사 후 Vite 프로덕션 빌드를 실행합니다.
+      - name: Build Vite app
+        run: npm run build
