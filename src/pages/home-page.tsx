@@ -2,8 +2,31 @@ import { useState } from "react";
 import {Link} from "react-router-dom";
 
 export function HomePage() {
-  //user이름, 임신주수, 케어카드 정보를 db로 받아야 함
   const [hasCheckedIn, setHasCheckedIn] = useState(false); //체크인 여부 상태 확인
+
+  //user이름, 임신주수, 케어카드 정보를 db로 받아야 함
+  const userName : string = "다미" ;
+  const pregnancy_date : Date = new Date("2027-02-03"); //출산 예정일
+  
+  //임신 주수 계산 함수
+  const getPregnancyWeeks = (pregnancy_date : Date) =>{
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // 오늘 날짜의 시간을 00:00:00으로 설정
+    pregnancy_date.setHours(0, 0, 0, 0); // 출산 예정일의 시간을 00:00:00으로 설정
+
+    const diffTime = pregnancy_date.getTime() - today.getTime(); // 두 날짜의 차이를 밀리초 단위로 계산
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // 밀리초를 일 단위로 변환
+    const weeks = Math.floor(diffDays / 7); // 임신 주수 계산
+    const days = diffDays % 7; // 임신 일수 계산
+
+    return { weeks, days };
+  }; 
+  
+  const weeks : number = getPregnancyWeeks(pregnancy_date).weeks; //임신 주수
+  const days : number = getPregnancyWeeks(pregnancy_date).days; //임신 일수
+  
+  
+  
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 gap-4">
       {/*프로필 창*/}
@@ -29,7 +52,7 @@ export function HomePage() {
             아기와 만나기
               <br />
               {/* 여기에 임신 남은 기간 계산하기 */}
-              {/*몇 주*/}주 {/*몇 일*/}일 전
+              {weeks}주 {days}일 전
             </p>  
           </div>
 
@@ -37,7 +60,7 @@ export function HomePage() {
           <div
             className="w-[180px] h-[34px] rounded-full bg-white flex items-center justify-center">
             <p className="text-[12px] font-medium text-[#777777]">
-              좋은 아침이에요, {/* 사용자 이름 */}님
+              좋은 아침이에요, {userName}님
             </p>
           </div>
         </div>      
