@@ -15,6 +15,10 @@ export function CheckinPage() {
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
   const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
   
+  const hasStretchMarks = useCheckinFlowStore((state) => state.hasStretchMarks)
+  const setHasStretchMarks = useCheckinFlowStore((state) => state.setHasStretchMarks)
+
+
   const BodyPart = [
     {id : 1, part : "가슴", x: 100, y: 40},
     {id : 2, part : "복부", x: 100, y: 90},
@@ -151,25 +155,43 @@ export function CheckinPage() {
                     )
                   })}
                   {selectedBodyPart !== null && (
-                    <Tabs defaultValue="pain" className="w-[183px] h-[127px] px-2.5 py-4 bg-blend-screen bg-gradient-to-b from-white to-Main rounded-[10px] outline outline-1 outline-offset-[-1px] outline-white inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-                      <div className="flex flex-col items-center justify-center">
-                          <p className="text-black text-[14px] font-semibold font-['Pretendard'] leading-6">
-                            {BodyPart.find((part) => part.id === selectedBodyPart)?.part}
-                          </p>
+                    <Tabs
+                      defaultValue="pain"
+                      className="flex items-center justify-center h-[127px] w-[183px] overflow-hidden rounded-[10px] border border-transparent p-2.5"
+                      style={{
+                        background:
+                          "linear-gradient(#fff, #fff) padding-box, linear-gradient(to bottom, #fff, #63D5B3) border-box",
+                      }}
+                    >
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <p className="text-black text-[14px] font-semibold font-['Pretendard'] leading-6">
+                          {BodyPart.find((part) => part.id === selectedBodyPart)?.part}
+                        </p>
 
-                        <TabsContent value="pain" className="flex flex-row gap-2 items-center">
+                        <div className="flex flex-row w-[120px] justify-between">
                           <p className="text-[14px] font-['Pretendard']">
                             튼살
                           </p>
-                          <div>
-                            <Button>
-                              
+                          <div className="text-[11px]">
+                            <Button 
+                              type="button"
+                              aria-pressed={hasStretchMarks === true}
+                              onClick={() => setHasStretchMarks(true)}
+                              className={hasStretchMarks === true ? "bg-[#484C52] font-light text-white w-[37px] h-[24px] text-[11px]" : "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
+                            >
+                              있음
                             </Button>
-                            <Button>
-                              
+
+                            <Button
+                              type="button"
+                              aria-pressed={hasStretchMarks === false}
+                              onClick={() => setHasStretchMarks(false)}
+                              className={hasStretchMarks === false ? "bg-[#484C52] font-light text-white w-[37px] h-[24px] text-[11px]": "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
+                            >
+                              없음
                             </Button>
                           </div>
-                        </TabsContent>
+                        </div>
 
                         <Textarea
                           value={memo}
@@ -180,7 +202,7 @@ export function CheckinPage() {
                           className="h-10 
                           min-h-10 
                           max-h-10 
-                          w-full 
+                          w-[155px] 
                           resize-none 
                           overflow-hidden 
                           rounded-lg 
@@ -192,11 +214,8 @@ export function CheckinPage() {
                           text-[10px] 
                           font-normal 
                           leading-6 
-                          text-neutral-900 
+                          text-[#737373] 
                           shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] 
-                          outline outline-1 
-                          outline-offset-[-1px] 
-                          outline-neutral-300 
                           placeholder:text-neutral-500 
                           focus-visible:ring-0 
                           focus-visible:outline-neutral-400"
@@ -283,8 +302,7 @@ export function CheckinPage() {
           )}  
       </div>  
       {/*다음 버튼, button 컴포넌트 사용*/}
-      <Button onClick={nextStep} className="w-[329px] h-[50px] bg-[#484C52] rounded-[15px] text-white font-Medium text-[12px]">
-        
+      <Button onClick={nextStep} className="w-[329px] h-[50px] bg-[#484C52] rounded-[15px] text-white font-Medium text-[12px]"> 
         다음
       </Button>
     </div>

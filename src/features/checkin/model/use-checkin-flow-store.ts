@@ -6,6 +6,7 @@ interface CheckinFlowState {
   selectedBodyPart: number | null
   capturedPhoto: Blob | null
   memo: string //checkin page에서 메모 저장용
+  hasStretchMarks: boolean | null
 
   setStep: (step: number) => void
   nextStep: () => void
@@ -14,6 +15,8 @@ interface CheckinFlowState {
   setSelectedBodyPart: (bodyPart: number | null) => void
   setCapturedPhoto: (photo: Blob | null) => void
   setMemo: (memo: string) => void
+  setHasStretchMarks: (value: boolean | null) => void 
+  //null -> 아직 선택 안 함 / true -> 튼살 있음 / false -> 튼살 없음
 
   reset: () => void
 }
@@ -24,6 +27,7 @@ const initialState = {
   selectedBodyPart: null,
   capturedPhoto: null,
   memo: "",
+  hasStretchMarks: null,
 }
 
 export const useCheckinFlowStore = create<CheckinFlowState>((set) => ({
@@ -37,6 +41,8 @@ export const useCheckinFlowStore = create<CheckinFlowState>((set) => ({
   setSelectedBodyPart: (selectedBodyPart) => set({ selectedBodyPart }),
   setCapturedPhoto: (capturedPhoto) => set({ capturedPhoto }),
   setMemo: (memo) => set({ memo }),
+  setHasStretchMarks: (hasStretchMarks) =>
+  set({ hasStretchMarks }),
   
   reset: () => set(initialState),
 }))
