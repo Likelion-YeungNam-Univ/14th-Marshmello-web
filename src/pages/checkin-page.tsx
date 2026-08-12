@@ -1,7 +1,7 @@
 import { Button } from "@/shared/components/ui/button"
 import { Slider } from "@/shared/components/ui/slider"
-import { Textarea} from "@/shared/components/ui/textarea"
-import { Tabs } from "@/shared/components/ui/tabs"
+import { Textarea } from "@/shared/components/ui/textarea"
+import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/shared/components/ui/tabs"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 
 export function CheckinPage() {
@@ -11,6 +11,24 @@ export function CheckinPage() {
   //zustand store에서 step과 nextStep 가져오기
   const step = useCheckinFlowStore((state) => state.step)
   const nextStep = useCheckinFlowStore((state) => state.nextStep)
+
+  const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
+  const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
+  
+  const BodyPart = [
+    {id : 1, part : "가슴", x: 100, y: 40},
+    {id : 2, part : "복부", x: 100, y: 90},
+    {id : 3, part : "골반", x: 100, y: 140},
+    {id : 4, part : "왼팔", x: 30, y: 90},
+    {id : 5, part : "오른팔", x: 170, y: 90},
+    {id : 6, part : "왼다리", x: 70, y: 220},
+    {id : 7, part : "오른다리", x: 140, y: 220},
+  ]
+
+  const touchTabs = (part : number) => {
+    setSelectedBodyPart(part)
+    
+  }
 
   //진행도 표시 컴포넌트
   const CheckinStep = ({ step }: { step: number }) => {
@@ -119,8 +137,74 @@ export function CheckinPage() {
                 <p className="text-[#B9C0C9] font-bold text-[10px]">
                 해당 부위를 터치해보세요
                 </p>
-                
-                  {/*부위 선택 시 팝업, tabs 사용할 예정*/}
+                <div className="relative w-[250px] h-[392px]">
+                  {BodyPart.map((part) => {
+                    return(   
+                      <button 
+                        key = {part.id} 
+                        type="button"
+                        className="absolute z-10 rounded bg-pink-200 px-2 py-1 text-xs"
+                        style={{left : part.x, top : part.y,}}
+                        onClick={() => touchTabs(part.id)}
+                      >
+                      </button>  
+                    )
+                  })}
+                  {selectedBodyPart !== null && (
+                    <Tabs defaultValue="pain" className="w-[183px] h-[127px] px-2.5 py-4 bg-blend-screen bg-gradient-to-b from-white to-Main rounded-[10px] outline outline-1 outline-offset-[-1px] outline-white inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+                      <div className="flex flex-col items-center justify-center">
+                          <p className="text-black text-[14px] font-semibold font-['Pretendard'] leading-6">
+                            {BodyPart.find((part) => part.id === selectedBodyPart)?.part}
+                          </p>
+
+                        <TabsContent value="pain" className="flex flex-row gap-2 items-center">
+                          <p className="text-[14px] font-['Pretendard']">
+                            튼살
+                          </p>
+                          <div>
+                            <Button>
+                              
+                            </Button>
+                            <Button>
+                              
+                            </Button>
+                          </div>
+                        </TabsContent>
+
+                        <Textarea
+                          value={memo}
+                          onChange={(event) => setMemo(event.target.value)}
+                          maxLength={100}
+                          rows={1}
+                          placeholder="메모를 입력하세요.."
+                          className="h-10 
+                          min-h-10 
+                          max-h-10 
+                          w-full 
+                          resize-none 
+                          overflow-hidden 
+                          rounded-lg 
+                          border-0 
+                          bg-white 
+                          px-3.5 
+                          py-2.5 
+                          font-['Pretendard'] 
+                          text-[10px] 
+                          font-normal 
+                          leading-6 
+                          text-neutral-900 
+                          shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] 
+                          outline outline-1 
+                          outline-offset-[-1px] 
+                          outline-neutral-300 
+                          placeholder:text-neutral-500 
+                          focus-visible:ring-0 
+                          focus-visible:outline-neutral-400"
+                          />
+                      </div>  
+                    </Tabs>
+                  )}
+                </div>  
              </div> 
           )}    
 

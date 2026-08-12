@@ -3,7 +3,7 @@ import { create } from "zustand"
 interface CheckinFlowState {
   step: number //checkin page에서 사용
   conditionScore: number | null
-  selectedBodyPart: string | null
+  selectedBodyPart: number | null
   capturedPhoto: Blob | null
   memo: string //checkin page에서 메모 저장용
 
@@ -11,7 +11,7 @@ interface CheckinFlowState {
   nextStep: () => void
 
   setConditionScore: (score: number) => void
-  setSelectedBodyPart: (bodyPart: string | null) => void
+  setSelectedBodyPart: (bodyPart: number | null) => void
   setCapturedPhoto: (photo: Blob | null) => void
   setMemo: (memo: string) => void
 
