@@ -1,7 +1,9 @@
 import { createBrowserRouter } from "react-router-dom"
 
 import App from "@/App"
+import { CarePage } from "@/pages/care-page"
 import { CheckinPage } from "@/pages/checkin-page"
+import { ContentDetailPage } from "@/pages/content-detail-page"
 import { HomePage } from "@/pages/home-page"
 
 export const router = createBrowserRouter([
@@ -14,7 +16,8 @@ export const router = createBrowserRouter([
       { path: "body-map" },
       { path: "camera" },
       { path: "records" },
-      { path: "care" },
+      { path: "care", element: <CarePage /> },
+      { path: "contents/:contentId", element: <ContentDetailPage /> },
     ],
   },
 ])
