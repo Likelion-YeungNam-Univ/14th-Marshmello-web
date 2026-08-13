@@ -19,7 +19,7 @@ export function CheckinPage() {
   const hasStretchMarks = useCheckinFlowStore((state) => state.hasStretchMarks)
   const setHasStretchMarks = useCheckinFlowStore((state) => state.setHasStretchMarks)
 
-
+  //바디맵 부위 별 매핑
   const BodyPart = [
     {id : 1, part : "가슴", x: 100, y: 40},
     {id : 2, part : "복부", x: 100, y: 90},
@@ -30,19 +30,23 @@ export function CheckinPage() {
     {id : 7, part : "오른다리", x: 140, y: 220},
   ]
 
+  const selectedPart = BodyPart.find(
+    (part) => part.id === selectedBodyPart,
+  )
+
+  //tab을 터치하면 Zustand에 부위 값이 전달됨
   const touchTabs = (part : number) => {
     setSelectedBodyPart(part)
-    
   }
 
   //진행도 표시 컴포넌트
   const CheckinStep = ({ step }: { step: number }) => {
     return (
-      <div className="flex w-[150px] items-center">
+      <div className="flex w-[150px] origin-center scale-75 items-center">
         {[1, 2, 3, 4].map((item) => (
           <div key={item} className="flex flex-1 items-center last:flex-none">
             {/* 동그라미 */}
-            <div className={`h-[8px] w-[8px] rounded-full ${item === step ? "bg-[#91DDCF]" : "bg-[#D9D9D9]"}`}/>
+            <div className={`h-[8px] w-[8px] rounded-full ${item === step ? "bg-[#F19ED2]" : "bg-[#D9D9D9]"}`}/>
 
             {/* 선 */}
             {item !== 4 && (<div className="h-[1px] flex-1 bg-[#D9D9D9]" />)}
@@ -59,53 +63,71 @@ export function CheckinPage() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center gap-10 mt-[86px] " >
+    <div className="flex flex-col items-center justify-center gap-8 mt-[86px] " >
       
-      <div className=" relative flex flex-row items-center justify-center w-[329px] h-[50px] font-Medium text-black ">
+      <div className=" relative w-[329px] h-[20px]  ">
         {/*뒤로가기 버튼*/}
-        <Button onClick={prevStep} className="absolute bg-transparent left-0 items-center justify-center">
+        <Button onClick={prevStep} className="absolute
+          left-0
+          top-1/2
+          h-6
+          w-6
+         -translate-y-1/2
+          bg-transparent
+          p-0
+          shadow-none
+          hover:bg-transparent">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.6283 0C17.8319 0 18.0402 0.0804844 18.1964 0.236695C18.5088 0.549117 18.5088 1.06036 18.1964 1.37278L7.50286 12.071L18.0402 22.6083C18.3526 22.9207 18.3526 23.432 18.0402 23.7444C17.7277 24.0568 17.2165 24.0568 16.9041 23.7444L5.79877 12.6391C5.48635 12.3267 5.48635 11.8154 5.79877 11.503L17.0603 0.236719C17.2165 0.0805078 17.4248 4.6875e-05 17.6283 4.6875e-05L17.6283 0Z" fill="black"/>
           </svg>
         </Button>
 
         {/*오늘의 체크인*/}
-        <p className="flex items-center justify-center h-full font-Medium text-[15px]">
+        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-[13px] font-medium text-black font-['Pretendard']">
           오늘의 체크인
         </p>
       </div>
       {/*진행도*/}
-      <div className="flex flex-col items-start w-[291px] h-[50px] justify-between gap-2">
-        {/*날짜*/}
-        <p className="text-[12px] text-black font-bold">
-          { today }
-        </p>
-
+      <div className="flex flex-col items- w-[291px] h-[50px] justify-between">
+        
+          {/*날짜*/}
+          {/*
+          <p className="text-[12px] text-black font-bold">
+            { today }
+          </p>
+          */}
+        
         {/*진행상황, Progress 사용할 예정*/}
-        <CheckinStep step={step} />
-
+        <div className="self-end mr-2">      
+          <CheckinStep step={step} />
+        </div>    
       </div>
         
       {/*page 별 활성화*/}
       <div className="flex flex-col items-center justify-start gap-4">  
           {/*page1*/}
           {(step === 1) && (
-            <div className="flex flex-col w-[291px] items-start justify-center gap-2">
-              {/*잠깐, 어제 행동카드는 잘 실천하셨나요?, page1*/}
-              <p className="text-black font-bold text-[12px]">
-                잠깐, 어제 행동카드는 잘 실천하셨나요?
+            <div className="flex flex-col w-[345px] items-start justify-center gap-2">
+              {/*어제 케어카드를 실천하셨나요?, page1*/}
+              <p className="text-black font-bold text-[20px]">
+                어제 케어카드를 실천하셨나요?
               </p>
 
               {/*실천사항 박스*/}
-              <div className="w-[291px] h-[30px] flex flex-row justify-start gap-2 items-center">
-                {/*실천사항*/}
-                <p className="text-black font-Medium text-[16px]">
-                  어쩌구 저쩌구를 하세요
-                </p>  
-
-                {/*체크박스*/}
-                <input type="checkbox" />
-              </div>
+              {/* 
+                <div className="w-[291px] h-[30px] flex flex-row justify-start gap-2 items-center">
+              */}
+              {/*실천사항*/}
+                {/*
+                  <p className="text-black font-Medium text-[16px]">
+                    어쩌구 저쩌구를 하세요
+                  </p>  
+                */}  
+                  {/*체크박스*/}
+                {/*
+                  <input type="checkbox" />
+                </div>
+                */}  
 
               {/*질문, 추천행동이 마음에 드셨나요?*/}
               <p className="text-[#B9C0C9] font-bold text-[10px]">
@@ -135,98 +157,112 @@ export function CheckinPage() {
 
           {(step === 3) && (
             <div className="flex flex-col w-[291px] items-start justify-center gap-2">      
-            {/*오늘, 특별히 불편한 부위가 있나요?, page3*/}
-            <p className="text-black font-bold text-[12px]">
-              오늘, 특별히 불편한 부위가 있나요?
-            </p>
-              {/*바디맵, svg로 구현 */}
-                {/*해당 부위를 터치해보세요 문구*/}
-                <p className="text-[#B9C0C9] font-bold text-[10px]">
-                해당 부위를 터치해보세요
-                </p>
-                <div className="relative w-[250px] h-[392px]">
-                  {BodyPart.map((part) => {
-                    return(   
-                      <button 
-                        key = {part.id} 
-                        type="button"
-                        className="absolute z-10 rounded bg-pink-200 px-2 py-1 text-xs"
-                        style={{left : part.x, top : part.y,}}
-                        onClick={() => touchTabs(part.id)}
-                      >
-                      </button>  
-                    )
-                  })}
-                  {selectedBodyPart !== null && (
-                    <Tabs
-                      defaultValue="pain"
-                      className="flex items-center justify-center h-[127px] w-[183px] overflow-hidden rounded-[10px] border border-transparent p-2.5"
-                      style={{
-                        background:
-                          "linear-gradient(#fff, #fff) padding-box, linear-gradient(to bottom, #fff, #63D5B3) border-box",
-                      }}
+              {/*오늘, 특별히 불편한 부위가 있나요?, page3*/}
+              <p className="text-black font-bold text-[12px]">
+                오늘, 특별히 불편한 부위가 있나요?
+              </p>
+              
+              {/*해당 부위를 터치해보세요 문구*/}
+              <p className="text-[#B9C0C9] font-bold text-[10px]">
+              해당 부위를 터치해보세요
+              </p>
+
+              {/*바디맵, 팝업창 */}
+              <div className="relative w-[250px] h-[392px] self-center">
+                {/*바디맵*/}
+                {BodyPart.map((part) => {
+                  return(   
+                    <button 
+                      key = {part.id} 
+                      type="button"
+                      className="absolute z-10 rounded bg-[#F19ED2] px-1 py-1 text-xs"
+                      style={{left : part.x, top : part.y,}}
+                      onClick={() => touchTabs(part.id)}
                     >
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-black text-[14px] font-semibold font-['Pretendard'] leading-6">
-                          {BodyPart.find((part) => part.id === selectedBodyPart)?.part}
+                    </button>  
+                  )
+                })}
+
+                {/*tab 팝업 창*/}
+                {selectedPart && (
+                  <Tabs
+                    defaultValue="tabs"
+                    className="absolute z-50 flex h-[127px] w-[183px] items-center justify-center overflow-hidden rounded-[10px] border border-transparent p-2.5"
+                    style={{
+                      left : selectedPart.x - 91.5 ,
+                      top : selectedPart.y,
+                      background:
+                        "linear-gradient(#fff, #fff) padding-box, linear-gradient(to bottom, #fff, #F19ED2) border-box",
+                    }}
+                  >
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      {/*버튼을 누른 부위 이름 */}
+                      <p className="text-black text-[14px] font-semibold font-['Pretendard'] leading-6">
+                        {BodyPart.find((part) => part.id === selectedBodyPart)?.part}
+                      </p>
+
+                      {/*튼살 유무 확인 공간 */}
+                      <div className="flex flex-row w-[120px] justify-between gap-2">
+                        {/*튼살 문구*/}
+                        <p className="text-[14px] font-['Pretendard']">
+                          튼살
                         </p>
 
-                        <div className="flex flex-row w-[120px] justify-between">
-                          <p className="text-[14px] font-['Pretendard']">
-                            튼살
-                          </p>
-                          <div className="text-[11px]">
-                            <Button 
-                              type="button"
-                              aria-pressed={hasStretchMarks === true}
-                              onClick={() => setHasStretchMarks(true)}
-                              className={hasStretchMarks === true ? "bg-[#484C52] font-light text-white w-[37px] h-[24px] text-[11px]" : "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
-                            >
-                              있음
-                            </Button>
+                        {/*튼살 유무 확인 버튼 */}
+                        <div className="flex text-[11px] gap-1">
+                          {/*있음*/}
+                          <Button 
+                            type="button"
+                            aria-pressed={hasStretchMarks === true}
+                            onClick={() => setHasStretchMarks(true)}
+                            className={hasStretchMarks === true ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]" : "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
+                          >
+                            있음
+                          </Button>
 
-                            <Button
-                              type="button"
-                              aria-pressed={hasStretchMarks === false}
-                              onClick={() => setHasStretchMarks(false)}
-                              className={hasStretchMarks === false ? "bg-[#484C52] font-light text-white w-[37px] h-[24px] text-[11px]": "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
-                            >
-                              없음
-                            </Button>
-                          </div>
+                          {/*없음*/}
+                          <Button
+                            type="button"
+                            aria-pressed={hasStretchMarks === false}
+                            onClick={() => setHasStretchMarks(false)}
+                            className={hasStretchMarks === false ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]": "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
+                          >
+                            없음
+                          </Button>
                         </div>
+                      </div>
 
-                        <Textarea
-                          value={memo}
-                          onChange={(event) => setMemo(event.target.value)}
-                          maxLength={100}
-                          rows={1}
-                          placeholder="메모를 입력하세요.."
-                          className="h-10 
-                          min-h-10 
-                          max-h-10 
-                          w-[155px] 
-                          resize-none 
-                          overflow-hidden 
-                          rounded-lg 
-                          border-0 
-                          bg-white 
-                          px-3.5 
-                          py-2.5 
-                          font-['Pretendard'] 
-                          text-[10px] 
-                          font-normal 
-                          leading-6 
-                          text-[#737373] 
-                          shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] 
-                          placeholder:text-neutral-500 
-                          focus-visible:ring-0 
-                          focus-visible:outline-neutral-400"
-                          />
-                      </div>  
-                    </Tabs>
-                  )}
-                </div>  
+                      <Textarea
+                        value={memo}
+                        onChange={(event) => setMemo(event.target.value)}
+                        maxLength={100}
+                        rows={1}
+                        placeholder="메모를 입력하세요.."
+                        className="h-10 
+                        min-h-10 
+                        max-h-10 
+                        w-[155px] 
+                        resize-none 
+                        overflow-hidden 
+                        rounded-lg 
+                        border-0 
+                        bg-white 
+                        px-3.5 
+                        py-2.5 
+                        font-['Pretendard'] 
+                        text-[10px] 
+                        font-normal 
+                        leading-6 
+                        text-[#737373] 
+                        shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] 
+                        placeholder:text-neutral-500 
+                        focus-visible:ring-0 
+                        focus-visible:outline-neutral-400"
+                        />
+                    </div>  
+                  </Tabs>
+                )}
+              </div>  
              </div> 
           )}    
 
