@@ -65,7 +65,7 @@ export function CheckinPage() {
   return (
     <div className="flex flex-col items-center justify-center gap-8 mt-[86px] " >
       
-      <div className=" relative w-[329px] h-[20px]  ">
+      <div className=" relative w-[344px] h-[20px]  ">
         {/*뒤로가기 버튼*/}
         <Button onClick={prevStep} className="absolute
           left-0
@@ -88,7 +88,7 @@ export function CheckinPage() {
         </p>
       </div>
       {/*진행도*/}
-      <div className="flex flex-col items- w-[291px] h-[50px] justify-between">
+      <div className="flex flex-col items- w-[291px] h-[10px] justify-between">
         
           {/*날짜*/}
           {/*
@@ -98,7 +98,7 @@ export function CheckinPage() {
           */}
         
         {/*진행상황, Progress 사용할 예정*/}
-        <div className="self-end mr-2">      
+        <div className="self-end">      
           <CheckinStep step={step} />
         </div>    
       </div>
@@ -107,11 +107,33 @@ export function CheckinPage() {
       <div className="flex flex-col items-center justify-start gap-4">  
           {/*page1*/}
           {(step === 1) && (
-            <div className="flex flex-col w-[345px] items-start justify-center gap-2">
+            <div className="flex flex-col w-[344px] items-start justify-center gap-2">
               {/*어제 케어카드를 실천하셨나요?, page1*/}
-              <p className="text-black font-bold text-[20px]">
+              <p className="text-black font-medium text-[20px]">
                 어제 케어카드를 실천하셨나요?
               </p>
+
+              <div className="flex text-[11px] gap-1">
+                          {/*있음*/}
+                          <Button 
+                            type="button"
+                            //aria-pressed={hasStretchMarks === true}
+                            //onClick={() => setHasStretchMarks(true)}
+                            className={hasStretchMarks === true ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]" : "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
+                          >
+                            네
+                          </Button>
+
+                          {/*없음*/}
+                          <Button
+                            type="button"
+                            //aria-pressed={hasStretchMarks === false}
+                            //onClick={() => setHasStretchMarks(false)}
+                            className={hasStretchMarks === false ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]": "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
+                          >
+                            아니요
+                          </Button>
+                        </div>
 
               {/*실천사항 박스*/}
               {/* 
@@ -130,7 +152,7 @@ export function CheckinPage() {
                 */}  
 
               {/*질문, 추천행동이 마음에 드셨나요?*/}
-              <p className="text-[#B9C0C9] font-bold text-[10px]">
+              <p className="text-black font-medium text-[20px]">
                 추천행동이 마음에 드셨나요?
               </p>
 
@@ -145,8 +167,8 @@ export function CheckinPage() {
               {/*page2*/}
               
             {/*오늘 배의 피부결을 확인해보아요, page2*/}
-              <p className="text-black font-bold text-[12px]">
-                오늘 배의 피부결을 확인해보아요
+               <p className="text-black font-medium text-[20px]">
+                사진을 업로드 해주세요
               </p>
               
               {/*사진 촬영 기능*/}
@@ -156,14 +178,14 @@ export function CheckinPage() {
           )}
 
           {(step === 3) && (
-            <div className="flex flex-col w-[291px] items-start justify-center gap-2">      
+            <div className="flex flex-col w-[344px] items-start justify-center gap-5">      
               {/*오늘, 특별히 불편한 부위가 있나요?, page3*/}
-              <p className="text-black font-bold text-[12px]">
-                오늘, 특별히 불편한 부위가 있나요?
+              <p className="text-black font-medium text-[20px]">
+                오늘, 특별히 불편한 부위가 있었나요?
               </p>
               
               {/*해당 부위를 터치해보세요 문구*/}
-              <p className="text-[#B9C0C9] font-bold text-[10px]">
+              <p className="text-[#B9C0C9] font-bold text-[14px]">
               해당 부위를 터치해보세요
               </p>
 
@@ -341,9 +363,11 @@ export function CheckinPage() {
           )}  
       </div>  
       {/*다음 버튼, button 컴포넌트 사용*/}
-      <Button onClick={nextStep} className="w-[329px] h-[50px] bg-[#484C52] rounded-[15px] text-white font-Medium text-[12px]"> 
-        다음
-      </Button>
+      <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+24px)] z-40 mx-auto w-full max-w-[393px] px-8">
+        <Button onClick={nextStep} className="h-[50px] w-full rounded-[15px] bg-[#484C52] text-[12px] text-white">
+          다음
+        </Button>
+      </div>
     </div>
   )
 }
