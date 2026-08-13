@@ -5,13 +5,11 @@ import { Link } from "react-router-dom"
 import bellyCircleIllustration from "@/assets/massage-guide/belly-circle-massage.png"
 import completionCheckIcon from "@/assets/massage-guide/completion-check.svg"
 import finishingBellyIllustration from "@/assets/massage-guide/finishing-belly-stroke.png"
-import finishingStrokeIndicator from "@/assets/massage-guide/finishing-stroke-indicator.svg"
 import handWarmingIllustration from "@/assets/massage-guide/hand-warming.png"
 import introIllustration from "@/assets/massage-guide/intro-illustration.png"
 import pelvicLineIllustration from "@/assets/massage-guide/pelvic-line-press.png"
-import pelvicPressIndicator from "@/assets/massage-guide/pelvic-press-indicator.svg"
 import sideSweepIllustration from "@/assets/massage-guide/side-sweep-up.png"
-import sideSweepIndicator from "@/assets/massage-guide/side-sweep-indicator.svg"
+import Illustration from "@/features/massage-guide/ui/illustration"
 import { Button } from "@/shared/components/ui/button"
 import {
   Dialog,
@@ -217,11 +215,13 @@ function MassageGuideStepOne({ onBack, onNext }: MassageGuideStepOneProps) {
             <p className="pt-0.5">차가운 손보다 훨씬 편안하게 느껴질 거예요.</p>
           </div>
 
-          <div className="mt-7 flex h-[443px] w-full items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(125.8735deg,#fff1cf_0%,#feeed3_7.1429%,#feead8_14.286%,#fde7dc_21.429%,#fde3e0_28.571%,#fce0e4_35.714%,#fcdde8_42.857%,#fbd9ec_50%,#fad6eb_57.143%,#f9d2ea_64.286%,#f8cfe9_71.429%,#f6cce7_78.571%,#f5c9e6_85.714%,#f4c5e5_92.857%,#f3c2e4_100%)]">
-            <img
-              alt="두 손을 비벼 따뜻하게 만드는 모습"
-              className="h-[535px] w-[337px] max-w-none object-contain"
-              src={handWarmingIllustration}
+          <div className="mt-7">
+            <Illustration
+              step={{
+                background: "warm",
+                image: handWarmingIllustration,
+                imageAlt: "두 손을 비벼 따뜻하게 만드는 모습",
+              }}
             />
           </div>
 
@@ -279,11 +279,13 @@ function MassageGuideStepTwo({ onBack, onNext }: MassageGuideStepTwoProps) {
             </p>
           </div>
 
-          <div className="mt-[41px] flex h-[443px] w-full items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(127.5749deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)]">
-            <img
-              alt="배 중앙을 원을 그리듯 마사지하는 모습"
-              className="size-[337px] object-contain"
-              src={bellyCircleIllustration}
+          <div className="mt-[41px]">
+            <Illustration
+              step={{
+                image: bellyCircleIllustration,
+                imageAlt: "배 중앙을 원을 그리듯 마사지하는 모습",
+                ring: true,
+              }}
             />
           </div>
 
@@ -337,20 +339,14 @@ function MassageGuideStepThree({ onBack, onNext }: MassageGuideStepThreeProps) {
           </p>
         </div>
 
-        <div className="mt-7 flex h-[443px] w-full items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(127.2611deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)]">
-          <div className="relative size-[337px] shrink-0">
-            <img
-              alt="배 옆쪽을 위로 쓸어 올리는 모습"
-              className="size-full object-contain"
-              src={sideSweepIllustration}
-            />
-            <img
-              alt=""
-              aria-hidden="true"
-              className="absolute top-[64.03px] left-[64.03px] size-[208.938px]"
-              src={sideSweepIndicator}
-            />
-          </div>
+        <div className="mt-7">
+          <Illustration
+            step={{
+              image: sideSweepIllustration,
+              imageAlt: "배 옆쪽을 위로 쓸어 올리는 모습",
+              sweep: true,
+            }}
+          />
         </div>
 
         <p className={STEP_HINT_CLASS_NAME}>
@@ -404,26 +400,14 @@ function MassageGuideStepFour({ onBack, onNext }: MassageGuideStepFourProps) {
           </p>
         </div>
 
-        <div className="mt-7 flex h-[443px] w-full items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(127.5118deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)]">
-          <div className="relative size-[337px] shrink-0">
-            <img
-              alt="배 아랫부분을 손가락으로 누르는 모습"
-              className="size-full object-contain"
-              src={pelvicLineIllustration}
-            />
-            <img
-              alt=""
-              aria-hidden="true"
-              className="absolute top-[52%] left-[28.5%] size-[9%]"
-              src={pelvicPressIndicator}
-            />
-            <img
-              alt=""
-              aria-hidden="true"
-              className="absolute top-[52%] right-[28.5%] size-[9%]"
-              src={pelvicPressIndicator}
-            />
-          </div>
+        <div className="mt-7">
+          <Illustration
+            step={{
+              image: pelvicLineIllustration,
+              imageAlt: "배 아랫부분을 손가락으로 누르는 모습",
+              press: true,
+            }}
+          />
         </div>
 
         <p className={STEP_HINT_CLASS_NAME}>
@@ -469,24 +453,18 @@ function MassageGuideStepFive({ onBack, onComplete }: MassageGuideStepFiveProps)
         </h1>
 
         <div className="mt-3 h-[54px] text-[15px] leading-[25.5px] tracking-[-0.16px] text-[#6a6e75]">
-          <p>배 전체를 크게, 천천히 쓰다듬으며 마무리해요.</p>
+          <p>배 전체를 크게, <br /> 천천히 쓰다듬으며 마무리해요.</p>
           <p className="pt-0.5">오늘도 여기까지 챙긴 것만으로 충분해요.</p>
         </div>
 
-        <div className="mt-7 flex h-[443px] w-full items-center justify-center overflow-hidden rounded-[22px] bg-[linear-gradient(126.1675deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)]">
-          <div className="relative size-[337px] shrink-0">
-            <img
-              alt="배 전체를 크게 쓰다듬는 모습"
-              className="size-full object-contain"
-              src={finishingBellyIllustration}
-            />
-            <img
-              alt=""
-              aria-hidden="true"
-              className="absolute top-[11.73%] left-[45.27%] size-[9.46%]"
-              src={finishingStrokeIndicator}
-            />
-          </div>
+        <div className="mt-7">
+          <Illustration
+            step={{
+              image: finishingBellyIllustration,
+              imageAlt: "배 전체를 크게 쓰다듬는 모습",
+              sweepBig: true,
+            }}
+          />
         </div>
 
         <p className={STEP_HINT_CLASS_NAME}>
