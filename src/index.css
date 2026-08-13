@@ -162,3 +162,29 @@
     letter-spacing: 0.02em;
   }
 }
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sweepUp {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
