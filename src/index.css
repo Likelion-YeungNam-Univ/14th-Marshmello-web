@@ -173,6 +173,75 @@
   }
 }
 
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(2px);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes breatheReduced {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(0.97);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes floatyReduced {
+  0%,
+  100% {
+    transform: translateY(1px);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.not-found-halo {
+  animation: breathe 4s ease-in-out infinite;
+  transform-box: view-box;
+  transform-origin: 104px 104px;
+  will-change: opacity, transform;
+}
+
+.not-found-face {
+  animation: floaty 3.6s ease-in-out infinite;
+  transform-box: view-box;
+  transform-origin: 104px 104px;
+  will-change: transform;
+}
+
+.not-found-orbit {
+  animation: orbit 6s linear infinite;
+  transform-box: view-box;
+  transform-origin: 104px 104px;
+  will-change: transform;
+}
+
 @keyframes sweepUp {
   0% {
     opacity: 0;
@@ -186,5 +255,19 @@
   100% {
     opacity: 0;
     transform: translateY(-16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-found-halo {
+    animation: breatheReduced 4.8s ease-in-out infinite;
+  }
+
+  .not-found-face {
+    animation: floatyReduced 4.8s ease-in-out infinite;
+  }
+
+  .not-found-orbit {
+    animation-duration: 7s;
   }
 }
