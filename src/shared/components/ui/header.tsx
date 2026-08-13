@@ -1,13 +1,14 @@
 import type { ComponentProps } from "react"
 import { LogOut } from "lucide-react"
+import { Link } from "react-router-dom"
 
 import { cn } from "@/shared/lib/utils"
 
 type HeaderProps = ComponentProps<"header"> & {
-  onLogout?: () => void
+  logoutTo?: string
 }
 
-export function Header({ className, onLogout, ...props }: HeaderProps) {
+export function Header({ className, logoutTo = "/logout", ...props }: HeaderProps) {
   return (
     <header
       className={cn(
@@ -20,14 +21,13 @@ export function Header({ className, onLogout, ...props }: HeaderProps) {
         품결
       </span>
 
-      <button
+      <Link
         aria-label="로그아웃"
         className="relative flex size-6 shrink-0 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        onClick={onLogout}
-        type="button"
+        to={logoutTo}
       >
         <LogOut aria-hidden="true" className="size-6" strokeWidth={2} />
-      </button>
+      </Link>
     </header>
   )
 }
