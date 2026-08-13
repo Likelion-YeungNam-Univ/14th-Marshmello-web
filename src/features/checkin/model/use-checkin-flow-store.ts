@@ -31,7 +31,7 @@ const initialState = {
   capturedPhoto: null,
   memo: "",
   hasStretchMarks: null,
-  praciceCare: null,
+  practiceCare: null,
 }
 
 export const useCheckinFlowStore = create<CheckinFlowState>((set) => ({
