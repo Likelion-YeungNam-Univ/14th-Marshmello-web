@@ -1,119 +1,122 @@
-import { useState } from "react";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom"
+
+import { Button } from "@/shared/components/ui/button"
+
+//user이름, 출산 예정일 정보는 추후 db에서 받아와야 함
+const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24
+const dueDate = new Date("2027-02-03")
+const userName = "다미"
+
+//출산 예정일까지 남은 주수와 일수를 계산하는 함수
+function getRemainingPregnancyTime(date: Date) {
+  const today = new Date()
+
+  //시간 차이 때문에 날짜 계산이 달라지지 않도록 UTC 기준으로 변환
+  const todayInUtc = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  )
+  const dueDateInUtc = Date.UTC(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  )
+  const remainingDays = Math.max(
+    0,
+    Math.ceil((dueDateInUtc - todayInUtc) / DAY_IN_MILLISECONDS),
+  )
+
+  //남은 전체 일수를 주와 일로 나누어 반환
+  return {
+    weeks: Math.floor(remainingDays / 7),
+    days: remainingDays % 7,
+  }
+}
 
 export function HomePage() {
-  const [hasCheckedIn, setHasCheckedIn] = useState(false); //체크인 여부 상태 확인
+  const today = new Date()
+  //아기와 만나기까지 남은 기간
+  const { weeks, days } = getRemainingPregnancyTime(dueDate)
 
-  //user이름, 임신주수, 케어카드 정보를 db로 받아야 함
-  const userName : string = "다미" ;
-  const pregnancy_date : Date = new Date("2027-02-03"); //출산 예정일
-  
-  //임신 주수 계산 함수
-  const getPregnancyWeeks = (pregnancy_date : Date) =>{
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // 오늘 날짜의 시간을 00:00:00으로 설정
-    pregnancy_date.setHours(0, 0, 0, 0); // 출산 예정일의 시간을 00:00:00으로 설정
+  //오늘 날짜를 '8월 7일' 형식으로 표시
+  const todayLabel = new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+  }).format(today)
 
-    const diffTime = pregnancy_date.getTime() - today.getTime(); // 두 날짜의 차이를 밀리초 단위로 계산
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // 밀리초를 일 단위로 변환
-    const weeks = Math.floor(diffDays / 7); // 임신 주수 계산
-    const days = diffDays % 7; // 임신 일수 계산
+  //time 태그의 dateTime 속성에 사용할 날짜 형식
+  const todayDateTime = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-")
 
-    return { weeks, days };
-  }; 
-  
-  const weeks : number = getPregnancyWeeks(pregnancy_date).weeks; //임신 주수
-  const days : number = getPregnancyWeeks(pregnancy_date).days; //임신 일수
-  
-  
-  
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 gap-4">
-      {/*프로필 창*/}
-      <div className="flex flex-row items-center justify-center w-[335px] h-[140px] bg-[#F5F5F5] rounded-lg gap-2">
-        {/* 왼쪽 아기 이미지 */}
-        <div className="w-[82px] h-[94px] bg-[#D9D9D9] overflow-hidden ">
-          {/* 실제 이미지가 있으면 아래처럼 사용 */}
-
-          {/* 
-          <img
-            src="/images/baby.png"
-            alt="아기"
-            className="w-full h-full object-cover"
-          />
-          */}
-
+    <main
+      className="w-full bg-[#E3C5E5] px-4 pb-16 pt-6 text-black sm:px-6"
+    >
+      <section className="mx-auto w-full max-w-[460px]">
+        {/* 이 시기에 흔히 겪는 변화 안내 */}
+        <div className="rounded-full bg-white px-5 py-[17px] text-center shadow-[0_6px_12px_rgba(57,41,62,0.2)]">
+          <p className="text-[13px] font-medium leading-[1.65] tracking-[-0.025em] sm:text-sm">
+            임신 중반 초산모의 대다수가 7주차에 배와 가슴 피부가 당기는 걸
+            느껴요. 자연스러운 변화예요.
+          </p>
         </div>
 
-        <div className="flex flex-col w-[180px] h-[94px] justify-between">
-          {/* 임신 남은 기간 */}
-          <div className="flex items-center justify-center h-[60px] ">
-            <p className="w-[100px] text-[13px] leading-[16px] font-medium text-[#000000]">
-            아기와 만나기
-              <br />
-              {/* 여기에 임신 남은 기간 계산하기 */}
-              {weeks}주 {days}일 전
-            </p>  
-          </div>
+        {/* 아기와 만나기까지 남은 기간 */}
+        <div className="mt-11 px-3 ">
+          <p className="text-xl font-medium leading-tight tracking-[-0.04em] sm:text-2xl">
+            {userName}님과 아기가 만나기까지
+          </p>
+          <h1
+            id="home-pregnancy-countdown"
+            className="mt-1 text-[42px] font-bold leading-none tracking-[-0.04em] sm:text-[46px] mt-[6px]"
+          >
+            {weeks}주 {days}일
+          </h1>
+        </div>
 
-          {/* 인사말 */}
+        {/* 오늘의 체크인 카드 */}
+        <div className="relative mx-auto mt-[66px] w-[calc(100%-16px)] max-w-[430px]">
+          {/* 카드가 뒤에 겹쳐 보이도록 만든 배경 레이어 */}
           <div
-            className="w-[180px] h-[34px] rounded-full bg-white flex items-center justify-center">
-            <p className="text-[12px] font-medium text-[#777777]">
-              좋은 아침이에요, {userName}님
+            aria-hidden="true"
+            className="absolute -top-8 bottom-8 left-4 right-12 rounded-[24px] bg-white/70 shadow-sm blur-[2px]"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -top-5 bottom-5 left-10 right-3 rotate-[-4deg] rounded-[24px] bg-white/80 shadow-sm blur-[2px]"
+          />
+
+          <article className="relative flex min-h-[332px] flex-col rounded-[22px] bg-white px-9 pb-8 pt-7 shadow-[0_5px_5px_rgba(48,37,52,0.32)]">
+            {/* 오늘 날짜 */}
+            <time
+              dateTime={todayDateTime}
+              className="text-center text-[14px] font-medium tracking-[-0.02em]"
+            >
+              {todayLabel}
+            </time>
+
+            {/* 체크인 전 안내 문구 */}
+            <p className="flex flex-1 items-center justify-center pb-1 text-center text-xl text-medium tracking-[-0.04em] text-[#d0d0d0]">
+              체크인 후에 만나요
             </p>
-          </div>
-        </div>      
-      </div>
 
-      {/*오늘의 체크인 창*/}
-      {/* 체크인 되어있으면 앞의 결과, 만약 체크인이 되어있지 않다면 뒤에꺼 */}
-      {hasCheckedIn ? (
-        //체크인 됐을 때
-        <div className="flex flex-row items-center justify-center w-[329px] h-[66px] bg-[#C07F7D] rounded-[15px] text-[16px]">
-          <p className="text-white font-medium">오늘의 체크인</p>
+            {/* 누르면 체크인 페이지로 이동 */}
+            <Button
+              asChild
+              size="lg"
+              className="h-[51px] w-full rounded-[16px] bg-[#4b4f55] text-base font-medium text-white shadow-none hover:bg-[#3f4349] focus-visible:ring-[#4b4f55]/35"
+            >
+              <Link to="/checkin" aria-label="오늘의 체크인 페이지로 이동">
+                체크인하러 가기&nbsp; &gt;&gt;
+              </Link>
+            </Button>
+          </article>
         </div>
-      ) : (
-        //체크인이 안됐을 때 (누르면 체크인 페이지로 이동)
-        <Link to="/checkin" className="flex flex-row items-center justify-center w-[329px] h-[66px] bg-[#484C52] rounded-[15px] text-[16px] hover:shadow-md active:scale-95 ">
-          <p className="text-white font-medium">오늘의 체크인</p>
-        </Link>
-      )}
-
-      {/*오늘의 케어카드*/}
-      <div  className="flex flex-col items-center justify-center w-[329px] h-[141px] bg-[#FFFFFF] rounded-[15px] border border-[#000000]">
-        <h2 className="text-[#484C52] font-bold text-[12px] ">
-          오늘의 케어카드
-        </h2>
-        <div className="flex flex-col items-center justify-center  w-[287px] h-[89px]">
-          {hasCheckedIn ? (
-            <p className="text-[#000000] text-[16px] justify-center ">
-              {/* 체크인 결과에 따라 다른 내용 표시 */}
-            </p>  
-          ) : (
-              <p className="text-[#000000] text-[16px] justify-center ">
-                체크인을 완료해주세요
-              </p>
-          )}
-        </div>  
-      </div>
-      
-      {/* 이 시기 흔히 겪는 변화 */}
-      {hasCheckedIn || (
-        <div className="flex flex-col justify-center w-[310px] h-[80px] bg-[#FFDDDB] ">
-          <p className="text-[#484C52] text-[10px] m-2">
-            이 시기 흔히 겪는 변화
-          </p>
-          <p className="text-[#000000] text-[11px] m-2">
-            임신 중반 초산모의 대다수가 이맘때 배와 가슴 피부가 당기는걸 느껴요. 자연스러운 변화에요
-          </p>
-        </div> )
-      }
-
-      {/*앱 정보*/}
-      <div className="flex flex-row items-center justify-between w-[329px] h-[141px] bg-[#FFFFFF] rounded-lg">
-        
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
