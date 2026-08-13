@@ -176,6 +176,26 @@ export function CameraCapture() {
             playsInline
             className="absolute inset-0 h-full w-full object-cover"
           />
+          
+          {/*안내 문구*/}
+          <p className="absolute inset-x-0 top-[calc(env(safe-area-inset-top)+150px)] z-20 text-center text-[19px] text-white">
+            표시선에 배꼽 위치를 맞춰 촬영해주세요.
+          </p>
+          {/*검은색 화면, 촬영가이드 */}
+          <div className="pointer-events-none absolute left-1/2 top-[46%] z-10 h-[360px] w-[280px]
+        -translate-x-1/2 -translate-y-1/2 rounded-[16px] border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.58)]">
+
+          {/*촬영 가이드 라인*/}
+              {/* 세로 보조선 */}
+            <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/40" />
+
+              {/* 가로 보조선 */}
+            <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-white/40" />
+
+              {/* 배꼽 중앙점 */}
+            <div className="absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F19ED2]" />
+          </div>
+          {/* */}
 
           {/*카메라 닫기 */}
           <Button
@@ -189,10 +209,13 @@ export function CameraCapture() {
           <Button
             type="button"
             onClick={capturePhoto}
-            className="absolute bottom-3 left-1/2 h-10 -translate-x-1/2 rounded-full bg-white px-5 text-[#484C52] hover:bg-white/90"
+            className=" absolute bottom-[calc(env(safe-area-inset-bottom)+70px)] left-1/2
+                z-30 flex size-[90px] -translate-x-1/2 items-center justify-center rounded-full border-[3px]
+                border-white bg-transparent p-[6px] transition-transform active:scale-95"
           >
-            <Camera aria-hidden="true" className="size-4" />
-            촬영
+            <div className="block size-full rounded-full bg-white">
+
+            </div>
           </Button>
         </div>
       ) : null}
