@@ -9,6 +9,7 @@ interface CheckinFlowState {
   hasStretchMarks: boolean | null
 
   setStep: (step: number) => void
+  prevStep: () => void
   nextStep: () => void
 
   setConditionScore: (score: number) => void
@@ -36,6 +37,7 @@ export const useCheckinFlowStore = create<CheckinFlowState>((set) => ({
   setStep: (step) => set({ step }),
 
   nextStep: () => set((state) => ({step: Math.min(state.step + 1, 4),})),
+  prevStep: () => set((state) => ({step: Math.max(state.step - 1, 1),})),
   
   setConditionScore: (conditionScore) => set({ conditionScore }),
   setSelectedBodyPart: (selectedBodyPart) => set({ selectedBodyPart }),

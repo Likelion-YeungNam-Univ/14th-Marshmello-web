@@ -11,6 +11,7 @@ export function CheckinPage() {
   //zustand store에서 step과 nextStep 가져오기
   const step = useCheckinFlowStore((state) => state.step)
   const nextStep = useCheckinFlowStore((state) => state.nextStep)
+  const prevStep = useCheckinFlowStore((state) => state.prevStep)
 
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
   const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
@@ -62,8 +63,10 @@ export function CheckinPage() {
       
       <div className=" relative flex flex-row items-center justify-center w-[329px] h-[50px] font-Medium text-black ">
         {/*뒤로가기 버튼*/}
-        <Button className="absolute left-0 w-[45px] h-[30px] bg-[#484C52] rounded-[15px] text-white font-Medium text-[16px] items-center justify-center">
-          &lt;
+        <Button onClick={prevStep} className="absolute bg-transparent left-0 items-center justify-center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.6283 0C17.8319 0 18.0402 0.0804844 18.1964 0.236695C18.5088 0.549117 18.5088 1.06036 18.1964 1.37278L7.50286 12.071L18.0402 22.6083C18.3526 22.9207 18.3526 23.432 18.0402 23.7444C17.7277 24.0568 17.2165 24.0568 16.9041 23.7444L5.79877 12.6391C5.48635 12.3267 5.48635 11.8154 5.79877 11.503L17.0603 0.236719C17.2165 0.0805078 17.4248 4.6875e-05 17.6283 4.6875e-05L17.6283 0Z" fill="black"/>
+          </svg>
         </Button>
 
         {/*오늘의 체크인*/}
