@@ -115,6 +115,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     boxShadow: "0 4px 14px rgba(0, 0, 0, 0.05)",
   },
+  
   googleIcon: {
     width: 22,
     height: 22,
