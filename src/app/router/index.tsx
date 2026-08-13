@@ -18,6 +18,7 @@ export const router = createBrowserRouter([
       { path: "camera" },
       { path: "records" },
       { path: "care", element: <CarePage /> },
+      { path: "massage-guide", element: <MassageGuidePage /> },
       { path: "contents/:contentId", element: <ContentDetailPage /> },
     ],
   },
