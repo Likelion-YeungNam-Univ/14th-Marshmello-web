@@ -28,7 +28,7 @@ export function Navbar() {
               className={function ({ isActive }) {
                   return `
                     flex flex-col items-center justify-center gap-1 text-[12px]
-                    ${isActive ? "text-[#D3A43B]" : "text-[#50545A]"} 
+                    ${isActive ? "text-[#F19ED2]" : "text-[#484C52]"}
                   `
               }} 
             >
