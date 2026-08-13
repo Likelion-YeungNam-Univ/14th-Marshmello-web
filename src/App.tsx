@@ -6,9 +6,9 @@ import SplashScreen from "@/shared/components/ui/splash-screen";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const location = useLocation(); // 현재 URL 주소 확인 도구
+  const location = useLocation(); // 현재 URL 주소 확인
 
-  // 1. 하단 바를 숨길 주소 목록
+  //하단 바 숨길 주소 목록
   const hideNavbarPaths = ["/login", "/signup"];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
@@ -22,13 +22,12 @@ export default function App() {
   }
 
   return (
-    // Navbar가 없을 때는 하단 여백(pb-[82px])도 제거
     <div className={`min-h-dvh ${shouldHideNavbar ? "" : "pb-[82px]"}`}>
       <main>
         <Outlet />
       </main>
 
-      {/* 2. shouldHideNavbar가 false일 때만 Navbar 렌더링 */}
+      {/* shouldHideNavbar가 false일 때만 Navbar 렌더링 */}
       {!shouldHideNavbar && <Navbar />}
     </div>
   );

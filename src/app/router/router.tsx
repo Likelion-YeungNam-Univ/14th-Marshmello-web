@@ -9,7 +9,6 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        // 핵심: "/" 주소로 오면 "/login"으로 무조건 쫓아냅니다(리다이렉트).
         index: true, 
         element: <Navigate to="/login" replace />, 
       },
