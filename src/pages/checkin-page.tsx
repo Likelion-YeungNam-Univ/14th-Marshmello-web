@@ -3,9 +3,10 @@ import { Slider } from "@/shared/components/ui/slider"
 import { Textarea } from "@/shared/components/ui/textarea"
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/shared/components/ui/tabs"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
+import { CameraCapture } from "@/features/camera/camera-capture"
 
 export function CheckinPage() {
-  
+
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
   const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
   
@@ -197,17 +198,16 @@ export function CheckinPage() {
           )}
 
           {(step === 2) && (
-            <div className="flex flex-col w-[291px] items-start justify-center gap-2">
+            <div className="flex w-[344px] flex-col items-start justify-center gap-8">
               {/*page2*/}
-              
+               
             {/*오늘 배의 피부결을 확인해보아요, page2*/}
                <p className="text-black font-medium text-[20px]">
-                사진을 업로드 해주세요
+                 사진을 업로드 해주세요
               </p>
-              
+               
               {/*사진 촬영 기능*/}
-              {/*카메라 ui + MediaDevices API*/}
-              {/*로딩창, 성공 or 실패*/}
+              <CameraCapture />
             </div>    
           )}
 
@@ -345,7 +345,9 @@ export function CheckinPage() {
 
                 {/*그냥 그래요*/}
                 <div className="flex flex-col items-center justify-center gap-1 hover:scale-110">
-                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    className="cursor-pointer transition-all duration-300 hover:drop-shadow-[0_0_8px_#F4B7A3]"
+                  >
                     <circle cx="22" cy="22" r="22" fill="#C9CDFE"/>
                     <circle cx="16.7559" cy="17.0118" r="5.24419" fill="white"/>
                     <circle cx="16.8839" cy="17.1392" r="2.30233" fill="black"/>
