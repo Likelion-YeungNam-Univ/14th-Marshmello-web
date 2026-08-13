@@ -5,20 +5,10 @@ import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/shared/components/ui
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 
 export function CheckinPage() {
-  //zustand store에서 memo와 setMemo 가져오기
-  const memo = useCheckinFlowStore((state) => state.memo)
-  const setMemo = useCheckinFlowStore((state) => state.setMemo)
-  //zustand store에서 step과 nextStep 가져오기
-  const step = useCheckinFlowStore((state) => state.step)
-  const nextStep = useCheckinFlowStore((state) => state.nextStep)
-  const prevStep = useCheckinFlowStore((state) => state.prevStep)
-
+  
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
   const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
   
-  const hasStretchMarks = useCheckinFlowStore((state) => state.hasStretchMarks)
-  const setHasStretchMarks = useCheckinFlowStore((state) => state.setHasStretchMarks)
-
   //바디맵 부위 별 매핑
   const BodyPart = [
     {id : 1, part : "가슴", x: 100, y: 40},
@@ -30,6 +20,7 @@ export function CheckinPage() {
     {id : 7, part : "오른다리", x: 140, y: 220},
   ]
 
+  //현재 바디맵에서 선택한 부위의 id로 부위 맵핑
   const selectedPart = BodyPart.find(
     (part) => part.id === selectedBodyPart,
   )
@@ -39,6 +30,36 @@ export function CheckinPage() {
     setSelectedBodyPart(part)
   }
 
+  //zustand store에서 memo와 setMemo 가져오기
+  const memo = useCheckinFlowStore((state) => state.memo)
+  const setMemo = useCheckinFlowStore((state) => state.setMemo)
+  //zustand store에서 step과 nextStep 가져오기
+  const step = useCheckinFlowStore((state) => state.step)
+  const nextStep = useCheckinFlowStore((state) => state.nextStep)
+  const prevStep = useCheckinFlowStore((state) => state.prevStep)
+
+  //zustand store에서 케어카드 실천여부
+  const practiceCare = useCheckinFlowStore((state) => state.practiceCare)
+  const setPracticeCare = useCheckinFlowStore((state) => state.setPracticeCare)
+
+  //zustand store에서 튼살 여부 
+  const hasStretchMarks = useCheckinFlowStore((state) => state.hasStretchMarks)
+  const setHasStretchMarks = useCheckinFlowStore((state) => state.setHasStretchMarks)
+
+  //zustand store에서 추천행동 만족도 여부
+  const conditionScore = useCheckinFlowStore((state) => state.conditionScore)
+  const setConditionScore = useCheckinFlowStore((state) => state.setConditionScore)
+
+  //버튼 별 만족도 맵핑
+  const satisfactionOptions = [
+    { score: 1, label: "매우 불만족" },
+    { score: 2, label: "불만족" },
+    { score: 3, label: "보통" },
+    { score: 4, label: "만족" },
+    { score: 5, label: "매우 만족" },
+  ]
+
+  
   //진행도 표시 컴포넌트
   const CheckinStep = ({ step }: { step: number }) => {
     return (
@@ -63,20 +84,14 @@ export function CheckinPage() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8 mt-[86px] " >
+    <div className="flex flex-col items-center justify-center gap-8  " >
       
-      <div className=" relative w-[344px] h-[20px]  ">
+      <div className="relative mt-[86px] h-[20px] w-full max-w-[393px] px-6 ">
         {/*뒤로가기 버튼*/}
-        <Button onClick={prevStep} className="absolute
-          left-0
-          top-1/2
-          h-6
-          w-6
-         -translate-y-1/2
-          bg-transparent
-          p-0
-          shadow-none
-          hover:bg-transparent">
+        <Button
+          onClick={prevStep}
+          className="absolute left-6 top-1/2 h-6 w-6 -translate-y-1/2 bg-transparent p-0 shadow-none hover:bg-transparent"
+        >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.6283 0C17.8319 0 18.0402 0.0804844 18.1964 0.236695C18.5088 0.549117 18.5088 1.06036 18.1964 1.37278L7.50286 12.071L18.0402 22.6083C18.3526 22.9207 18.3526 23.432 18.0402 23.7444C17.7277 24.0568 17.2165 24.0568 16.9041 23.7444L5.79877 12.6391C5.48635 12.3267 5.48635 11.8154 5.79877 11.503L17.0603 0.236719C17.2165 0.0805078 17.4248 4.6875e-05 17.6283 4.6875e-05L17.6283 0Z" fill="black"/>
           </svg>
@@ -107,33 +122,31 @@ export function CheckinPage() {
       <div className="flex flex-col items-center justify-start gap-4">  
           {/*page1*/}
           {(step === 1) && (
-            <div className="flex flex-col w-[344px] items-start justify-center gap-2">
+            <div className="flex flex-col w-[344px] items-start justify-center gap-8">
               {/*어제 케어카드를 실천하셨나요?, page1*/}
               <p className="text-black font-medium text-[20px]">
                 어제 케어카드를 실천하셨나요?
               </p>
 
-              <div className="flex text-[11px] gap-1">
-                          {/*있음*/}
-                          <Button 
-                            type="button"
-                            //aria-pressed={hasStretchMarks === true}
-                            //onClick={() => setHasStretchMarks(true)}
-                            className={hasStretchMarks === true ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]" : "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
-                          >
-                            네
-                          </Button>
+              <div className="flex text-[11px] gap-2">
+                {/*케어카드 '네' 버튼*/}
+                <Button 
+                  aria-pressed={practiceCare === true}
+                  onClick={() => setPracticeCare(true)}
+                  className={`transition-colors duration-200 border border-[#787D84] text-[20px] font-light  w-[157px] h-[40px] rounded-[20px] font-['Pretendard'] ${practiceCare === true ? "bg-[#F19ED2] text-white" : "bg-[#FFFFFF] text-black"}`}
+                  >
+                  네
+                </Button>
 
-                          {/*없음*/}
-                          <Button
-                            type="button"
-                            //aria-pressed={hasStretchMarks === false}
-                            //onClick={() => setHasStretchMarks(false)}
-                            className={hasStretchMarks === false ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]": "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
-                          >
-                            아니요
-                          </Button>
-                        </div>
+                {/*케어카드 '아니요' 버튼*/}
+                <Button
+                  aria-pressed={practiceCare === false}
+                  onClick={() => setPracticeCare(false)}
+                  className={`transition-colors duration-200 border border-[#787D84] text-[20px] font-light  w-[157px] h-[40px] rounded-[20px] font-['Pretendard'] ${practiceCare === false ? "bg-[#F19ED2] text-white" : "bg-[#FFFFFF] text-black"}`}
+                  >
+                  아니요
+                </Button>
+              </div>
 
               {/*실천사항 박스*/}
               {/* 
@@ -156,8 +169,29 @@ export function CheckinPage() {
                 추천행동이 마음에 드셨나요?
               </p>
 
-              {/*만족도 조사, RadioGroup 사용할 예정*/}
-              <Slider defaultValue={[50]} max={100} step={1} className="w-[329px] h-[8px] rounded-[15px] bg-[#D9D9D9]" />
+              {/*만족도 조사, RadioGroup*/}
+              <div className="flex w-full justify-between">
+                {satisfactionOptions.map((option) => {
+                  const isSelected = conditionScore === option.score
+
+                  return (
+                    <div key={option.score} className="flex flex-col items-center gap-2">
+                      <Button
+                        role="radio"
+                        aria-checked={isSelected}
+                        onClick={() => setConditionScore(option.score)}
+                        className={`h-5 w-5 rounded-full border transition-colors ${isSelected ? "border-[#F19ED2] bg-[#F19ED2]" : "border-[#D9D9D9] bg-white"}`}
+                      />
+
+                      {(option.score === 1 || option.score === 5) && (
+                        <span className="whitespace-nowrap rounded-md bg-[#E6A3D2] px-2 py-1 text-[8px] text-black">
+                          {option.label}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
               {/*만족도 조사*/}
             </div>
           )}
@@ -234,7 +268,6 @@ export function CheckinPage() {
                         <div className="flex text-[11px] gap-1">
                           {/*있음*/}
                           <Button 
-                            type="button"
                             aria-pressed={hasStretchMarks === true}
                             onClick={() => setHasStretchMarks(true)}
                             className={hasStretchMarks === true ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]" : "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
@@ -244,7 +277,6 @@ export function CheckinPage() {
 
                           {/*없음*/}
                           <Button
-                            type="button"
                             aria-pressed={hasStretchMarks === false}
                             onClick={() => setHasStretchMarks(false)}
                             className={hasStretchMarks === false ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]": "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
