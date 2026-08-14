@@ -185,7 +185,7 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
         </Link>
       </header>
 
-      <div className="flex flex-col items-center px-8 pt-10 pb-[37px]">
+      <div className="flex flex-1 flex-col items-center px-8 pt-10 pb-[37px]">
         <p className="text-center text-[13px] leading-[19.5px] font-semibold tracking-[1.82px] text-[#f19ed2]">
           MASSAGE GUIDE
         </p>
@@ -220,7 +220,7 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
         </div>
 
         <motion.button
-          className="mt-[60px] flex h-14 w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none transition-[filter] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2] focus-visible:ring-offset-2 active:brightness-90"
+          className="mt-auto flex h-14 w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none transition-[filter] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2] focus-visible:ring-offset-2 active:brightness-90"
           onClick={onStart}
           type="button"
           whileTap={{ scale: 0.98 }}
