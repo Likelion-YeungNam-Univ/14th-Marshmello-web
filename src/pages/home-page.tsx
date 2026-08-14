@@ -53,9 +53,7 @@ export function HomePage() {
   ].join("-")
 
   return (
-    <main
-      className="w-full bg-[#E3C5E5] px-4 pb-16 pt-6 text-black sm:px-6"
-    >
+    <main className="w-full px-4 pb-16 pt-6 text-black sm:px-6">
       <section className="mx-auto w-full max-w-[460px]">
         {/* 이 시기에 흔히 겪는 변화 안내 */}
         <div className="rounded-full bg-white px-5 py-[17px] text-center shadow-[0_6px_12px_rgba(57,41,62,0.2)]">

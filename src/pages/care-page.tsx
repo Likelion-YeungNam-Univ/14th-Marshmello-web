@@ -5,7 +5,7 @@ import { TodayCareCard } from "@/features/care/ui/today-care-card"
 
 export function CarePage() {
   return (
-    <main className="mx-auto min-h-svh w-full max-w-[393px] overflow-hidden bg-background pt-8">
+    <main className="mx-auto min-h-svh w-full max-w-[393px] overflow-hidden pt-8">
       <TodayCareCard card={mockTodayCareCard} />
 
       <section aria-labelledby="massage-guide-title" className="mt-8">
