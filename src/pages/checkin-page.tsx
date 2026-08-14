@@ -6,7 +6,14 @@ import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-s
 import { CameraCapture } from "@/features/camera/camera-capture"
 
 import { CheckinAnimation, type CheckinDirection,} from "@/features/checkin/ui/checkin-animation"
-import { Direction } from "radix-ui"
+
+import chestSvg from "@/features/checkin/bodymap/chest.svg"
+import abdomenSvg from "@/features/checkin/bodymap/abdomen.svg"
+import pelvisSvg from "@/features/checkin/bodymap/pelvis.svg"
+import leftArmSvg from "@/features/checkin/bodymap/left-arm.svg"
+import rightArmSvg from "@/features/checkin/bodymap/right-arm.svg"
+import leftLegSvg from "@/features/checkin/bodymap/left-leg.svg"
+import rightLegSvg from "@/features/checkin/bodymap/right-leg.svg"
 
 export function CheckinPage() {
 
@@ -15,13 +22,13 @@ export function CheckinPage() {
   
   //바디맵 부위 별 매핑
   const BodyPart = [
-    {id: 1, part: "가슴", left: "40%", top: "10.2%"},
-    {id : 2, part : "복부", x: 100, y: 90},
-    {id : 3, part : "골반", x: 100, y: 140},
-    {id : 4, part : "왼쪽 팔", x: 30, y: 90},
-    {id : 5, part : "오른쪽 팔", x: 170, y: 90},
-    {id : 6, part : "왼쪽 다리", x: 70, y: 220},
-    {id : 7, part : "오른쪽 다리", x: 140, y: 220},
+    {id : 1, part : "가슴", image: chestSvg, x: 99, y: 88},
+    {id : 2, part : "복부", image: abdomenSvg,x: 100, y: 137},
+    {id : 3, part : "골반", image: pelvisSvg, x: 95, y: 170},
+    {id : 4, part : "왼쪽 팔", image: leftArmSvg, x: 45, y: 75},
+    {id : 5, part : "오른쪽 팔", image: rightArmSvg, x: 157, y: 82},
+    {id : 6, part : "왼쪽 다리", image: leftLegSvg, x: 87, y: 180},
+    {id : 7, part : "오른쪽 다리", image: rightLegSvg, x: 130, y: 180},
   ]
 
   //현재 바디맵에서 선택한 부위의 id로 부위 맵핑
@@ -42,13 +49,16 @@ export function CheckinPage() {
   const nextStep = useCheckinFlowStore((state) => state.nextStep)
   const prevStep = useCheckinFlowStore((state) => state.prevStep)
 
+  //버튼에 따라서 애니메이션 방향 변경을 위한 useState
   const [direction, setDirection] = useState<CheckinDirection>(1)
 
+  //버튼 클릭 시 애니메이션 + 다음 페이지 이동
   const handleNextStep = () => {
     setDirection(1)
     nextStep()
   }
 
+  //버튼 클릭 시 애니메이션 + 이전 페이지 이동
   const handlePrevStep = () => {
     setDirection(-1)
     prevStep()
@@ -75,7 +85,6 @@ export function CheckinPage() {
     { score: 5, label: "매우 만족" },
   ]
 
-  
   //진행도 표시 컴포넌트
   const CheckinStep = ({ step }: { step: number }) => {
     return (
@@ -92,12 +101,6 @@ export function CheckinPage() {
       </div>
     );
 }
-
-  const today = new Date().toLocaleDateString("ko-KR", {
-    month: "long",
-    day: "numeric",
-    weekday: "long",
-  });
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col items-center gap-8 overflow-x-hidden bg-white">
@@ -120,13 +123,6 @@ export function CheckinPage() {
       </div>
       {/*진행도*/}
       <div className="flex flex-col items- w-[291px] h-[10px] justify-between">
-        
-          {/*날짜*/}
-          {/*
-          <p className="text-[12px] text-black font-bold">
-            { today }
-          </p>
-          */}
         
         {/*진행상황, Progress 사용할 예정*/}
         <div className="self-end">      
@@ -243,15 +239,30 @@ export function CheckinPage() {
               <div className="relative w-[250px] h-[392px] self-center">
                 {/*바디맵*/}
                 {BodyPart.map((part) => {
-                  return(   
-                    <button 
-                      key = {part.id} 
+                  const isSelected = selectedBodyPart === part.id
+
+                  return (
+                    <button
+                      key={part.id}
                       type="button"
-                      className="absolute z-10 rounded bg-[#F19ED2] px-1 py-1 text-xs"
-                      style={{left : part.x, top : part.y,}}
                       onClick={() => touchTabs(part.id)}
+                      className="absolute z-10 bg-transparent p-0"
+                      style={{
+                        left: part.x,
+                        top: part.y,
+                      }}
                     >
-                    </button>  
+                      <img
+                        src={part.image}
+                        alt=""
+                        draggable={false}
+                        className={`pointer-events-none block h-auto w-auto ${
+                          isSelected
+                            ? "drop-shadow-[0_0_3px_rgba(241,158,210,1)]"
+                            : ""
+                        }`}
+                      />
+                    </button>
                   )
                 })}
 
