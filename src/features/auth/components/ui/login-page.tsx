@@ -1,6 +1,6 @@
 // src/features/auth/components/login-page.tsx
 import React from "react";
-import GoogleIcon from "@/features/auth/components/google-icon";
+import GoogleIcon from "@/features/auth/components/ui/google-icon";
 
 export default function LoginPage() {
   const handleGoogleLogin = () => {
@@ -115,7 +115,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     boxShadow: "0 4px 14px rgba(0, 0, 0, 0.05)",
   },
-  
+
   googleIcon: {
     width: 22,
     height: 22,

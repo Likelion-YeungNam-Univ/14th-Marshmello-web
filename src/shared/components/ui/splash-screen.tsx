@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import logoImg from "@/assets/care/logo.png";
+import logoImg from "@/assets/logo.png";
+
 
 interface SplashScreenProps {
   /** 스플래시 노출 시간(ms). 기본값 5000ms (5초) */
@@ -50,9 +51,9 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     position: "relative",
     width: "100%",
-    maxWidth: "393px", // 아이폰 14 Pro 기준 너비
-    height: "100dvh",  // iOS 사파리 주소창 대응 높이
-    margin: "0 auto",   // PC 화면 시 중앙 정렬
+    maxWidth: "393px", // 아이폰 14 Pro
+    height: "100dvh",  
+    margin: "0 auto",   
     background:
       "linear-gradient(180deg, #F6BFD3 0%, #F8CBDB 30%, #FBDFE9 60%, #FDF0EF 100%)",
     display: "flex",
