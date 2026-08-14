@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type PropsWithChildren } from "react"
+import {
+  AnimatePresence,
+  motion,
+  MotionConfig,
+  type Variants,
+} from "framer-motion"
 import { ChevronLeft } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -20,13 +26,47 @@ import {
 
 const SCREEN_DURATION_MS = 5000
 const STEP_FRAME_CLASS_NAME =
-  "mx-auto h-[849px] w-full max-w-[393px] overflow-hidden bg-[#e8c5e5]"
+  "mx-auto h-[849px] w-full max-w-[393px] overflow-hidden bg-transparent"
 const STEP_HEADER_CLASS_NAME =
-  "flex h-[66px] items-center justify-between px-5 pt-6"
+  "relative z-10 flex h-[66px] items-center justify-between bg-[#e8c5e5] px-5 pt-6"
 const STEP_CONTENT_CLASS_NAME =
   "relative mt-5 h-[744px] rounded-t-[26px] bg-white px-7 pt-8"
 const STEP_HINT_CLASS_NAME =
   "absolute right-7 bottom-7 left-7 text-center text-[13px] leading-[19.5px] text-[#a8a290]"
+
+const stepCardVariants: Variants = {
+  enter: {
+    opacity: 0,
+  },
+  center: {
+    opacity: 1,
+    transition: {
+      duration: 0.5,
+      ease: "easeInOut",
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeInOut",
+    },
+  },
+}
+
+function MassageStepCard({ children }: PropsWithChildren) {
+  return (
+    <motion.section
+      animate="center"
+      className={STEP_CONTENT_CLASS_NAME}
+      exit="exit"
+      initial="enter"
+      variants={stepCardVariants}
+    >
+      {children}
+    </motion.section>
+  )
+}
 
 function useTimedProgress(onComplete: () => void, durationMs: number) {
   const [progress, setProgress] = useState(0)
@@ -84,7 +124,7 @@ function TimedStepProgress({ progress, step }: TimedStepProgressProps) {
       aria-valuemax={100}
       aria-valuemin={0}
       aria-valuenow={Math.round(normalizedProgress)}
-      className="flex gap-1.5 px-5 pt-4"
+      className="relative z-10 flex gap-1.5 bg-[#e8c5e5] px-5 pt-4"
       role="progressbar"
     >
       {Array.from({ length: 5 }, (_, index) => {
@@ -146,7 +186,16 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
           마사지 가이드
         </h1>
 
-        <div className="mt-[25px] flex h-[411px] w-full items-center justify-center overflow-hidden rounded-[26px] bg-[linear-gradient(128.6768deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)] pt-[22px]">
+        <motion.div
+          animate={{ opacity: 1 }}
+          className="mt-[25px] flex h-[411px] w-full items-center justify-center overflow-hidden rounded-[26px] bg-[linear-gradient(128.6768deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)] pt-[22px]"
+          initial={{ opacity: 0 }}
+          transition={{
+            delay: 0.1,
+            duration: 0.6,
+            ease: "easeInOut",
+          }}
+        >
           <div className="relative h-[395px] w-[371px] shrink-0">
             <img
               alt="임산부가 배를 부드럽게 마사지하는 모습"
@@ -154,7 +203,7 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
               src={introIllustration}
             />
           </div>
-        </div>
+        </motion.div>
 
         <div className="mt-[43px] text-center text-[19px] leading-[30.4px] tracking-[-0.2px]">
           <p className="font-semibold text-[#26292e]">
@@ -163,13 +212,14 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
           <p className="font-medium text-[#6a6e75]">시작해볼까요?</p>
         </div>
 
-        <button
-          className="mt-[78.2px] flex h-14 w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none transition-[filter,transform] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2] focus-visible:ring-offset-2 active:translate-y-px active:brightness-90"
+        <motion.button
+          className="mt-[78.2px] flex h-14 w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none transition-[filter] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2] focus-visible:ring-offset-2 active:brightness-90"
           onClick={onStart}
           type="button"
+          whileTap={{ scale: 0.98 }}
         >
           시작하기
-        </button>
+        </motion.button>
       </div>
     </article>
   )
@@ -201,7 +251,7 @@ function MassageGuideStepOne({ onBack, onNext }: MassageGuideStepOneProps) {
 
       <TimedStepProgress progress={progress} step={1} />
 
-      <section className={STEP_CONTENT_CLASS_NAME}>
+      <MassageStepCard>
         <div className="flex h-[701px] flex-col">
           <p className="text-[13px] leading-[19.5px] font-semibold tracking-[1.04px] text-[#f19ed2]">
             STEP 1
@@ -230,7 +280,7 @@ function MassageGuideStepOne({ onBack, onNext }: MassageGuideStepOneProps) {
             잠시 후 다음 단계로 자동 전환돼요
           </p>
         </div>
-      </section>
+      </MassageStepCard>
     </article>
   )
 }
@@ -261,7 +311,7 @@ function MassageGuideStepTwo({ onBack, onNext }: MassageGuideStepTwoProps) {
 
       <TimedStepProgress progress={progress} step={2} />
 
-      <section className={STEP_CONTENT_CLASS_NAME}>
+      <MassageStepCard>
         <div className="flex h-[711px] flex-col">
           <p className="text-[13px] leading-[19.5px] font-semibold tracking-[1.04px] text-[#f19ed2]">
             STEP 2
@@ -293,7 +343,7 @@ function MassageGuideStepTwo({ onBack, onNext }: MassageGuideStepTwoProps) {
             잠시 후 다음 단계로 자동 전환돼요
           </p>
         </div>
-      </section>
+      </MassageStepCard>
     </article>
   )
 }
@@ -324,7 +374,7 @@ function MassageGuideStepThree({ onBack, onNext }: MassageGuideStepThreeProps) {
 
       <TimedStepProgress progress={progress} step={3} />
 
-      <section className={STEP_CONTENT_CLASS_NAME}>
+      <MassageStepCard>
         <p className="text-[13px] leading-[19.5px] font-semibold tracking-[1.04px] text-[#f19ed2]">
           STEP 3
         </p>
@@ -352,7 +402,7 @@ function MassageGuideStepThree({ onBack, onNext }: MassageGuideStepThreeProps) {
         <p className={STEP_HINT_CLASS_NAME}>
           잠시 후 다음 단계로 자동 전환돼요
         </p>
-      </section>
+      </MassageStepCard>
     </article>
   )
 }
@@ -383,7 +433,7 @@ function MassageGuideStepFour({ onBack, onNext }: MassageGuideStepFourProps) {
 
       <TimedStepProgress progress={progress} step={4} />
 
-      <section className={STEP_CONTENT_CLASS_NAME}>
+      <MassageStepCard>
         <p className="text-[13px] leading-[19.5px] font-semibold tracking-[1.04px] text-[#f19ed2]">
           STEP 4
         </p>
@@ -413,7 +463,7 @@ function MassageGuideStepFour({ onBack, onNext }: MassageGuideStepFourProps) {
         <p className={STEP_HINT_CLASS_NAME}>
           잠시 후 다음 단계로 자동 전환돼요
         </p>
-      </section>
+      </MassageStepCard>
     </article>
   )
 }
@@ -444,7 +494,7 @@ function MassageGuideStepFive({ onBack, onComplete }: MassageGuideStepFiveProps)
 
       <TimedStepProgress progress={progress} step={5} />
 
-      <section className={STEP_CONTENT_CLASS_NAME}>
+      <MassageStepCard>
         <p className="text-[13px] leading-[19.5px] font-semibold tracking-[1.04px] text-[#f19ed2]">
           STEP 5
         </p>
@@ -470,7 +520,7 @@ function MassageGuideStepFive({ onBack, onComplete }: MassageGuideStepFiveProps)
         <p className={STEP_HINT_CLASS_NAME}>
           잠시 후 마사지 가이드가 종료돼요
         </p>
-      </section>
+      </MassageStepCard>
     </article>
   )
 }
@@ -547,47 +597,81 @@ export function MassageGuidePage() {
   const [screen, setScreen] = useState<MassageGuideScreen>("intro")
   const [isComplete, setIsComplete] = useState(false)
 
+  const changeScreen = (nextScreen: MassageGuideScreen) => {
+    setScreen(nextScreen)
+  }
+
   const replayMassageGuide = () => {
     setIsComplete(false)
     setScreen("step-one")
   }
 
+  const renderScreen = () => {
+    switch (screen) {
+      case "intro":
+        return <MassageGuideIntro onStart={() => changeScreen("step-one")} />
+      case "step-one":
+        return (
+          <MassageGuideStepOne
+            onBack={() => changeScreen("intro")}
+            onNext={() => changeScreen("step-two")}
+          />
+        )
+      case "step-two":
+        return (
+          <MassageGuideStepTwo
+            onBack={() => changeScreen("step-one")}
+            onNext={() => changeScreen("step-three")}
+          />
+        )
+      case "step-three":
+        return (
+          <MassageGuideStepThree
+            onBack={() => changeScreen("step-two")}
+            onNext={() => changeScreen("step-four")}
+          />
+        )
+      case "step-four":
+        return (
+          <MassageGuideStepFour
+            onBack={() => changeScreen("step-three")}
+            onNext={() => changeScreen("step-five")}
+          />
+        )
+      case "step-five":
+        return (
+          <MassageGuideStepFive
+            onBack={() => changeScreen("step-four")}
+            onComplete={() => setIsComplete(true)}
+          />
+        )
+    }
+  }
+
   return (
-    <main className="min-h-svh bg-white">
-      {screen === "intro" ? (
-        <MassageGuideIntro onStart={() => setScreen("step-one")} />
-      ) : null}
-      {screen === "step-one" ? (
-        <MassageGuideStepOne
-          onBack={() => setScreen("intro")}
-          onNext={() => setScreen("step-two")}
-        />
-      ) : null}
-      {screen === "step-two" ? (
-        <MassageGuideStepTwo
-          onBack={() => setScreen("step-one")}
-          onNext={() => setScreen("step-three")}
-        />
-      ) : null}
-      {screen === "step-three" ? (
-        <MassageGuideStepThree
-          onBack={() => setScreen("step-two")}
-          onNext={() => setScreen("step-four")}
-        />
-      ) : null}
-      {screen === "step-four" ? (
-        <MassageGuideStepFour
-          onBack={() => setScreen("step-three")}
-          onNext={() => setScreen("step-five")}
-        />
-      ) : null}
-      {screen === "step-five" ? (
-        <MassageGuideStepFive
-          onBack={() => setScreen("step-four")}
-          onComplete={() => setIsComplete(true)}
-        />
-      ) : null}
-      <MassageCompleteDialog open={isComplete} onReplay={replayMassageGuide} />
-    </main>
+    <MotionConfig reducedMotion="user">
+      <motion.main
+        animate={{ opacity: 1 }}
+        className="min-h-svh bg-white"
+        initial={{ opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+      >
+        <div
+          className={`relative min-h-svh ${
+            screen === "intro" ? "bg-white" : "bg-[#e8c5e5]"
+          }`}
+        >
+          <AnimatePresence initial={false} mode="sync">
+            <motion.div
+              className="absolute inset-x-0 top-0 min-h-svh"
+              key={screen}
+            >
+              {renderScreen()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        <MassageCompleteDialog open={isComplete} onReplay={replayMassageGuide} />
+      </motion.main>
+    </MotionConfig>
   )
 }
