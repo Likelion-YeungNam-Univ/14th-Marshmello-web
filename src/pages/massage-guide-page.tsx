@@ -185,17 +185,17 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
         </Link>
       </header>
 
-      <div className="flex flex-col items-center px-8 pt-4 pb-[37px]">
+      <div className="flex flex-col items-center px-8 pt-10 pb-[37px]">
         <p className="text-center text-[13px] leading-[19.5px] font-semibold tracking-[1.82px] text-[#f19ed2]">
           MASSAGE GUIDE
         </p>
-        <h1 className="mt-[25.5px] text-center text-[22px] leading-[33px] font-semibold tracking-[-0.4px] text-[#26292e]">
+        <h1 className="mt-2 text-center text-[22px] leading-[33px] font-semibold tracking-[-0.4px] text-[#26292e]">
           마사지 가이드
         </h1>
 
         <motion.div
           animate={{ opacity: 1 }}
-          className="mt-[25px] flex h-[411px] w-full items-center justify-center overflow-hidden rounded-[26px] bg-[linear-gradient(128.6768deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)] pt-[22px]"
+          className="relative mt-10 size-[329px] shrink-0 overflow-hidden rounded-[26px] bg-[linear-gradient(128.6768deg,#fdf1f8_0%,#fdf3f9_7.1429%,#fef5fa_14.286%,#fef7fb_21.429%,#fef9fc_28.571%,#fefbfd_35.714%,#fffdfE_42.857%,#fff_50%,#fefdfE_57.143%,#fefafc_64.286%,#fdf8fb_71.429%,#fdf5fa_78.571%,#fcf3f9_85.714%,#fcf0f7_92.857%,#fbeef6_100%)]"
           initial={{ opacity: 0 }}
           transition={{
             delay: 0.1,
@@ -203,16 +203,16 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
             ease: "easeInOut",
           }}
         >
-          <div className="relative h-[395px] w-[371px] shrink-0">
+          <div className="absolute -top-[88px] -left-[58px] size-[446px]">
             <img
               alt="임산부가 배를 부드럽게 마사지하는 모습"
-              className="absolute top-[9.89%] left-[17.79%] h-[80.54%] w-[64.89%] max-w-none"
+              className="pointer-events-none absolute inset-0 size-full max-w-none object-contain"
               src={introIllustration}
             />
           </div>
         </motion.div>
 
-        <div className="mt-[43px] text-center text-[19px] leading-[30.4px] tracking-[-0.2px]">
+        <div className="mt-9 text-center text-[19px] leading-[30.4px] tracking-[-0.2px]">
           <p className="font-semibold text-[#26292e]">
             몸이 편해지는 마사지 시간
           </p>
@@ -220,7 +220,7 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
         </div>
 
         <motion.button
-          className="mt-[78.2px] flex h-14 w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none transition-[filter] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2] focus-visible:ring-offset-2 active:brightness-90"
+          className="mt-[60px] flex h-14 w-full items-center justify-center overflow-hidden rounded-[10px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none transition-[filter] hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2] focus-visible:ring-offset-2 active:brightness-90"
           onClick={onStart}
           type="button"
           whileTap={{ scale: 0.98 }}
