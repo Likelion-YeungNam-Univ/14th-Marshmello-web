@@ -6,6 +6,7 @@ import { CheckinPage } from "@/pages/checkin-page"
 import { ContentDetailPage } from "@/pages/content-detail-page"
 import { HomePage } from "@/pages/home-page"
 import { MassageGuidePage } from "@/pages/massage-guide-page"
+import { MyPage } from "@/pages/mypage-page"
 import { NotFoundPage } from "@/pages/not-found-page"
 
 export const router = createBrowserRouter([
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { path: "care", element: <CarePage /> },
       { path: "massage-guide", element: <MassageGuidePage /> },
       { path: "contents/:contentId", element: <ContentDetailPage /> },
+      { path: "mypage", element: <MyPage /> },
     ],
   },
   { path: "*", element: <NotFoundPage /> },
