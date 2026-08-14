@@ -44,7 +44,7 @@ export function ProfileEditPage() {
   }
 
   return (
-    <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden bg-white px-5 pt-[27px] text-black">
+    <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden px-5 pt-[27px] text-black">
       <button
         aria-label="마이페이지로 돌아가기"
         className="flex size-6 items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/40"

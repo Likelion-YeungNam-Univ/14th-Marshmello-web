@@ -26,7 +26,7 @@ export function ContentDetailPage() {
 
   if (!content) {
     return (
-      <main className="mx-auto min-h-svh w-full max-w-[393px] bg-[#f5f6f7] p-4">
+      <main className="mx-auto min-h-svh w-full max-w-[393px] p-4">
         <article className="relative rounded-[24px] bg-white px-6 pt-16 pb-8 shadow-[0_8px_24px_rgba(2,20,51,0.08)]">
           <CloseContentButton />
           <h1 className="text-xl font-semibold">콘텐츠를 찾을 수 없습니다.</h1>
@@ -39,7 +39,7 @@ export function ContentDetailPage() {
   }
 
   return (
-    <main className="mx-auto min-h-svh w-full max-w-[393px] bg-[#f5f6f7] p-4">
+    <main className="mx-auto min-h-svh w-full max-w-[393px] p-4">
       <article className="relative rounded-[24px] bg-white px-6 pt-16 pb-8 shadow-[0_8px_24px_rgba(2,20,51,0.08)]">
         <CloseContentButton />
         <img

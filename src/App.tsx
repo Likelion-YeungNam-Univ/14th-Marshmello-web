@@ -1,18 +1,29 @@
-import { useCallback, useState } from "react";
-import { Header } from "@/shared/components/ui/header";
-import { Navbar } from "@/shared/components/ui/navbar";
-import { Outlet, useLocation } from "react-router-dom";
-import SplashScreen from "@/shared/components/ui/splash-screen";
+import { useCallback, useState } from "react"
+import { Outlet, useMatches } from "react-router-dom"
+
+import {
+  PageLayout,
+  type PageLayoutConfig,
+} from "@/shared/components/layout/page-layout"
+import SplashScreen from "@/shared/components/ui/splash-screen"
 
 export type AppOutletContext = {
-  restartSplash: () => void;
-};
+  restartSplash: () => void
+}
+
+type RouteHandle = {
+  pageLayout?: PageLayoutConfig
+}
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState(true);
-  const { pathname } = useLocation();
-  const isImmersivePage = ["/massage-guide", "/mypage/edit"].includes(pathname);
-  const restartSplash = useCallback(() => setShowSplash(true), []);
+  const [showSplash, setShowSplash] = useState(true)
+  const matches = useMatches()
+  const restartSplash = useCallback(() => setShowSplash(true), [])
+  const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
+    (currentLayout, match) =>
+      (match.handle as RouteHandle | undefined)?.pageLayout ?? currentLayout,
+    undefined,
+  )
 
   if (showSplash) {
     return (
@@ -20,18 +31,12 @@ export default function App() {
         durationMs={5000}
         onFinish={() => setShowSplash(false)}
       />
-    );
+    )
   }
 
   return (
-    <div className={`min-h-dvh ${isImmersivePage ? "" : "pb-[82px]"}`}>
-      {isImmersivePage ? null : <Header className="mt-[20px]" />}
-
-      <main>
-        <Outlet context={{ restartSplash }} />
-      </main>
-
-      {isImmersivePage ? null : <Navbar />}
-    </div>
-  );
+    <PageLayout {...pageLayout}>
+      <Outlet context={{ restartSplash }} />
+    </PageLayout>
+  )
 }

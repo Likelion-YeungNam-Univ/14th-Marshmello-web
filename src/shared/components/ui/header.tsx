@@ -11,7 +11,7 @@ export function Header({ className, onLogout, ...props }: HeaderProps) {
   return (
     <header
       className={cn(
-        "mx-auto flex h-4 w-full max-w-[393px] items-center justify-between px-[20px]",
+        "mx-auto flex h-4 w-full max-w-[393px] items-center justify-between bg-transparent px-[20px]",
         className,
       )}
       {...props}

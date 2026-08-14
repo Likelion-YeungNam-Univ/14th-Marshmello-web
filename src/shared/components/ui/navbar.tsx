@@ -13,7 +13,7 @@ const navItems = [
 //navbar 컴포넌트
 export function Navbar() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[#F1F1F1] bg-white pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed inset-x-0 -bottom-px z-50 border-t border-[#F1F1F1] bg-white pb-[env(safe-area-inset-bottom)]">
       {/*4칸으로 나누기 */}
       <div className="mx-auto grid h-[82px] max-w-[430px] grid-cols-4">
         {/*map으로 배열의 요소 메뉴 반복 생성 */}

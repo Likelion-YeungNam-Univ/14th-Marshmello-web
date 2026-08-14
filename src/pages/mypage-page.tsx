@@ -78,7 +78,7 @@ export function MyPage() {
     <>
       <section
         aria-labelledby="mypage-user-name"
-        className="mx-auto min-h-[calc(100svh-82px)] w-full max-w-[393px] bg-white px-5 pt-[117px]"
+        className="mx-auto min-h-[calc(100svh-82px)] w-full max-w-[393px] px-5 pt-[117px]"
       >
         <div className="flex flex-col items-center text-center">
           <img
