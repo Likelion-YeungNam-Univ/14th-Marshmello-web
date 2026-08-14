@@ -11,7 +11,7 @@ export function CheckinPage() {
   
   //바디맵 부위 별 매핑
   const BodyPart = [
-    {id : 1, part : "가슴", x: 100, y: 40},
+    {id: 1, part: "가슴", left: "40%", top: "10.2%"},
     {id : 2, part : "복부", x: 100, y: 90},
     {id : 3, part : "골반", x: 100, y: 140},
     {id : 4, part : "왼쪽 팔", x: 30, y: 90},
@@ -84,7 +84,7 @@ export function CheckinPage() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8  " >
+    <div className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col items-center gap-8 overflow-x-hidden bg-white">
       
       <div className="relative mt-[86px] h-[20px] w-full max-w-[393px] px-6 ">
         {/*뒤로가기 버튼*/}
@@ -119,7 +119,7 @@ export function CheckinPage() {
       </div>
         
       {/*page 별 활성화*/}
-      <div className="flex flex-col items-center justify-start gap-4">  
+      <div className="flex w-full flex-col items-center justify-start gap-4 px-6">
           {/*page1*/}
           {(step === 1) && (
             <div className="flex flex-col w-[344px] items-start justify-center gap-8">

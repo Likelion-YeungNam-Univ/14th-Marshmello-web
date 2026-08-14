@@ -211,7 +211,7 @@ export function CameraCapture() {
         <button
           disabled={cameraStatus === "opening"}
           onClick={() => void startCamera()}
-          className="flex h-[203px] w-[294px] flex-col items-center justify-center rounded-[10px] border border-dashed border-[#B9C0C9] bg-white disabled:cursor-wait"
+          className="flex aspect-[294/203] w-full max-w-[294px] flex-col items-center justify-center rounded-[10px] border border-dashed border-[#B9C0C9] bg-white disabled:cursor-wait"
         >
           <span className="flex h-10 w-[90px] items-center justify-center rounded-lg ">
             <Camera aria-hidden="true" className="size-6 text-[#484C52]" strokeWidth={2} />
@@ -286,7 +286,7 @@ export function CameraCapture() {
 
       {/*촬영 후 */}
       {cameraStatus === "captured" && previewUrl ? (
-        <div className="relative h-[203px] w-[294px] overflow-hidden rounded-[10px] border border-[#E3E5E8] bg-[#F7F7FA]">
+        <div className="relative aspect-[294/203] w-full max-w-[294px] overflow-hidden rounded-[10px] border border-[#E3E5E8] bg-[#F7F7FA]">
           {/*촬영한 사진*/}
           <img
             src={previewUrl}
@@ -334,7 +334,7 @@ export function CameraCapture() {
           {/*사진 다시 촬영하기*/}
           <button
             onClick={retakePhoto}
-            className="flex h-[352px] w-full flex-col items-center justify-center rounded-[15px] border border-[#F04438] bg-white"
+            className="flex aspect-[365/352] w-full w-full flex-col items-center justify-center rounded-[15px] border border-[#F04438] bg-white"
           >
             <span className="flex size-[84px] items-center justify-center rounded-full bg-[#FBE3E3]">
               <CircleAlert
@@ -353,7 +353,7 @@ export function CameraCapture() {
 
       {/*오류 발생 시*/}
       {errorMessage ? (
-        <p role="alert" className="w-[294px] text-center text-[12px] text-red-500">
+        <p role="alert" className="w-full max-w-[294px] text-center text-[12px] text-red-500">
           {errorMessage}
         </p>
       ) : null}
