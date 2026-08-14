@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Header } from "@/shared/components/ui/header";
 import { Navbar } from "@/shared/components/ui/navbar";
 import { Outlet, useLocation } from "react-router-dom";
 import SplashScreen from "@/shared/components/ui/splash-screen";
 
+export type AppOutletContext = {
+  restartSplash: () => void;
+};
+
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const { pathname } = useLocation();
-  const isImmersivePage = pathname === "/massage-guide";
+  const isImmersivePage = ["/massage-guide", "/mypage/edit"].includes(pathname);
+  const restartSplash = useCallback(() => setShowSplash(true), []);
 
   if (showSplash) {
     return (
@@ -23,7 +28,7 @@ export default function App() {
       {isImmersivePage ? null : <Header className="mt-[20px]" />}
 
       <main>
-        <Outlet />
+        <Outlet context={{ restartSplash }} />
       </main>
 
       {isImmersivePage ? null : <Navbar />}
