@@ -13,6 +13,7 @@ import type { AppOutletContext } from "@/App"
 import profilePlaceholder from "@/assets/mypage/profile-placeholder.svg"
 import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 import { AccountWithdrawalDialog } from "@/features/mypage/ui/account-withdrawal-dialog"
+import { UnavailableFeatureDialog } from "@/features/mypage/ui/unavailable-feature-dialog"
 
 type MyPageMenuItem = {
   icon: LucideIcon
@@ -56,6 +57,7 @@ function MyPageMenuRow({ icon: Icon, label, onClick }: MyPageMenuRowProps) {
 }
 
 export function MyPage() {
+  const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false)
   const [isWithdrawalDialogOpen, setIsWithdrawalDialogOpen] = useState(false)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -106,7 +108,7 @@ export function MyPage() {
                     ? () => setIsWithdrawalDialogOpen(true)
                     : item.id === "edit-profile"
                       ? () => navigate("/mypage/edit")
-                      : undefined
+                      : () => setIsSupportDialogOpen(true)
                 }
               />
             </li>
@@ -118,6 +120,11 @@ export function MyPage() {
         onComplete={completeWithdrawal}
         onOpenChange={setIsWithdrawalDialogOpen}
         open={isWithdrawalDialogOpen}
+      />
+
+      <UnavailableFeatureDialog
+        onOpenChange={setIsSupportDialogOpen}
+        open={isSupportDialogOpen}
       />
     </>
   )
