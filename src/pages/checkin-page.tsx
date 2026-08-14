@@ -1,7 +1,6 @@
 import { Button } from "@/shared/components/ui/button"
-import { Slider } from "@/shared/components/ui/slider"
 import { Textarea } from "@/shared/components/ui/textarea"
-import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/shared/components/ui/tabs"
+import { Tabs } from "@/shared/components/ui/tabs"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 import { CameraCapture } from "@/features/camera/camera-capture"
 
