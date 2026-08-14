@@ -13,6 +13,7 @@ const navItems = [
 //navbar 컴포넌트
 export function Navbar() {
   return (
+    // 모바일 환경에서 하단에 1px 틈이 보이는 현상을 방지하기 위해 1px 아래로 배치
     <nav className="fixed inset-x-0 -bottom-px z-50 border-t border-[#F1F1F1] bg-white pb-[env(safe-area-inset-bottom)]">
       {/*4칸으로 나누기 */}
       <div className="mx-auto grid h-[82px] max-w-[430px] grid-cols-4">

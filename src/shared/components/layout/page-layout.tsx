@@ -45,7 +45,7 @@ export function PageLayout({
       className={cn(
         "min-h-dvh",
         backgroundClassByVariant[variant],
-        showHeader && "pt-[20px]",
+        showHeader && "pt-[var(--header-layout-height)]",
         showNavbar && "pb-[82px]",
         className,
       )}

@@ -71,6 +71,7 @@
 
 :root {
     --background: oklch(1 0 0);
+    --header-layout-height: calc(52px + env(safe-area-inset-top));
     --page-background-default: var(--background);
     --page-background-home: #e3c5e5;
     --page-background-care: var(--background);
