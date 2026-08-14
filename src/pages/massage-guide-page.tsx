@@ -535,51 +535,95 @@ function MassageCompleteDialog({ open, onReplay }: MassageCompleteDialogProps) {
     <Dialog open={open}>
       <DialogContent
         aria-describedby="massage-complete-description"
-        className="flex w-[calc(100%-32px)] max-w-[361px] flex-col items-start gap-0 rounded-[24px] bg-white px-7 pt-8 pb-7 text-[#26292e] shadow-[0_24px_25px_rgba(0,0,0,0.4)] ring-0"
+        className="block w-[calc(100%-32px)] max-w-[361px] bg-transparent p-0 shadow-none ring-0 data-closed:animate-none data-open:animate-none"
         onEscapeKeyDown={(event) => event.preventDefault()}
         onInteractOutside={(event) => event.preventDefault()}
         overlayClassName="mx-auto w-full max-w-[393px] bg-black/40 backdrop-blur-none supports-backdrop-filter:backdrop-blur-none"
         showCloseButton={false}
       >
-        <div className="flex w-full justify-center">
-          <div className="flex size-16 items-center justify-center rounded-full bg-[#fbe0f1]">
-            <img
-              alt=""
-              aria-hidden="true"
-              className="size-[30px]"
-              src={completionCheckIcon}
-            />
-          </div>
-        </div>
-
-        <DialogTitle className="h-[53px] w-full pt-5 text-center text-[22px] leading-[33px] font-semibold tracking-[-0.3px]">
-          마사지 완료
-        </DialogTitle>
-
-        <DialogDescription
-          className="h-14 w-full pt-2 text-center text-[15px] leading-6 tracking-[-0.16px] text-[#6a6e75]"
-          id="massage-complete-description"
+        <motion.div
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="flex w-full flex-col items-start gap-0 rounded-[24px] bg-white px-7 pt-8 pb-7 text-[#26292e] shadow-[0_24px_25px_rgba(0,0,0,0.4)]"
+          initial={{ opacity: 0, scale: 0.9, y: 22 }}
+          transition={{
+            opacity: { duration: 0.24, ease: "easeOut" },
+            scale: {
+              damping: 22,
+              mass: 0.75,
+              stiffness: 260,
+              type: "spring",
+            },
+            y: {
+              damping: 22,
+              mass: 0.75,
+              stiffness: 260,
+              type: "spring",
+            },
+          }}
         >
-          오늘도 몸을 챙겨주셨어요.
-          <br />
-          여기까지 온 것만으로 충분해요.
-        </DialogDescription>
+          <motion.div
+            animate={{ opacity: 1, rotate: 0, scale: 1 }}
+            className="flex w-full justify-center"
+            initial={{ opacity: 0, rotate: -8, scale: 0.55 }}
+            transition={{
+              damping: 18,
+              delay: 0.12,
+              mass: 0.65,
+              stiffness: 360,
+              type: "spring",
+            }}
+          >
+            <div className="flex size-16 items-center justify-center rounded-full bg-[#fbe0f1]">
+              <img
+                alt=""
+                aria-hidden="true"
+                className="size-[30px]"
+                src={completionCheckIcon}
+              />
+            </div>
+          </motion.div>
 
-        <div className="flex h-[152px] w-full flex-col gap-3 pt-7">
-          <Button
-            className="h-14 w-full rounded-[15px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-2 focus-visible:ring-[#f19ed2]/30"
-            onClick={onReplay}
-            type="button"
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full"
+            initial={{ opacity: 0, y: 8 }}
+            transition={{ delay: 0.16, duration: 0.3, ease: "easeOut" }}
           >
-            마사지 다시 보기
-          </Button>
-          <Button
-            asChild
-            className="h-14 w-full rounded-[15px] bg-[#f6ecf4] text-[16px] leading-6 font-semibold text-[#a06a91] shadow-none hover:bg-[#f1e3ee] focus-visible:border-[#a06a91] focus-visible:ring-2 focus-visible:ring-[#a06a91]/25"
+            <DialogTitle className="h-[53px] w-full pt-5 text-center text-[22px] leading-[33px] font-semibold tracking-[-0.3px]">
+              마사지 완료
+            </DialogTitle>
+
+            <DialogDescription
+              className="h-14 w-full pt-2 text-center text-[15px] leading-6 tracking-[-0.16px] text-[#6a6e75]"
+              id="massage-complete-description"
+            >
+              오늘도 몸을 챙겨주셨어요.
+              <br />
+              여기까지 온 것만으로 충분해요.
+            </DialogDescription>
+          </motion.div>
+
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            className="flex h-[152px] w-full flex-col gap-3 pt-7"
+            initial={{ opacity: 0, y: 10 }}
+            transition={{ delay: 0.22, duration: 0.32, ease: "easeOut" }}
           >
-            <Link to="/care">케어카드 화면으로 돌아가기</Link>
-          </Button>
-        </div>
+            <Button
+              className="h-14 w-full rounded-[15px] bg-[#f19ed2] text-[16px] leading-6 font-semibold text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-2 focus-visible:ring-[#f19ed2]/30"
+              onClick={onReplay}
+              type="button"
+            >
+              마사지 다시 보기
+            </Button>
+            <Button
+              asChild
+              className="h-14 w-full rounded-[15px] bg-[#f6ecf4] text-[16px] leading-6 font-semibold text-[#a06a91] shadow-none hover:bg-[#f1e3ee] focus-visible:border-[#a06a91] focus-visible:ring-2 focus-visible:ring-[#a06a91]/25"
+            >
+              <Link to="/care">케어카드 화면으로 돌아가기</Link>
+            </Button>
+          </motion.div>
+        </motion.div>
       </DialogContent>
     </Dialog>
   )
