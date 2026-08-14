@@ -104,7 +104,9 @@ export function MyPage() {
                 onClick={
                   item.id === "withdraw-account"
                     ? () => setIsWithdrawalDialogOpen(true)
-                    : undefined
+                    : item.id === "edit-profile"
+                      ? () => navigate("/mypage/edit")
+                      : undefined
                 }
               />
             </li>

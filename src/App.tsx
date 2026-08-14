@@ -10,7 +10,7 @@ export type AppOutletContext = {
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const { pathname } = useLocation();
-  const isImmersivePage = pathname === "/massage-guide";
+  const isImmersivePage = ["/massage-guide", "/mypage/edit"].includes(pathname);
   const restartSplash = useCallback(() => setShowSplash(true), []);
 
   if (showSplash) {

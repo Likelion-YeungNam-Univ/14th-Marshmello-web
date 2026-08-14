@@ -8,6 +8,7 @@ import { HomePage } from "@/pages/home-page"
 import { MassageGuidePage } from "@/pages/massage-guide-page"
 import { MyPage } from "@/pages/mypage-page"
 import { NotFoundPage } from "@/pages/not-found-page"
+import { ProfileEditPage } from "@/pages/profile-edit-page"
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: "massage-guide", element: <MassageGuidePage /> },
       { path: "contents/:contentId", element: <ContentDetailPage /> },
       { path: "mypage", element: <MyPage /> },
+      { path: "mypage/edit", element: <ProfileEditPage /> },
     ],
   },
   { path: "*", element: <NotFoundPage /> },
