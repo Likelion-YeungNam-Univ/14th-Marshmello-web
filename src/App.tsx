@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react"
-import { Outlet, useMatches } from "react-router-dom"
+import { useQueryClient } from "@tanstack/react-query"
+import { Outlet, useMatches, useNavigate } from "react-router-dom"
 
+import { LogoutDrawer } from "@/features/auth/ui/logout-drawer"
 import {
   PageLayout,
   type PageLayoutConfig,
@@ -16,14 +18,24 @@ type RouteHandle = {
 }
 
 export default function App() {
+  const [isLogoutDrawerOpen, setIsLogoutDrawerOpen] = useState(false)
   const [showSplash, setShowSplash] = useState(true)
   const matches = useMatches()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const restartSplash = useCallback(() => setShowSplash(true), [])
   const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
     (currentLayout, match) =>
       (match.handle as RouteHandle | undefined)?.pageLayout ?? currentLayout,
     undefined,
   )
+  const logout = useCallback(() => {
+    queryClient.clear()
+    window.sessionStorage.clear()
+    setIsLogoutDrawerOpen(false)
+    navigate("/", { replace: true })
+    restartSplash()
+  }, [navigate, queryClient, restartSplash])
 
   if (showSplash) {
     return (
@@ -35,8 +47,19 @@ export default function App() {
   }
 
   return (
-    <PageLayout {...pageLayout}>
-      <Outlet context={{ restartSplash }} />
-    </PageLayout>
+    <>
+      <PageLayout
+        {...pageLayout}
+        onLogout={() => setIsLogoutDrawerOpen(true)}
+      >
+        <Outlet context={{ restartSplash }} />
+      </PageLayout>
+
+      <LogoutDrawer
+        onConfirm={logout}
+        onOpenChange={setIsLogoutDrawerOpen}
+        open={isLogoutDrawerOpen}
+      />
+    </>
   )
 }

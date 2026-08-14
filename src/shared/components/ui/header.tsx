@@ -22,6 +22,7 @@ export function Header({ className, onLogout, ...props }: HeaderProps) {
         </span>
 
         <button
+          aria-haspopup="dialog"
           aria-label="로그아웃"
           className="relative flex size-6 shrink-0 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={onLogout}

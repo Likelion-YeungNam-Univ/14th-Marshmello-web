@@ -21,6 +21,7 @@ export type PageLayoutConfig = {
 type PageLayoutProps = PropsWithChildren<
   PageLayoutConfig & {
     className?: string
+    onLogout?: () => void
   }
 >
 
@@ -36,6 +37,7 @@ const backgroundClassByVariant: Record<PageLayoutVariant, string> = {
 export function PageLayout({
   children,
   className,
+  onLogout,
   showHeader = true,
   showNavbar = true,
   variant = "default",
@@ -50,7 +52,7 @@ export function PageLayout({
         className,
       )}
     >
-      {showHeader ? <Header /> : null}
+      {showHeader ? <Header onLogout={onLogout} /> : null}
 
       <div>{children}</div>
 
