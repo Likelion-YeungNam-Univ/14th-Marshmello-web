@@ -4,6 +4,8 @@ import { Camera, CircleAlert, LoaderCircle, RotateCcw, X } from "lucide-react"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 import { Button } from "@/shared/components/ui/button"
 
+import loadingSpinner from "./loading-spinner.svg"
+
 //api연결시 밑에꺼 axios 활성화
 //import { validatePhoto } from "./api/validate-photo"
 
@@ -160,7 +162,7 @@ export function CameraCapture() {
     canvas.toBlob(
       async (blob) => {
         if (!blob) {
-          setErrorMessage("사진을 저장하지 못했어요. 다시 시도해주세요.")
+          setErrorMessage("사진을 저장하지 못했어요. \n다시 시도해주세요.")
           return
         }
 
@@ -180,7 +182,7 @@ export function CameraCapture() {
           }
           else {
             setCapturedPhoto(null)
-            setErrorMessage("사진에서 배 부위를 확인하지 못했어요. 다시 촬영해 주세요.")
+            setErrorMessage("사진에서 배 부위를 확인하지 못했어요. \n 다시 촬영해 주세요.")
             setCameraStatus("rejected")
           }
         } catch{
@@ -312,10 +314,11 @@ export function CameraCapture() {
             className="flex -translate-y-8 flex-col items-center"
           >
             <div className="flex size-[60px] items-center justify-center bg-white">
-              <LoaderCircle
+              <img
+                src={loadingSpinner}
+                alt=""
                 aria-hidden="true"
-                className="size-7 animate-spin text-[#AEB4BC]"
-                strokeWidth={2.5}
+                className="size-8 animate-[spin_0.8s_steps(8)_infinite]"
               />
             </div>
 
@@ -326,15 +329,25 @@ export function CameraCapture() {
         </div>
       ) : null}
 
-      {cameraStatus === "rejected" ? (
-        <div>
+      {cameraStatus === "rejected" || cameraStatus === "error" ? (
+        <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[393px] items-center justify-center bg-white px-[14px]">
+          {/*사진 다시 촬영하기*/}
+          <button
+            onClick={retakePhoto}
+            className="flex h-[352px] w-full flex-col items-center justify-center rounded-[15px] border border-[#F04438] bg-white"
+          >
+            <span className="flex size-[84px] items-center justify-center rounded-full bg-[#FBE3E3]">
+              <CircleAlert
+                aria-hidden="true"
+                className="size-10 text-[#C9362C]"
+                strokeWidth={2.2}
+              />
+            </span>
 
-        </div>
-      ) : null}
-
-      {cameraStatus === "error" ? (
-        <div>
-
+            <span className="mt-7 whitespace-pre-line text-center font-['Pretendard'] text-[18px] font-normal leading-[1.45] text-black">
+              {errorMessage}
+            </span>
+          </button>
         </div>
       ) : null}
 
