@@ -322,7 +322,7 @@ function MassageGuideStepTwo({ onBack, onNext }: MassageGuideStepTwoProps) {
 
           <div className="mt-3 h-[79px] text-[15px] leading-[25.5px] tracking-[-0.16px] text-[#6a6e75]">
             <p className="break-words">
-              손바닥 전체로 배꼽 주변을 시계 방향으로 천천히 그려주세요.
+              손바닥 전체로 배꼽 주변을 <br/>시계 방향으로 천천히 그려주세요.
             </p>
             <p className="pt-0.5">
               힘은 안 줘도 괜찮아요, 스치듯 만져도 충분해요.
@@ -385,7 +385,7 @@ function MassageGuideStepThree({ onBack, onNext }: MassageGuideStepThreeProps) {
         <div className="mt-3 h-[79px] text-[15px] leading-[25.5px] tracking-[-0.16px] text-[#6a6e75]">
           <p>배 옆쪽에서 위쪽으로, 부드럽게 쓸어 올려주세요.</p>
           <p className="break-words pt-0.5">
-            유독 당기는 곳이 있다면 그 부위에서 조금 더 머물러도 좋아요.
+            유독 당기는 곳이 있다면 <br/>그 부위에서 조금 더 머물러도 좋아요.
           </p>
         </div>
 
@@ -446,7 +446,7 @@ function MassageGuideStepFour({ onBack, onNext }: MassageGuideStepFourProps) {
             배 아랫부분을 손가락으로 살짝 눌러가며 원을 그려주세요.
           </p>
           <p className="break-words pt-0.5">
-            이 부위가 유독 신경 쓰이는 분들이 많아요, 당신만 그런 게 아니에요.
+            이 부위가 유독 신경 쓰이는 분들이 많아요. <br/> 당신만 그런 게 아니에요.
           </p>
         </div>
 
@@ -503,7 +503,7 @@ function MassageGuideStepFive({ onBack, onComplete }: MassageGuideStepFiveProps)
         </h1>
 
         <div className="mt-3 h-[54px] text-[15px] leading-[25.5px] tracking-[-0.16px] text-[#6a6e75]">
-          <p>배 전체를 크게, <br /> 천천히 쓰다듬으며 마무리해요.</p>
+          <p>배 전체를 크게, 천천히 쓰다듬으며 마무리해요.</p>
           <p className="pt-0.5">오늘도 여기까지 챙긴 것만으로 충분해요.</p>
         </div>
 
