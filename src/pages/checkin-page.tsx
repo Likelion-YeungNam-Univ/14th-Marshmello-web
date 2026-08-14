@@ -302,7 +302,7 @@ export function CheckinPage() {
 
                 {/*tab 팝업 창*/}
                 {selectedPart && (
-                  <motion.Tabs
+                  <Tabs
                     defaultValue="tabs"
                     className="absolute z-50 flex h-[127px] w-[183px] items-center justify-center overflow-hidden rounded-[10px] border border-transparent p-2.5"
                     style={{
@@ -376,7 +376,7 @@ export function CheckinPage() {
                         focus-visible:outline-neutral-400"
                         />
                     </div>  
-                  </motion.Tabs>
+                  </Tabs>
                 )}
               </div>  
              </div> 
