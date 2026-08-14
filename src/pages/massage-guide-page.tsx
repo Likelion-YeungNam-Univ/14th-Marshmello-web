@@ -26,7 +26,7 @@ import {
 
 const SCREEN_DURATION_MS = 5000
 const STEP_FRAME_CLASS_NAME =
-  "mx-auto h-[849px] w-full max-w-[393px] overflow-hidden bg-transparent"
+  "mx-auto h-[852px] w-full max-w-[393px] overflow-hidden bg-transparent"
 const STEP_HEADER_CLASS_NAME =
   "relative z-10 flex h-[66px] items-center justify-between bg-[#e8c5e5] px-5 pt-6"
 const STEP_CONTENT_CLASS_NAME =
