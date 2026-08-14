@@ -54,13 +54,20 @@ const stepCardVariants: Variants = {
   },
 }
 
-function MassageStepCard({ children }: PropsWithChildren) {
+type MassageStepCardProps = PropsWithChildren<{
+  animateOnMount?: boolean
+}>
+
+function MassageStepCard({
+  animateOnMount = true,
+  children,
+}: MassageStepCardProps) {
   return (
     <motion.section
       animate="center"
       className={STEP_CONTENT_CLASS_NAME}
       exit="exit"
-      initial="enter"
+      initial={animateOnMount ? "enter" : false}
       variants={stepCardVariants}
     >
       {children}
@@ -226,11 +233,16 @@ function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
 }
 
 type MassageGuideStepOneProps = {
+  animateCard?: boolean
   onBack: () => void
   onNext: () => void
 }
 
-function MassageGuideStepOne({ onBack, onNext }: MassageGuideStepOneProps) {
+function MassageGuideStepOne({
+  animateCard = true,
+  onBack,
+  onNext,
+}: MassageGuideStepOneProps) {
   const progress = useTimedProgress(onNext, SCREEN_DURATION_MS)
 
   return (
@@ -251,7 +263,7 @@ function MassageGuideStepOne({ onBack, onNext }: MassageGuideStepOneProps) {
 
       <TimedStepProgress progress={progress} step={1} />
 
-      <MassageStepCard>
+      <MassageStepCard animateOnMount={animateCard}>
         <div className="flex h-[701px] flex-col">
           <p className="text-[13px] leading-[19.5px] font-semibold tracking-[1.04px] text-[#f19ed2]">
             STEP 1
@@ -639,14 +651,17 @@ type MassageGuideScreen =
 
 export function MassageGuidePage() {
   const [screen, setScreen] = useState<MassageGuideScreen>("intro")
+  const [isStartingGuide, setIsStartingGuide] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
 
   const changeScreen = (nextScreen: MassageGuideScreen) => {
+    setIsStartingGuide(screen === "intro" && nextScreen === "step-one")
     setScreen(nextScreen)
   }
 
   const replayMassageGuide = () => {
     setIsComplete(false)
+    setIsStartingGuide(false)
     setScreen("step-one")
   }
 
@@ -657,6 +672,7 @@ export function MassageGuidePage() {
       case "step-one":
         return (
           <MassageGuideStepOne
+            animateCard={!isStartingGuide}
             onBack={() => changeScreen("intro")}
             onNext={() => changeScreen("step-two")}
           />
@@ -707,8 +723,15 @@ export function MassageGuidePage() {
         >
           <AnimatePresence initial={false} mode="sync">
             <motion.div
+              animate={{ opacity: 1 }}
               className="absolute inset-x-0 top-0 min-h-svh"
+              exit={screen === "intro" ? { opacity: 0 } : undefined}
+              initial={isStartingGuide ? { opacity: 0 } : false}
               key={screen}
+              transition={{
+                duration: screen === "intro" ? 0.22 : 0.38,
+                ease: "easeInOut",
+              }}
             >
               {renderScreen()}
             </motion.div>
