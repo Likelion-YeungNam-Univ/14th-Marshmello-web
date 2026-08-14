@@ -7,6 +7,7 @@ import { CameraCapture } from "@/features/camera/camera-capture"
 
 import { CheckinAnimation, type CheckinDirection,} from "@/features/checkin/ui/checkin-animation"
 
+{/*svg파일 그냥 가져오기엔 너무 길어서 그냥 파일 형식으로 저장 */}
 import bodyMapBaseSvg from "@/features/checkin/bodymap/body-map-base.svg"
 import chestSvg from "@/features/checkin/bodymap/chest.svg?no-inline"
 import abdomenSvg from "@/features/checkin/bodymap/abdomen.svg?no-inline"
@@ -26,82 +27,26 @@ export function CheckinPage() {
   
   //바디맵 부위 별 매핑
   const BodyPart = [
-    {
-      id: 1,
-      part: "가슴",
-      image: chestSvg,
-      x: 98,
-      y: 86,
-      width: 62,
-      height: 52,
-      hitPath: "M5 0C4 14 1 30 0 52H62C61 33 58 15 57 0C48 2 42 4 34 5C25 5 17 2 10 1Z",
-      zIndex: 30,
+    { id: 1, part: "가슴", image: chestSvg, x: 98, y: 86, width: 62, height: 52,
+      hitPath: "M5 0C4 14 1 30 0 52H62C61 33 58 15 57 0C48 2 42 4 34 5C25 5 17 2 10 1Z", zIndex: 30,
     },
-    {
-      id: 2,
-      part: "복부",
-      image: abdomenSvg,
-      x: 99,
-      y: 136,
-      width: 61,
-      height: 39,
-      hitPath: "M2 0C3 10 4 20 2 30L0 35C12 39 21 39 30.5 39C41 39 51 38 61 35L59 30C56 20 57 10 58 0C45 2 39 2 30.5 2C21 2 14 2 2 0Z",
-      zIndex: 30,
+    { id: 2, part: "복부", image: abdomenSvg, x: 99, y: 136, width: 61, height: 39,
+      hitPath: "M2 0C3 10 4 20 2 30L0 35C12 39 21 39 30.5 39C41 39 51 38 61 35L59 30C56 20 57 10 58 0C45 2 39 2 30.5 2C21 2 14 2 2 0Z", zIndex: 30,
     },
-    {
-      id: 3,
-      part: "골반",
-      image: pelvisSvg,
-      x: 96,
-      y: 170,
-      width: 67,
-      height: 48,
-      hitPath: "M2 2C13 6 23 9 33 9C44 9 55 6 65 2L64 11C54 18 47 26 42 35C39 42 37 47 33 47C29 47 27 44 23 38C18 29 11 20 3 12Z",
-      zIndex: 40,
+    { id: 3, part: "골반", image: pelvisSvg, x: 96, y: 170, width: 67, height: 48,
+      hitPath: "M2 2C13 6 23 9 33 9C44 9 55 6 65 2L64 11C54 18 47 26 42 35C39 42 37 47 33 47C29 47 27 44 23 38C18 29 11 20 3 12Z", zIndex: 40,
     },
-    {
-      id: 4,
-      part: "왼쪽 팔",
-      image: leftArmSvg,
-      x: 34.5,
-      y: 78.2,
-      width: 57,
-      height: 161,
-      hitPath: "M57 13C51 20 50 31 48 42C46 53 42 64 37 72C32 81 29 92 25 106C22 116 20 120 14 124C9 128 5 133 5 135C7 137 10 136 13 133C16 131 18 131 21 130C20 137 14 147 11 151C13 154 17 154 20 151C24 146 27 137 29 128C31 121 38 110 44 100C50 90 55 77 57 68Z",
-      zIndex: 20,
+    { id: 4, part: "왼쪽 팔", image: leftArmSvg, x: 34.5, y: 78.2, width: 57, height: 161,
+      hitPath: "M57 13C51 20 50 31 48 42C46 53 42 64 37 72C32 81 29 92 25 106C22 116 20 120 14 124C9 128 5 133 5 135C7 137 10 136 13 133C16 131 18 131 21 130C20 137 14 147 11 151C13 154 17 154 20 151C24 146 27 137 29 128C31 121 38 110 44 100C50 90 55 77 57 68Z", zIndex: 20,
     },
-    {
-      id: 5,
-      part: "오른쪽 팔",
-      image: rightArmSvg,
-      x: 168,
-      y: 85,
-      width: 59,
-      height: 170,
-      hitPath: "M1 8C4 16 5 29 8 41C11 54 16 65 21 76C27 89 34 103 38 112C41 118 42 120 47 123C52 126 56 132 57 136C55 138 52 137 48 134C46 132 44 132 42 132C44 140 49 151 50 157C48 161 44 161 41 157C37 151 34 142 32 134C30 126 24 117 18 108C12 98 7 87 4 77C1 67 1 55 1 44Z",
-      zIndex: 20,
+    { id: 5, part: "오른쪽 팔", image: rightArmSvg, x: 168, y: 85, width: 59, height: 170,
+      hitPath: "M1 8C4 16 5 29 8 41C11 54 16 65 21 76C27 89 34 103 38 112C41 118 42 120 47 123C52 126 56 132 57 136C55 138 52 137 48 134C46 132 44 132 42 132C44 140 49 151 50 157C48 161 44 161 41 157C37 151 34 142 32 134C30 126 24 117 18 108C12 98 7 87 4 77C1 67 1 55 1 44Z", zIndex: 20,
     },
-    {
-      id: 6,
-      part: "왼쪽 다리",
-      image: leftLegSvg,
-      x: 88,
-      y: 179,
-      width: 42,
-      height: 215,
-      hitPath: "M9 1C20 5 31 24 40 36C40 52 38 68 37 82C37 96 34 105 34 116C35 132 34 143 32 155C30 166 31 174 33 184C35 193 34 201 31 204C27 207 21 204 17 202C14 199 15 195 18 189C21 183 21 177 20 169C19 159 15 150 14 139C12 129 13 117 14 108C15 98 14 91 12 83C9 70 6 57 5 45C3 29 5 12 9 1Z",
-      zIndex: 10,
+    { id: 6, part: "왼쪽 다리", image: leftLegSvg, x: 88, y: 179, width: 42, height: 215,
+      hitPath: "M9 1C20 5 31 24 40 36C40 52 38 68 37 82C37 96 34 105 34 116C35 132 34 143 32 155C30 166 31 174 33 184C35 193 34 201 31 204C27 207 21 204 17 202C14 199 15 195 18 189C21 183 21 177 20 169C19 159 15 150 14 139C12 129 13 117 14 108C15 98 14 91 12 83C9 70 6 57 5 45C3 29 5 12 9 1Z", zIndex: 10,
     },
-    {
-      id: 7,
-      part: "오른쪽 다리",
-      image: rightLegSvg,
-      x: 131,
-      y: 179,
-      width: 41,
-      height: 208,
-      hitPath: "M30 1C20 5 11 15 5 28C1 36 0 43 1 53C2 65 4 76 3 86C2 98 5 108 6 119C6 132 5 140 7 151C9 163 8 171 7 178C5 187 6 198 9 201C13 204 20 202 24 199C26 196 24 191 21 186C18 181 18 176 19 169C20 159 24 149 25 139C27 128 27 117 26 108C25 99 26 90 28 80C30 70 34 57 35 47C37 31 34 13 30 1Z",
-      zIndex: 10,
+    { id: 7, part: "오른쪽 다리", image: rightLegSvg, x: 131, y: 179, width: 41, height: 208,
+      hitPath: "M30 1C20 5 11 15 5 28C1 36 0 43 1 53C2 65 4 76 3 86C2 98 5 108 6 119C6 132 5 140 7 151C9 163 8 171 7 178C5 187 6 198 9 201C13 204 20 202 24 199C26 196 24 191 21 186C18 181 18 176 19 169C20 159 24 149 25 139C27 128 27 117 26 108C25 99 26 90 28 80C30 70 34 57 35 47C37 31 34 13 30 1Z", zIndex: 10,
     },
   ]
 
@@ -158,6 +103,9 @@ export function CheckinPage() {
     { score: 4, label: "만족" },
     { score: 5, label: "매우 만족" },
   ]
+
+  const bodymapMemo = useCheckinFlowStore((state) => state.bodymapMemo)
+  const setBodymapMemo = useCheckinFlowStore((state) => state.setBodymapMemo)
 
   //진행도 표시 컴포넌트
   const CheckinStep = ({ step }: { step: number }) => {
@@ -235,22 +183,6 @@ export function CheckinPage() {
                 </Button>
               </div>
 
-              {/*실천사항 박스*/}
-              {/* 
-                <div className="w-[291px] h-[30px] flex flex-row justify-start gap-2 items-center">
-              */}
-              {/*실천사항*/}
-                {/*
-                  <p className="text-black font-Medium text-[16px]">
-                    어쩌구 저쩌구를 하세요
-                  </p>  
-                */}  
-                  {/*체크박스*/}
-                {/*
-                  <input type="checkbox" />
-                </div>
-                */}  
-
               {/*질문, 추천행동이 마음에 드셨나요?*/}
               <p className="text-black font-medium text-[20px]">
                 추천행동이 마음에 드셨나요?
@@ -323,6 +255,7 @@ export function CheckinPage() {
                   const isSelected = selectedBodyPart === part.id
 
                   return (
+                    //각 부위 별 svg 파일
                     <svg
                       key={part.id}
                       width={part.width}
@@ -369,7 +302,7 @@ export function CheckinPage() {
 
                 {/*tab 팝업 창*/}
                 {selectedPart && (
-                  <Tabs
+                  <motion.Tabs
                     defaultValue="tabs"
                     className="absolute z-50 flex h-[127px] w-[183px] items-center justify-center overflow-hidden rounded-[10px] border border-transparent p-2.5"
                     style={{
@@ -416,8 +349,8 @@ export function CheckinPage() {
                       </div>
 
                       <Textarea
-                        value={memo}
-                        onChange={(event) => setMemo(event.target.value)}
+                        value={bodymapMemo}
+                        onChange={(event) => setBodymapMemo(event.target.value)}
                         maxLength={100}
                         rows={1}
                         placeholder="메모를 입력하세요.."
@@ -443,7 +376,7 @@ export function CheckinPage() {
                         focus-visible:outline-neutral-400"
                         />
                     </div>  
-                  </Tabs>
+                  </motion.Tabs>
                 )}
               </div>  
              </div> 
