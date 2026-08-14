@@ -1,8 +1,12 @@
+import { useState } from "react"
 import { Button } from "@/shared/components/ui/button"
 import { Textarea } from "@/shared/components/ui/textarea"
 import { Tabs } from "@/shared/components/ui/tabs"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 import { CameraCapture } from "@/features/camera/camera-capture"
+
+import { CheckinAnimation, type CheckinDirection,} from "@/features/checkin/ui/checkin-animation"
+import { Direction } from "radix-ui"
 
 export function CheckinPage() {
 
@@ -37,6 +41,18 @@ export function CheckinPage() {
   const step = useCheckinFlowStore((state) => state.step)
   const nextStep = useCheckinFlowStore((state) => state.nextStep)
   const prevStep = useCheckinFlowStore((state) => state.prevStep)
+
+  const [direction, setDirection] = useState<CheckinDirection>(1)
+
+  const handleNextStep = () => {
+    setDirection(1)
+    nextStep()
+  }
+
+  const handlePrevStep = () => {
+    setDirection(-1)
+    prevStep()
+  }
 
   //zustand store에서 케어카드 실천여부
   const practiceCare = useCheckinFlowStore((state) => state.practiceCare)
@@ -89,7 +105,7 @@ export function CheckinPage() {
       <div className="relative mt-[86px] h-[20px] w-full max-w-[393px] px-6 ">
         {/*뒤로가기 버튼*/}
         <Button
-          onClick={prevStep}
+          onClick={handlePrevStep}
           className="absolute left-6 top-1/2 h-6 w-6 -translate-y-1/2 bg-transparent p-0 shadow-none hover:bg-transparent"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -120,6 +136,7 @@ export function CheckinPage() {
         
       {/*page 별 활성화*/}
       <div className="flex w-full flex-col items-center justify-start gap-4 px-6">
+        <CheckinAnimation  step = {step} direction={direction}>
           {/*page1*/}
           {(step === 1) && (
             <div className="flex flex-col w-[344px] items-start justify-center gap-8">
@@ -401,13 +418,16 @@ export function CheckinPage() {
             {/*케어카드를 작성중입니다. */}       
             </div>
           )}  
+        </CheckinAnimation>   
       </div>  
+       
       {/*다음 버튼, button 컴포넌트 사용*/}
       <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+24px)] z-40 mx-auto w-full max-w-[393px] px-8">
-        <Button onClick={nextStep} className="h-[50px] w-full rounded-[15px] bg-[#484C52] text-[12px] text-white">
+        <Button onClick={handleNextStep} className="h-[50px] w-full rounded-[15px] bg-[#484C52] text-[12px] text-white">
           다음
         </Button>
       </div>
+      
     </div>
   )
 }
