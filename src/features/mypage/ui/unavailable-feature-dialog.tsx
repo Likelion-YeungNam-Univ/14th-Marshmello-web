@@ -1,3 +1,4 @@
+import { motion } from "framer-motion"
 import { CircleAlert } from "lucide-react"
 
 import {
@@ -19,13 +20,25 @@ export function UnavailableFeatureDialog({
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent
-        className="flex w-[300px] max-w-[calc(100%-32px)] flex-col items-center gap-5 rounded-[15px] border-[1.25px] border-[rgba(241,158,210,0.25)] bg-[linear-gradient(159.54deg,#ffffff_58.3%,#fdf1f8_91.51%)] px-8 pt-10 pb-8 text-black shadow-[0_8px_40px_rgba(241,158,210,0.18),0_2px_12px_rgba(0,0,0,0.07)] ring-0"
+        className="w-[300px] max-w-[calc(100%-32px)] overflow-hidden rounded-[15px] border-[1.25px] border-[rgba(241,158,210,0.25)] bg-[linear-gradient(159.54deg,#ffffff_58.3%,#fdf1f8_91.51%)] p-0 text-black shadow-[0_8px_40px_rgba(241,158,210,0.18),0_2px_12px_rgba(0,0,0,0.07)] ring-0"
         overlayClassName="bg-black/15 backdrop-blur-none supports-backdrop-filter:backdrop-blur-none"
         showCloseButton={false}
       >
-        <UnavailableFeatureIcon />
+        <motion.div
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="flex w-full flex-col items-center gap-5 px-8 pt-10 pb-8"
+          initial={{ opacity: 0, scale: 0.94, y: 12 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.div
+            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.72 }}
+            transition={{ delay: 0.08, type: "spring", stiffness: 360, damping: 22 }}
+          >
+            <UnavailableFeatureIcon />
+          </motion.div>
 
-        <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex flex-col items-center gap-2 text-center">
           <DialogTitle className="text-[16px] leading-6 font-normal tracking-[-0.3px] text-[#26292e]">
             기능 준비 중이에요
           </DialogTitle>
@@ -34,15 +47,16 @@ export function UnavailableFeatureDialog({
             <br />
             조금만 기다려 주세요.
           </DialogDescription>
-        </div>
+          </div>
 
-        <button
+          <button
           className="h-[47px] w-[234px] rounded-[15px] bg-[#f19ed2] text-[15px] leading-[22.5px] font-semibold tracking-[-0.2px] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/50 focus-visible:ring-offset-2"
           onClick={() => onOpenChange(false)}
           type="button"
-        >
+          >
           확인
-        </button>
+          </button>
+        </motion.div>
       </DialogContent>
     </Dialog>
   )

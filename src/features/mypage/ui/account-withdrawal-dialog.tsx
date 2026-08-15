@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 import { CircleCheck, TriangleAlert } from "lucide-react"
 
 import {
@@ -38,7 +39,7 @@ export function AccountWithdrawalDialog({
   return (
     <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogContent
-        className={`flex w-[300px] max-w-[calc(100%-32px)] flex-col items-center rounded-[15px] border-[1.25px] bg-[linear-gradient(159.54deg,#ffffff_58.3%,#fdf1f8_91.51%)] px-8 pt-10 pb-8 text-black shadow-[0_8px_40px_rgba(241,158,210,0.18),0_2px_12px_rgba(0,0,0,0.07)] ring-0 ${
+        className={`w-[300px] max-w-[calc(100%-32px)] overflow-hidden rounded-[15px] border-[1.25px] bg-[linear-gradient(159.54deg,#ffffff_58.3%,#fdf1f8_91.51%)] p-0 text-black shadow-[0_8px_40px_rgba(241,158,210,0.18),0_2px_12px_rgba(0,0,0,0.07)] ring-0 ${
           isComplete
             ? "gap-5 border-[rgba(125,211,192,0.25)]"
             : "gap-[29px] border-[rgba(255,234,85,0.25)]"
@@ -52,6 +53,17 @@ export function AccountWithdrawalDialog({
         overlayClassName="bg-black/15 backdrop-blur-none supports-backdrop-filter:backdrop-blur-none"
         showCloseButton={false}
       >
+        <AnimatePresence mode="wait">
+          <motion.div
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className={`flex w-full flex-col items-center px-8 pt-10 pb-8 ${
+              isComplete ? "gap-5" : "gap-[29px]"
+            }`}
+            exit={{ opacity: 0, scale: 0.98, y: -4 }}
+            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            key={isComplete ? "complete" : "confirm"}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
         {isComplete ? (
           <>
             <CompletionIcon />
@@ -106,6 +118,8 @@ export function AccountWithdrawalDialog({
             </div>
           </>
         )}
+          </motion.div>
+        </AnimatePresence>
       </DialogContent>
     </Dialog>
   )
