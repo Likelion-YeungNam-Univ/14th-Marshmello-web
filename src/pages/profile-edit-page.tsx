@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, CalendarDays, UserRound } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { useProfileStore } from "@/features/mypage/model/use-profile-store"
@@ -44,43 +44,94 @@ export function ProfileEditPage() {
   }
 
   return (
-    <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden px-5 pt-[27px] text-black">
-      <button
-        aria-label="마이페이지로 돌아가기"
-        className="flex size-6 items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/40"
-        onClick={() => navigate("/mypage")}
-        type="button"
-      >
-        <ArrowLeft aria-hidden="true" className="size-6" strokeWidth={1.8} />
-      </button>
+    <main className="relative mx-auto min-h-dvh w-full max-w-[393px] bg-[linear-gradient(180deg,#fdf8fc_0%,#ffffff_44%)] px-5 pt-5 pb-8 text-[#26292e]">
+      <header className="relative flex h-11 items-center justify-center">
+        <button
+          aria-label="마이페이지로 돌아가기"
+          className="absolute left-0 flex size-10 items-center justify-center rounded-xl text-[#484c52] transition-colors hover:bg-[#f7eef4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/45"
+          onClick={() => navigate("/mypage")}
+          type="button"
+        >
+          <ArrowLeft aria-hidden="true" className="size-5" strokeWidth={1.9} />
+        </button>
 
-      <h1 className="mt-8 text-[12px] leading-[1.4] font-medium tracking-[-0.12px]">
-        회원정보를 수정해주세요
-      </h1>
+        <span className="text-[16px] leading-6 font-semibold tracking-[-0.2px]">
+          회원정보 수정
+        </span>
+      </header>
+
+      <section aria-labelledby="profile-edit-title" className="mt-8">
+        <h1
+          className="text-[22px] leading-[31px] font-semibold tracking-[-0.45px] text-[#26292e]"
+          id="profile-edit-title"
+        >
+          회원정보를 수정해주세요
+        </h1>
+        <p className="mt-1 text-[14px] leading-[21px] tracking-[-0.2px] text-[#7c747a]">
+          정확한 정보를 입력하면 더 꼭 맞는 케어를 받을 수 있어요.
+        </p>
+      </section>
 
       <form className="mt-8" onSubmit={submitProfile}>
-        <label
-          className="block text-[12px] leading-[1.6] font-medium tracking-[-0.24px] text-[#6c7278]"
-          htmlFor="profile-name"
+        <section
+          aria-labelledby="profile-name-label"
+          className="rounded-2xl border border-[#eee9ed] bg-white p-5"
         >
-          닉네임을 입력해주세요
-        </label>
-        <Input
-          autoComplete="nickname"
-          className="mt-0.5 h-[46px] rounded-[10px] border-[#edf1f3] bg-white px-[14px] text-[14px] font-medium tracking-[-0.14px] text-[#1a1c1e] shadow-[0_1px_2px_rgba(228,229,231,0.24)] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/20"
-          id="profile-name"
-          maxLength={20}
-          onChange={(event) => setName(event.target.value)}
-          required
-          value={name}
-        />
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center text-[#e68ec2]">
+              <UserRound aria-hidden="true" className="size-[18px]" strokeWidth={1.8} />
+            </span>
+            <div>
+              <label
+                className="block text-[15px] leading-[22.5px] font-semibold tracking-[-0.2px] text-[#3d3d3d]"
+                htmlFor="profile-name"
+                id="profile-name-label"
+              >
+                닉네임
+              </label>
 
-        <fieldset className="mt-[46px]">
-          <legend className="text-[12px] leading-[1.6] font-medium tracking-[-0.24px] text-[#6c7278]">
-            출산예정일을 입력해주세요
-          </legend>
+            </div>
+          </div>
 
-          <div className="mt-[23px] w-full">
+          <Input
+            aria-describedby="profile-name-helper"
+            autoComplete="nickname"
+            className="mt-4 h-[50px] rounded-xl border-[#e8e2e6] bg-white px-4 text-[15px] font-medium tracking-[-0.2px] text-[#26292e] shadow-none placeholder:text-[#b6a6b1] focus-visible:border-[#f19ed2] focus-visible:ring-3 focus-visible:ring-[#f19ed2]/15"
+            id="profile-name"
+            maxLength={20}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="닉네임을 입력해 주세요"
+            required
+            value={name}
+          />
+          <p
+            className="mt-2 text-right text-[11px] leading-[16.5px] text-[#aaa2a7]"
+            id="profile-name-helper"
+          >
+            {name.length}/20
+          </p>
+        </section>
+
+        <section
+          aria-labelledby="due-date-label"
+          className="mt-4 rounded-2xl border border-[#eee9ed] bg-white p-5"
+        >
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center text-[#e68ec2]">
+              <CalendarDays aria-hidden="true" className="size-[18px]" strokeWidth={1.8} />
+            </span>
+            <div>
+              <h2
+                className="text-[15px] leading-[22.5px] font-semibold tracking-[-0.2px] text-[#3d3d3d]"
+                id="due-date-label"
+              >
+                출산 예정일
+              </h2>
+
+            </div>
+          </div>
+
+          <div className="mt-5 border-t border-[#f1edf0] pt-5">
             <DateWheelPicker
               maxYear={2035}
               minYear={2025}
@@ -88,10 +139,10 @@ export function ProfileEditPage() {
               value={date}
             />
           </div>
-        </fieldset>
+        </section>
 
         <Button
-          className="mt-[101px] h-12 w-full rounded-[10px] bg-[#f19ed2] text-[15px] font-semibold tracking-[-0.15px] text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/30"
+          className="mt-6 h-[52px] w-full rounded-xl bg-[#f19ed2] text-[15px] font-semibold tracking-[-0.2px] text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/30"
           disabled={!name.trim()}
           type="submit"
         >
