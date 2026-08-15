@@ -10,6 +10,7 @@ import { MyPage } from "@/pages/mypage-page"
 import { NotFoundPage } from "@/pages/not-found-page"
 import { ProfileEditPage } from "@/pages/profile-edit-page"
 import type { PageLayoutConfig } from "@/shared/components/layout/page-layout"
+import LoginPage from "@/pages/login-page"
 
 const withPageLayout = (pageLayout: PageLayoutConfig) => ({ pageLayout })
 
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
         handle: withPageLayout({ variant: "home" }),
+      },
+      {
+        path: "login",
+        element: <LoginPage />,
       },
       {
         path: "checkin",

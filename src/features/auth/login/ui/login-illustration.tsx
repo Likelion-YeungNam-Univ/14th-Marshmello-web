@@ -1,0 +1,50 @@
+const svgPaths = {
+  pff03871: "M103.996 35.359C141.902 35.359 172.633 66.09 172.633 103.996C172.633 141.902 141.902 172.633 103.996 172.633C66.09 172.633 35.359 141.902 35.359 103.996C35.359 66.09 66.09 35.359 103.996 35.359Z",
+  p2c99a500: "M103.996 54.078C131.565 54.078 153.914 76.427 153.914 103.996C153.914 131.565 131.565 153.914 103.996 153.914C76.427 153.914 54.078 131.565 54.078 103.996C54.078 76.427 76.427 54.078 103.996 54.078Z",
+  p2cf33d80: "M72.797 100.876C76.957 105.036 83.197 105.036 87.356 100.876",
+  p3059f200: "M120.636 100.876C124.796 105.036 131.036 105.036 135.195 100.876",
+  p31071980: "M89.437 121.676C98.797 130.996 109.196 130.996 118.555 121.676",
+} as const;
+
+export function LoginIllustration() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="size-[208px] overflow-visible"
+      fill="none"
+      preserveAspectRatio="none"
+      viewBox="0 0 207.992 207.992"
+    >
+      <path
+        className="not-found-halo"
+        d={svgPaths.pff03871}
+        fill="#fde7f5"
+        opacity="0.567147"
+      />
+      <path d={svgPaths.p2c99a500} fill="#f6cbe6" />
+      <g className="not-found-face">
+        <path
+          d={svgPaths.p2cf33d80}
+          fill="none"
+          stroke="#a06a91"
+          strokeLinecap="round"
+          strokeWidth="4.15984"
+        />
+        <path
+          d={svgPaths.p3059f200}
+          fill="none"
+          stroke="#a06a91"
+          strokeLinecap="round"
+          strokeWidth="4.15984"
+        />
+        <path
+          d={svgPaths.p31071980}
+          fill="none"
+          stroke="#a06a91"
+          strokeLinecap="round"
+          strokeWidth="4.15984"
+        />
+      </g>
+    </svg>
+  );
+}
