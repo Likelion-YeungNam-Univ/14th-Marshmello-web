@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Button } from "@/shared/components/ui/button"
 import { Textarea } from "@/shared/components/ui/textarea"
-import { Tabs } from "@/shared/components/ui/tabs"
+import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/shared/components/ui/drawer"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 import { CameraCapture } from "@/features/camera/camera-capture"
 
@@ -241,8 +241,10 @@ export function CheckinPage() {
               해당 부위를 터치해보세요
               </p>
 
-              {/*바디맵, 팝업창 */}
+              {/*바디맵, 팝업창 : 전신 svg에 각 부위 별 svg를 덧댐 / 원래대로 하고 싶다면 -translate-y-6만 삭제해 */}
               <div className="relative aspect-[262/411] w-[262px] max-w-full self-center">
+              
+                {/*바디맵 전신  svg*/}
                 <img
                   src={bodyMapBaseSvg}
                   alt=""
@@ -258,8 +260,6 @@ export function CheckinPage() {
                     //각 부위 별 svg 파일
                     <svg
                       key={part.id}
-                      width={part.width}
-                      height={part.height}
                       viewBox={`0 0 ${part.width} ${part.height}`}
                       className="pointer-events-none absolute h-auto overflow-visible"
                       style={{
@@ -268,8 +268,9 @@ export function CheckinPage() {
                         width: `${(part.width / BODY_MAP_WIDTH) * 100}%`,
                         zIndex: part.zIndex,
                       }}
-                    >
+                    >                  
                       <g className="group">
+                        {/*투명한 클릭 영역, svg파일이 자꾸 네모로 설정이 되서 그냥 넣음 */}
                         <path
                           d={part.hitPath}
                           role="button"
@@ -286,6 +287,7 @@ export function CheckinPage() {
                           className="cursor-pointer fill-black opacity-[0.001] [pointer-events:visibleFill]"
                         />
 
+                        {/*핑크색으로 빛나는 */}
                         <use
                           href={`${part.image}#body-part-path`}
                           aria-hidden="true"
@@ -300,84 +302,97 @@ export function CheckinPage() {
                   )
                 })}
 
-                {/*tab 팝업 창*/}
-                {selectedPart && (
-                  <Tabs
-                    defaultValue="tabs"
-                    className="absolute z-50 flex h-[127px] w-[183px] items-center justify-center overflow-hidden rounded-[10px] border border-transparent p-2.5"
-                    style={{
-                      left: "50%",
-                      top: `${(selectedPart.y / BODY_MAP_HEIGHT) * 100}%`,
-                      transform: "translateX(-50%)",
-                      background:
-                        "linear-gradient(#fff, #fff) padding-box, linear-gradient(to bottom, #fff, #F19ED2) border-box",
-                    }}
+                {/*Drawer 팝업 창*/}
+                  <Drawer
+                    open={selectedPart !== undefined}
+                    onOpenChange={(open) => {if (!open) {setSelectedBodyPart(null)}}}
                   >
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      {/*버튼을 누른 부위 이름 */}
-                      <p className="text-black text-[14px] font-semibold font-['Pretendard'] leading-6">
-                        {selectedPart.part}
-                      </p>
-
-                      {/*튼살 유무 확인 공간 */}
-                      <div className="flex flex-row w-[120px] justify-between gap-2">
-                        {/*튼살 문구*/}
-                        <p className="text-[14px] font-['Pretendard']">
-                          튼살
+                    <DrawerContent
+                      className=" mx-auto w-full max-w-[393px] border-0 bg-white px-6 pb-[calc(env(safe-area-inset-bottom)+24px)] text-black
+                      data-[vaul-drawer-direction=bottom]:rounded-t-[32px] [&>div:first-child]:mt-5 [&>div:first-child]:h-1.5 [&>div:first-child]:w-14 [&>div:first-child]:bg-[#D9D9D9]"
+                    >
+                    {selectedPart && (
+                      <div className="flex flex-col font-['Pretendard']">
+                        {/*버튼을 누른 부위 이름 */}
+                        <p className="text-left text-[22px] font-semibold text-black">
+                          {selectedPart.part}
                         </p>
 
-                        {/*튼살 유무 확인 버튼 */}
-                        <div className="flex text-[11px] gap-1">
-                          {/*있음*/}
-                          <Button 
-                            aria-pressed={hasStretchMarks === true}
-                            onClick={() => setHasStretchMarks(true)}
-                            className={hasStretchMarks === true ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]" : "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
-                          >
-                            있음
-                          </Button>
+                        {/* 구분선 */}
+                        <div className="mt-6 h-px w-full bg-[#E5E7EB]" />
 
-                          {/*없음*/}
-                          <Button
-                            aria-pressed={hasStretchMarks === false}
-                            onClick={() => setHasStretchMarks(false)}
-                            className={hasStretchMarks === false ? "bg-[#F19ED2] font-light text-white w-[37px] h-[24px] text-[11px]": "bg-[#787D84] font-light text-white w-[37px] h-[24px] text-[11px]"}
-                          >
-                            없음
-                          </Button>
+                        {/*튼살 유무 확인 공간 */}
+                        <div className="flex items-center justify-between py-6">
+                          {/*튼살 문구*/}
+                          <p className="text-[16px] font-semibold font-['Pretendard']">
+                            튼살
+                          </p>
+
+                          {/*튼살 유무 확인 버튼 */}
+                          <div className="flex gap-3">
+                            {/*있음*/}
+                            <Button 
+                              aria-pressed={hasStretchMarks === true}
+                              onClick={() => setHasStretchMarks(true)}
+                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${hasStretchMarks === true ? "border-[#D49ACB] text-[#D49ACB] hover:bg-[#FFF7FC]" : "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
+                            >
+                              있음
+                            </Button>
+
+                            {/*없음*/}
+                            <Button
+                              aria-pressed={hasStretchMarks === false}
+                              onClick={() => setHasStretchMarks(false)}
+                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${hasStretchMarks === false ? "border-[#D49ACB] text-[#D49ACB] hover:bg-[#FFF7FC]": "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
+                            >
+                              없음
+                            </Button>
+                          </div>
                         </div>
-                      </div>
 
-                      <Textarea
-                        value={bodymapMemo}
-                        onChange={(event) => setBodymapMemo(event.target.value)}
-                        maxLength={100}
-                        rows={1}
-                        placeholder="메모를 입력하세요.."
-                        className="h-10 
-                        min-h-10 
-                        max-h-10 
-                        w-[155px] 
-                        resize-none 
-                        overflow-hidden 
-                        rounded-lg 
-                        border-0 
-                        bg-white 
-                        px-3.5 
-                        py-2.5 
-                        font-['Pretendard'] 
-                        text-[10px] 
-                        font-normal 
-                        leading-6 
-                        text-[#737373] 
-                        shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] 
-                        placeholder:text-neutral-500 
-                        focus-visible:ring-0 
-                        focus-visible:outline-neutral-400"
-                        />
-                    </div>  
-                  </Tabs>
-                )}
+                        {/* 구분선 */}
+                        <div className="mb-6 h-px w-full bg-[#E5E7EB]" />
+
+                        <p className="text-[16px] mb-4 font-semibold font-['Pretendard']">
+                            메모
+                        </p>
+
+                        <Textarea
+                          value={bodymapMemo}
+                          onChange={(event) => setBodymapMemo(event.target.value)}
+                          maxLength={100}
+                          rows={4}
+                          placeholder="메모를 입력하세요.."
+                          className="
+                            h-[104px]
+                            min-h-[104px] 
+                            w-full
+                            resize-none 
+                            overflow-hidden 
+                            rounded-[12px] 
+                            border
+                            border-[#B7B7B7]
+                            bg-white 
+                            px-4
+                            py-3
+                            font-['Pretendard'] 
+                            text-[14px]  
+                            text-black
+                            shadow-none
+                            placeholder:text-[#B7B7B7]
+                            focus-visible:ring-0 
+                            focus-visible:border-[#D49ACB]
+                          "
+                          />
+                          <DrawerClose asChild>
+                            <Button className="h-[54px] mt-6 w-full rounded-[16px] bg-[#B77DB8] text-[16px] font-semibold text-white hover:bg-[#A96EAA]">
+                              적용
+                            </Button>
+                          </DrawerClose>      
+                      </div>
+                    )}  
+                  </DrawerContent>  
+                </Drawer>
               </div>  
              </div> 
           )}    
