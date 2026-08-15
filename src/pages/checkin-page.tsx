@@ -79,7 +79,7 @@ export function CheckinPage() {
   const handleNextStep = () => {
     if (step === 4) {
       // TODO: Swagger 확인 후 체크인 저장 API 성공 시에만 홈으로 이동
-      navigate("/home", { replace: true })
+      navigate("/", { replace: true })
       return
     }
 
