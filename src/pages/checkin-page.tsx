@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Textarea } from "@/shared/components/ui/textarea"
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/shared/components/ui/drawer"
@@ -21,6 +22,8 @@ const BODY_MAP_WIDTH = 262
 const BODY_MAP_HEIGHT = 411
 
 export function CheckinPage() {
+
+  const navigate = useNavigate()
 
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
   const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
@@ -74,6 +77,12 @@ export function CheckinPage() {
 
   //버튼 클릭 시 애니메이션 + 다음 페이지 이동
   const handleNextStep = () => {
+    if (step === 4) {
+      // TODO: Swagger 확인 후 체크인 저장 API 성공 시에만 홈으로 이동
+      navigate("/home", { replace: true })
+      return
+    }
+
     setDirection(1)
     nextStep()
   }
