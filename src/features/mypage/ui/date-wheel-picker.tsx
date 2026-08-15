@@ -78,7 +78,7 @@ export function DateWheelPicker({
     <div aria-label="출산 예정일 선택" className="grid w-full grid-cols-3 gap-3" role="group">
       <div className="flex min-w-0 flex-col items-center">
         <span className="text-[12px] leading-[18px] font-medium text-[#7c747a]">
-          YEAR
+          년
         </span>
         <div className="mt-3 w-full">
           <WheelPickerColumn
@@ -92,7 +92,7 @@ export function DateWheelPicker({
 
       <div className="flex min-w-0 flex-col items-center">
         <span className="text-[12px] leading-[18px] font-medium text-[#7c747a]">
-          MONTH
+          월
         </span>
         <div className="mt-3 w-full">
           <WheelPickerColumn
@@ -106,7 +106,7 @@ export function DateWheelPicker({
 
       <div className="flex min-w-0 flex-col items-center">
         <span className="text-[12px] leading-[18px] font-medium text-[#7c747a]">
-          DAY
+          일
         </span>
         <div className="mt-3 w-full">
           <WheelPickerColumn
