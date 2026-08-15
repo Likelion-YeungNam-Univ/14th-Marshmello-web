@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from "react"
-import { ArrowLeft, CalendarDays, UserRound } from "lucide-react"
+import { useEffect, useRef, useState, type FormEvent } from "react"
+import { AnimatePresence, motion, type Variants } from "framer-motion"
+import { ArrowLeft, CalendarDays, CircleCheck, UserRound } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { useProfileStore } from "@/features/mypage/model/use-profile-store"
@@ -9,6 +10,34 @@ import {
 } from "@/features/mypage/ui/date-wheel-picker"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
+
+const fadeUpVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 14,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1],
+    },
+    y: 0,
+  },
+}
+
+const formVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.16,
+      staggerChildren: 0.1,
+    },
+  },
+}
+
+const SUCCESS_OVERLAY_DURATION_MS = 1200
+const SUCCESS_OVERLAY_EXIT_DURATION_MS = 180
 
 export function ProfileEditPage() {
   const navigate = useNavigate()
@@ -25,6 +54,22 @@ export function ProfileEditPage() {
     month: initialMonth,
     year: initialYear,
   })
+  const [isSaveSuccessVisible, setIsSaveSuccessVisible] = useState(false)
+  const hideSuccessTimeoutRef = useRef<number | null>(null)
+  const navigateTimeoutRef = useRef<number | null>(null)
+
+  useEffect(
+    () => () => {
+      if (hideSuccessTimeoutRef.current !== null) {
+        window.clearTimeout(hideSuccessTimeoutRef.current)
+      }
+
+      if (navigateTimeoutRef.current !== null) {
+        window.clearTimeout(navigateTimeoutRef.current)
+      }
+    },
+    [],
+  )
 
   const submitProfile = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -32,20 +77,38 @@ export function ProfileEditPage() {
     const trimmedName = name.trim()
     if (!trimmedName) return
 
-    updateProfile({
-      dueDate: [
-        date.year,
-        String(date.month).padStart(2, "0"),
-        String(date.day).padStart(2, "0"),
-      ].join("-"),
-      name: trimmedName,
-    })
-    navigate("/mypage", { replace: true })
+    try {
+      updateProfile({
+        dueDate: [
+          date.year,
+          String(date.month).padStart(2, "0"),
+          String(date.day).padStart(2, "0"),
+        ].join("-"),
+        name: trimmedName,
+      })
+      setIsSaveSuccessVisible(true)
+
+      hideSuccessTimeoutRef.current = window.setTimeout(() => {
+        setIsSaveSuccessVisible(false)
+      }, SUCCESS_OVERLAY_DURATION_MS)
+
+      navigateTimeoutRef.current = window.setTimeout(() => {
+        navigate("/mypage", { replace: true })
+      }, SUCCESS_OVERLAY_DURATION_MS + SUCCESS_OVERLAY_EXIT_DURATION_MS)
+    } catch {
+      setIsSaveSuccessVisible(false)
+    }
   }
 
   return (
     <main className="relative mx-auto min-h-dvh w-full max-w-[393px] bg-[linear-gradient(180deg,#fdf8fc_0%,#ffffff_44%)] px-5 pt-5 pb-8 text-[#26292e]">
-      <header className="relative flex h-11 items-center justify-center">
+      <motion.header
+        animate="visible"
+        className="relative flex h-11 items-center justify-center"
+        initial="hidden"
+        transition={{ delay: 0.04 }}
+        variants={fadeUpVariants}
+      >
         <button
           aria-label="마이페이지로 돌아가기"
           className="absolute left-0 flex size-10 items-center justify-center rounded-xl text-[#484c52] transition-colors hover:bg-[#f7eef4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/45"
@@ -58,9 +121,16 @@ export function ProfileEditPage() {
         <span className="text-[16px] leading-6 font-semibold tracking-[-0.2px]">
           회원정보 수정
         </span>
-      </header>
+      </motion.header>
 
-      <section aria-labelledby="profile-edit-title" className="mt-8">
+      <motion.section
+        animate="visible"
+        aria-labelledby="profile-edit-title"
+        className="mt-8"
+        initial="hidden"
+        transition={{ delay: 0.1 }}
+        variants={fadeUpVariants}
+      >
         <h1
           className="text-[22px] leading-[31px] font-semibold tracking-[-0.45px] text-[#26292e]"
           id="profile-edit-title"
@@ -70,12 +140,19 @@ export function ProfileEditPage() {
         <p className="mt-1 text-[14px] leading-[21px] tracking-[-0.2px] text-[#7c747a]">
           정확한 정보를 입력하면 더 꼭 맞는 케어를 받을 수 있어요.
         </p>
-      </section>
+      </motion.section>
 
-      <form className="mt-8" onSubmit={submitProfile}>
-        <section
+      <motion.form
+        animate="visible"
+        className="mt-8"
+        initial="hidden"
+        onSubmit={submitProfile}
+        variants={formVariants}
+      >
+        <motion.section
           aria-labelledby="profile-name-label"
           className="rounded-2xl border border-[#eee9ed] bg-white p-5"
+          variants={fadeUpVariants}
         >
           <div className="flex items-start gap-3">
             <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center text-[#e68ec2]">
@@ -89,7 +166,9 @@ export function ProfileEditPage() {
               >
                 닉네임
               </label>
-
+              <span className="mt-0.5 block text-[12px] leading-[18px] text-[#8a8388]">
+                다른 사용자에게 표시되는 이름이에요.
+              </span>
             </div>
           </div>
 
@@ -110,11 +189,12 @@ export function ProfileEditPage() {
           >
             {name.length}/20
           </p>
-        </section>
+        </motion.section>
 
-        <section
+        <motion.section
           aria-labelledby="due-date-label"
           className="mt-4 rounded-2xl border border-[#eee9ed] bg-white p-5"
+          variants={fadeUpVariants}
         >
           <div className="flex items-start gap-3">
             <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center text-[#e68ec2]">
@@ -127,7 +207,9 @@ export function ProfileEditPage() {
               >
                 출산 예정일
               </h2>
-
+              <span className="mt-0.5 block text-[12px] leading-[18px] text-[#8a8388]">
+                휠을 위아래로 움직여 날짜를 선택해 주세요.
+              </span>
             </div>
           </div>
 
@@ -139,16 +221,44 @@ export function ProfileEditPage() {
               value={date}
             />
           </div>
-        </section>
+        </motion.section>
 
-        <Button
-          className="mt-6 h-[52px] w-full rounded-xl bg-[#f19ed2] text-[15px] font-semibold tracking-[-0.2px] text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/30"
-          disabled={!name.trim()}
-          type="submit"
-        >
-          수정하기
-        </Button>
-      </form>
+        <motion.div className="mt-6" variants={fadeUpVariants}>
+          <Button
+            className="h-[52px] w-full rounded-xl bg-[#f19ed2] text-[15px] font-semibold tracking-[-0.2px] text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/30"
+            disabled={!name.trim() || isSaveSuccessVisible}
+            type="submit"
+          >
+            수정하기
+          </Button>
+        </motion.div>
+      </motion.form>
+
+      <AnimatePresence>
+        {isSaveSuccessVisible ? (
+          <motion.div
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-[2px]"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+          >
+            <motion.div
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex size-24 items-center justify-center rounded-full bg-white shadow-[0_12px_32px_rgba(38,41,46,0.2)]"
+              exit={{ opacity: 0, scale: 0.92 }}
+              initial={{ opacity: 0, scale: 0.56 }}
+              transition={{ type: "spring", stiffness: 360, damping: 22 }}
+            >
+              <CircleCheck
+                aria-label="저장 완료"
+                className="size-14 text-[#f19ed2]"
+                strokeWidth={1.8}
+              />
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </main>
   )
 }
