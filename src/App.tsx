@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Outlet, useMatches, useNavigate } from "react-router-dom"
 
 import { LogoutDrawer } from "@/features/auth/ui/logout-drawer"
+import { CarePage } from "@/pages/care-page"
 import {
   PageLayout,
   type PageLayoutConfig,
@@ -36,6 +37,8 @@ export default function App() {
     navigate("/", { replace: true })
     restartSplash()
   }, [navigate, queryClient, restartSplash])
+  const isContentDetail = pageLayout?.variant === "content"
+  const isCareFlow = isContentDetail || pageLayout?.variant === "care"
 
   if (showSplash) {
     return (
@@ -48,12 +51,27 @@ export default function App() {
 
   return (
     <>
-      <PageLayout
-        {...pageLayout}
-        onLogout={() => setIsLogoutDrawerOpen(true)}
-      >
-        <Outlet context={{ restartSplash }} />
-      </PageLayout>
+      {isCareFlow ? (
+        <PageLayout
+          onLogout={() => setIsLogoutDrawerOpen(true)}
+          variant="care"
+        >
+          <CarePage />
+        </PageLayout>
+      ) : (
+        <PageLayout
+          {...pageLayout}
+          onLogout={() => setIsLogoutDrawerOpen(true)}
+        >
+          <Outlet context={{ restartSplash }} />
+        </PageLayout>
+      )}
+
+      {isContentDetail ? (
+        <PageLayout {...pageLayout}>
+          <Outlet context={{ restartSplash }} />
+        </PageLayout>
+      ) : null}
 
       <LogoutDrawer
         onConfirm={logout}
