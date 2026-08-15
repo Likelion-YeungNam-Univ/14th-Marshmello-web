@@ -122,9 +122,13 @@ export function WheelPickerColumn<T>({
   return (
     <div className="relative h-[132px] w-full overflow-hidden">
       <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-11 z-0 h-11 border-y border-[#f4e1eb] bg-[#fff9fc]"
+      />
+      <div
         aria-activedescendant={`${listboxId}-option-${selectedIndex}`}
         aria-label={ariaLabel}
-        className="h-[132px] snap-y snap-mandatory touch-pan-y overflow-y-auto overscroll-contain scroll-smooth py-11 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="relative z-10 h-[132px] snap-y snap-mandatory touch-pan-y overflow-y-auto overscroll-contain scroll-smooth py-11 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         onKeyDown={handleKeyDown}
         onScroll={handleScroll}
         ref={viewportRef}
@@ -140,8 +144,8 @@ export function WheelPickerColumn<T>({
               className={cn(
                 "flex h-11 cursor-pointer snap-center items-center justify-center text-center transition-[color,font-size,opacity] duration-150 select-none",
                 isSelected
-                  ? "text-[20px] font-medium text-black opacity-100"
-                  : "text-[18px] font-normal text-[#c7cbd0] opacity-75",
+                  ? "text-[17px] font-semibold text-[#3d3d3d] opacity-100"
+                  : "text-[14px] font-medium text-[#c7bec4] opacity-70",
               )}
               id={`${listboxId}-option-${index}`}
               key={`${getLabel(item)}-${index}`}
@@ -156,11 +160,11 @@ export function WheelPickerColumn<T>({
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-11 bg-gradient-to-b from-white/60 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-11 bg-gradient-to-b from-white to-transparent"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-11 bg-gradient-to-t from-white/60 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-11 bg-gradient-to-t from-white to-transparent"
       />
     </div>
   )
