@@ -63,6 +63,7 @@ export function CheckinPage() {
   //zustand store에서 memo와 setMemo 가져오기
   const memo = useCheckinFlowStore((state) => state.memo)
   const setMemo = useCheckinFlowStore((state) => state.setMemo)
+
   //zustand store에서 step과 nextStep 가져오기
   const step = useCheckinFlowStore((state) => state.step)
   const nextStep = useCheckinFlowStore((state) => state.nextStep)
@@ -87,10 +88,6 @@ export function CheckinPage() {
   const practiceCare = useCheckinFlowStore((state) => state.practiceCare)
   const setPracticeCare = useCheckinFlowStore((state) => state.setPracticeCare)
 
-  //zustand store에서 튼살 여부 
-  const hasStretchMarks = useCheckinFlowStore((state) => state.hasStretchMarks)
-  const setHasStretchMarks = useCheckinFlowStore((state) => state.setHasStretchMarks)
-
   //zustand store에서 추천행동 만족도 여부
   const conditionScore = useCheckinFlowStore((state) => state.conditionScore)
   const setConditionScore = useCheckinFlowStore((state) => state.setConditionScore)
@@ -103,9 +100,6 @@ export function CheckinPage() {
     { score: 4, label: "만족" },
     { score: 5, label: "매우 만족" },
   ]
-
-  const bodymapMemo = useCheckinFlowStore((state) => state.bodymapMemo)
-  const setBodymapMemo = useCheckinFlowStore((state) => state.setBodymapMemo)
 
   //진행도 표시 컴포넌트
   const CheckinStep = ({ step }: { step: number }) => {
@@ -123,6 +117,10 @@ export function CheckinPage() {
       </div>
     );
 }
+
+  const bodyPartAnswers = useCheckinFlowStore((state) => state.bodyPartAnswers,)
+  const setBodyPartAnswer = useCheckinFlowStore((state) => state.setBodyPartAnswer,)
+  const selectedBodyPartAnswer = selectedBodyPart === null ? null : bodyPartAnswers[selectedBodyPart]
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col items-center gap-8 overflow-x-hidden bg-white">
@@ -292,7 +290,7 @@ export function CheckinPage() {
                           href={`${part.image}#body-part-path`}
                           aria-hidden="true"
                           className={`pointer-events-none text-[#F19ED2] transition-[opacity,filter] duration-200 ease-out group-hover:opacity-100 group-hover:[filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)] group-focus-within:opacity-100 group-focus-within:[filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)] ${
-                            isSelected
+                            isSelected || bodyPartAnswers[part.id]?.hasStretchMarks === true
                               ? "opacity-100 [filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)]"
                               : "opacity-0"
                           }`}
@@ -314,17 +312,17 @@ export function CheckinPage() {
                     {selectedPart && (
                       <div className="flex flex-col font-['Pretendard']">
                         {/*버튼을 누른 부위 이름 */}
-                        <p className="text-left text-[22px] font-semibold text-black">
+                        <p className="text-left text-[24px] font-bold text-black">
                           {selectedPart.part}
                         </p>
 
                         {/* 구분선 */}
-                        <div className="mt-6 h-px w-full bg-[#E5E7EB]" />
+                        <div className="mt-5 h-px w-full bg-[#E5E7EB]" />
 
                         {/*튼살 유무 확인 공간 */}
-                        <div className="flex items-center justify-between py-6">
+                        <div className="flex items-center justify-between py-5">
                           {/*튼살 문구*/}
-                          <p className="text-[16px] font-semibold font-['Pretendard']">
+                          <p className="text-[18px] font-semibold font-['Pretendard']">
                             튼살
                           </p>
 
@@ -332,18 +330,28 @@ export function CheckinPage() {
                           <div className="flex gap-3">
                             {/*있음*/}
                             <Button 
-                              aria-pressed={hasStretchMarks === true}
-                              onClick={() => setHasStretchMarks(true)}
-                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${hasStretchMarks === true ? "border-[#D49ACB] text-[#D49ACB] hover:bg-[#FFF7FC]" : "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
+                              aria-pressed={selectedBodyPartAnswer?.hasStretchMarks === true}
+                              onClick={() => {
+                                {/*만약 선택이 안됐으면 그냥 null로 보내고 그게 아니라면 버튼 활성화 */}
+                                if (selectedBodyPart === null) return
+
+                                setBodyPartAnswer(selectedBodyPart, {hasStretchMarks: true,})
+                              }}
+                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${selectedBodyPartAnswer?.hasStretchMarks === true ? "border-[#F19ED2] text-[#F19ED2] hover:bg-[#FFF7FC]" : "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
                             >
                               있음
                             </Button>
 
                             {/*없음*/}
                             <Button
-                              aria-pressed={hasStretchMarks === false}
-                              onClick={() => setHasStretchMarks(false)}
-                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${hasStretchMarks === false ? "border-[#D49ACB] text-[#D49ACB] hover:bg-[#FFF7FC]": "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
+                              aria-pressed={selectedBodyPartAnswer?.hasStretchMarks === false}
+                              onClick={() => {
+                                {/*만약 선택이 안됐으면 그냥 null로 보내고 그게 아니라면 버튼 활성화 */}
+                                if (selectedBodyPart === null) return
+
+                                setBodyPartAnswer(selectedBodyPart, {hasStretchMarks: false,})
+                              }}
+                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${selectedBodyPartAnswer?.hasStretchMarks === false ? "border-[#F19ED2] text-[#F19ED2] hover:bg-[#FFF7FC]": "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
                             >
                               없음
                             </Button>
@@ -353,13 +361,17 @@ export function CheckinPage() {
                         {/* 구분선 */}
                         <div className="mb-6 h-px w-full bg-[#E5E7EB]" />
 
-                        <p className="text-[16px] mb-4 font-semibold font-['Pretendard']">
+                        <p className="text-[18px] mb-4 font-semibold font-['Pretendard']">
                             메모
                         </p>
 
                         <Textarea
-                          value={bodymapMemo}
-                          onChange={(event) => setBodymapMemo(event.target.value)}
+                          value={selectedBodyPartAnswer?.bodymapMemo ?? ""}
+                          onChange={(event) => {
+                            if (selectedBodyPart === null) return
+
+                            setBodyPartAnswer(selectedBodyPart, {bodymapMemo: event.target.value,})
+                          }}
                           maxLength={100}
                           rows={4}
                           placeholder="메모를 입력하세요.."
@@ -385,7 +397,7 @@ export function CheckinPage() {
                           "
                           />
                           <DrawerClose asChild>
-                            <Button className="h-[54px] mt-6 w-full rounded-[16px] bg-[#B77DB8] text-[16px] font-semibold text-white hover:bg-[#A96EAA]">
+                            <Button className="h-[54px] mt-6 w-full rounded-[16px] bg-[#F19ED2] text-[16px] font-semibold text-white hover:bg-[#A96EAA]">
                               적용
                             </Button>
                           </DrawerClose>      

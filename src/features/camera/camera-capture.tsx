@@ -21,7 +21,7 @@ import loadingSpinner from "./loading-spinner.svg"
 type CameraStatus = "idle" | "opening" | "preview" | "captured" | "validating" | "rejected" | "error"
 
 //api 연결 전 로딩 화면 테스트 데이터 값
-const MOCK_PHOTO_IS_VALID = false
+const MOCK_PHOTO_IS_VALID = true
 
 //
 function mockValidatePhoto(_blob: Blob): Promise<boolean> {
