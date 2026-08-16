@@ -37,7 +37,7 @@ export function TodayCareCard({ card }: TodayCareCardProps) {
         <div className="flex h-[26px] items-center justify-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f19ed2]/12 px-3 py-1 text-[15px] leading-[18px] font-medium tracking-[-0.01em] text-[#484c52]">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-[#91ddcf]" />
-            오늘의 케어카드
+            {card.category || "오늘의 케어카드"}
           </span>
         </div>
 
@@ -57,9 +57,11 @@ export function TodayCareCard({ card }: TodayCareCardProps) {
           {card.description}
         </p>
 
-        {card.source ? (
+        {card.source || card.createdDate ? (
           <p className="mt-6 text-[12px] leading-[18px] tracking-[-0.01em] text-[#6b6f76]/70">
-            출처: {card.source}
+            {card.source ? `출처: ${card.source}` : null}
+            {card.source && card.createdDate ? " · " : null}
+            {card.createdDate}
           </p>
         ) : null}
       </motion.article>
