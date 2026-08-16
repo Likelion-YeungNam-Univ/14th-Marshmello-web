@@ -47,7 +47,11 @@ export const router = createBrowserRouter([
       {
         path: "contents/:contentId",
         element: <ContentDetailPage />,
-        handle: withPageLayout({ variant: "content" }),
+        handle: withPageLayout({
+          showHeader: false,
+          showNavbar: false,
+          variant: "content",
+        }),
       },
       {
         path: "mypage",
