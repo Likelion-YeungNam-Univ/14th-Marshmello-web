@@ -1,12 +1,15 @@
 import { LoginIllustration } from "@/features/auth/login/ui/login-illustration";
 import { GoogleLoginButton } from "@/features/auth/login/ui/google-login-button";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
 const BG_GRADIENT =
   "linear-gradient(114.6569940554643deg, rgb(253, 241, 248) 0%, rgb(253, 243, 249) 7.1429%, rgb(254, 245, 250) 14.286%, rgb(254, 247, 251) 21.429%, rgb(254, 249, 252) 28.571%, rgb(254, 251, 253) 35.714%, rgb(255, 253, 254) 42.857%, rgb(255, 255, 255) 50%, rgb(253, 250, 253) 57.143%, rgb(252, 244, 250) 64.286%, rgb(250, 239, 248) 71.429%, rgb(248, 233, 245) 78.571%, rgb(247, 228, 243) 85.714%, rgb(245, 222, 240) 92.857%, rgb(243, 217, 238) 100%)";
 
 export default function LoginPage() {
   const handleGoogleLogin = () => {
-    // 소셜 로그인 처리 로직
+    window.location.href =
+      `${API_BASE_URL}/oauth2/authorization/oidc`;
   };
 
   return (
@@ -18,6 +21,7 @@ export default function LoginPage() {
         aria-hidden="true"
         className="absolute -top-24 -left-24 size-72 rounded-full bg-[#fbe0f1] blur-[64px]"
       />
+
       <div
         aria-hidden="true"
         className="absolute -right-16 -bottom-24 size-80 rounded-full bg-[#efc9e6] opacity-70 blur-[64px]"
@@ -31,10 +35,12 @@ export default function LoginPage() {
           >
             품결
           </h1>
+
           <p className="mt-3 text-[18px] leading-[1.4] font-medium text-[#4a4d55]">
-            임신의 시간을 <span className="text-[#e756be] font-bold">품</span>은
+            임신의 시간을{" "}
+            <span className="font-bold text-[#e756be]">품</span>은
             <br />
-            피부<span className="text-[#e756be] font-bold">결</span>의 기록
+            피부<span className="font-bold text-[#e756be]">결</span>의 기록
           </p>
         </div>
 
