@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from "react"
-import { ArrowLeft } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { useProfileStore } from "@/features/mypage/model/use-profile-store"
@@ -45,16 +44,7 @@ export function ProfileEditPage() {
 
   return (
     <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden px-5 pt-[27px] text-black">
-      <button
-        aria-label="마이페이지로 돌아가기"
-        className="flex size-6 items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/40"
-        onClick={() => navigate("/mypage")}
-        type="button"
-      >
-        <ArrowLeft aria-hidden="true" className="size-6" strokeWidth={1.8} />
-      </button>
-
-      <h1 className="mt-8 text-[12px] leading-[1.4] font-medium tracking-[-0.12px]">
+      <h1 className="text-[12px] leading-[1.4] font-medium tracking-[-0.12px]">
         회원정보를 수정해주세요
       </h1>
 
