@@ -7,6 +7,8 @@ import {
   DateWheelPicker,
   type WheelDate,
 } from "@/features/mypage/ui/date-wheel-picker"
+import type { TermsAgreementResult } from "@/features/terms-agreement/model/types"
+import { TermsDialog } from "@/features/terms-agreement/ui/terms-dialog"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
 import { updateUserProfile } from "@/shared/api/auth"
@@ -24,6 +26,7 @@ export function SignupProfilePage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isTermsOpen, setIsTermsOpen] = useState(false)
 
   const submitProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -43,26 +46,36 @@ export function SignupProfilePage() {
     try {
       setIsSubmitting(true)
 
-      // 백엔드 회원정보 등록
       await updateUserProfile({
         nickname: trimmedName,
         expectedDeliveryDate,
       })
 
-      // 프론트 상태에도 저장
       updateProfile({
         name: trimmedName,
         dueDate: expectedDeliveryDate,
       })
 
-      // 회원정보 등록 완료 → 케어 화면
-      navigate("/care", { replace: true })
+      // 팝업 없이 바로 이동하는 테스트용으로 되돌리려면 아래 줄 대신
+      // navigate("/care", { replace: true }) 를 쓰면 됩니다.
+      setIsTermsOpen(true)
     } catch (error) {
       console.error("회원정보 등록 실패:", error)
       alert("회원정보 등록에 실패했습니다.")
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleTermsComplete = (result: TermsAgreementResult) => {
+    if (!result.requiredAgreed) {
+      return
+    }
+
+    console.log("약관 동의 결과:", result)
+
+    setIsTermsOpen(false)
+    navigate("/care", { replace: true })
   }
 
   return (
@@ -73,11 +86,7 @@ export function SignupProfilePage() {
         onClick={() => navigate("/login")}
         type="button"
       >
-        <ArrowLeft
-          aria-hidden="true"
-          className="size-6"
-          strokeWidth={1.8}
-        />
+        <ArrowLeft aria-hidden="true" className="size-6" strokeWidth={1.8} />
       </button>
 
       <h1 className="mt-8 text-[12px] leading-[1.4] font-medium tracking-[-0.12px]">
@@ -125,6 +134,12 @@ export function SignupProfilePage() {
           {isSubmitting ? "등록 중..." : "다음"}
         </Button>
       </form>
+
+      <TermsDialog
+        onConfirm={handleTermsComplete}
+        onOpenChange={setIsTermsOpen}
+        open={isTermsOpen}
+      />
     </main>
   )
 }
