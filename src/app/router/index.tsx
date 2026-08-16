@@ -20,6 +20,8 @@ const withPageLayout = (pageLayout: PageLayoutConfig) => ({
 
 /**
  * 로그인 여부 확인
+ *
+ * 로그인되어 있지 않으면 로그인 화면으로 이동
  */
 async function requireAuth() {
   const me = await getMe()
@@ -33,6 +35,9 @@ async function requireAuth() {
 
 /**
  * 로그인 + 회원정보 등록 완료 확인
+ *
+ * 로그인은 되어 있지만 회원정보가 등록되지 않았다면
+ * 신규 회원정보 등록 페이지로 이동
  */
 async function requireProfileComplete() {
   await requireAuth()
@@ -47,36 +52,10 @@ async function requireProfileComplete() {
 }
 
 /**
- * 로그인 페이지 접근 처리
- *
- * 로그인 안 됨 → 로그인 화면
- *
- * 로그인 됨 + 회원정보 미완료 → 회원정보 등록
- *
- * 로그인 됨 + 회원정보 완료 → 홈
- */
-async function loginPageLoader() {
-  const me = await getMe()
-
-  if (!me) {
-    return null
-  }
-
-  const profile = await getUserProfile()
-
-  if (!profile.profileCompleted) {
-    throw redirect("/signup/profile")
-  }
-
-  throw redirect("/")
-}
-
-/**
  * 신규 회원정보 등록 페이지 접근 처리
  *
- * 로그인하지 않았다면 로그인으로
- *
- * 이미 회원정보 등록이 끝났다면 홈으로
+ * 로그인하지 않았다면 로그인 화면으로 이동
+ * 이미 회원정보 등록이 완료되었다면 홈으로 이동
  */
 async function signupProfileLoader() {
   await requireAuth()
@@ -91,7 +70,54 @@ async function signupProfileLoader() {
 }
 
 /**
- * 마이페이지 등
+ * 로그인 후 첫 화면 처리
+ *
+ * 로그인 버튼을 누르기 전에는
+ * 브라우저에 기존 쿠키가 있어도 로그인 화면을 보여준다.
+ *
+ * 로그인 버튼을 눌러 localStorage에 loginStarted가 저장된 후
+ * Google OAuth 인증을 완료하면 인증 상태를 확인한다.
+ */
+async function rootLoader() {
+  const loginStarted =
+    localStorage.getItem("loginStarted") === "true"
+
+  /**
+   * 아직 로그인 버튼을 누르지 않았다면
+   * 무조건 로그인 화면으로 이동
+   */
+  if (!loginStarted) {
+    throw redirect("/login")
+  }
+
+  const me = await getMe()
+
+  /**
+   * 로그인 버튼을 눌렀지만 인증에 실패한 경우
+   */
+  if (!me) {
+    localStorage.removeItem("loginStarted")
+    throw redirect("/login")
+  }
+
+  const profile = await getUserProfile()
+
+  /**
+   * 신규 회원
+   */
+  if (!profile.profileCompleted) {
+    throw redirect("/signup/profile")
+  }
+
+  /**
+   * 기존 회원
+   *
+   * App이 렌더링되고 HomePage가 표시됨
+   */
+  return profile
+}
+
+/**
  * 로그인만 필요한 페이지
  */
 async function authLoader() {
@@ -99,31 +125,35 @@ async function authLoader() {
 }
 
 export const router = createBrowserRouter([
+  /**
+   * 로그인 화면
+   *
+   * App 밖에 있어서 Header / Navbar가 표시되지 않는다.
+   */
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+
+  /**
+   * 서비스 영역
+   */
   {
     path: "/",
+    loader: rootLoader,
     element: <App />,
     children: [
       /**
        * 홈
        *
-       * 로그인 + 회원정보 등록 완료 필요
+       * 로그인 + 회원정보 등록 완료 상태에서만 접근
        */
       {
         index: true,
-        loader: requireProfileComplete,
         element: <HomePage />,
         handle: withPageLayout({
           variant: "home",
         }),
-      },
-
-      /**
-       * 로그인
-       */
-      {
-        path: "login",
-        loader: loginPageLoader,
-        element: <LoginPage />,
       },
 
       /**
@@ -140,6 +170,18 @@ export const router = createBrowserRouter([
       },
 
       /**
+       * 별도 홈 경로
+       */
+      {
+        path: "home",
+        loader: requireProfileComplete,
+        element: <HomePage />,
+        handle: withPageLayout({
+          variant: "home",
+        }),
+      },
+
+      /**
        * 체크인
        */
       {
@@ -152,25 +194,33 @@ export const router = createBrowserRouter([
       },
 
       /**
-       * 로그인 + 회원정보 등록 완료 필요
+       * Body Map
        */
       {
         path: "body-map",
         loader: requireProfileComplete,
       },
 
+      /**
+       * Camera
+       */
       {
         path: "camera",
         loader: requireProfileComplete,
       },
 
+      /**
+       * Records
+       */
       {
         path: "records",
         loader: requireProfileComplete,
       },
 
       /**
-       * 케어
+       * Care
+       *
+       * 로그인 + 회원정보 등록 완료 필요
        */
       {
         path: "care",
@@ -221,9 +271,9 @@ export const router = createBrowserRouter([
       },
 
       /**
-       * 기존 회원의 회원정보 수정
+       * 기존 회원정보 수정
        *
-       * 이 페이지는 기존 코드 그대로 사용
+       * 기존 ProfileEditPage 그대로 사용
        */
       {
         path: "mypage/edit",
@@ -238,6 +288,9 @@ export const router = createBrowserRouter([
     ],
   },
 
+  /**
+   * 존재하지 않는 경로
+   */
   {
     path: "*",
     element: <NotFoundPage />,
