@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useCallback, useEffect, useState } from "react"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Textarea } from "@/shared/components/ui/textarea"
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/shared/components/ui/drawer"
@@ -7,6 +7,7 @@ import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-s
 import { CameraCapture } from "@/features/camera/camera-capture"
 
 import { CheckinAnimation, type CheckinDirection,} from "@/features/checkin/ui/checkin-animation"
+import type { AppOutletContext } from "@/App"
 
 {/*svg파일 그냥 가져오기엔 너무 길어서 그냥 파일 형식으로 저장 */}
 import bodyMapBaseSvg from "@/features/checkin/bodymap/body-map-base.svg"
@@ -24,6 +25,7 @@ const BODY_MAP_HEIGHT = 411
 export function CheckinPage() {
 
   const navigate = useNavigate()
+  const { setHeaderBackAction } = useOutletContext<AppOutletContext>()
 
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
   const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
@@ -87,11 +89,21 @@ export function CheckinPage() {
     nextStep()
   }
 
-  //버튼 클릭 시 애니메이션 + 이전 페이지 이동
-  const handlePrevStep = () => {
+  const handlePreviousStep = useCallback(() => {
     setDirection(-1)
     prevStep()
-  }
+  }, [prevStep])
+
+  useEffect(() => {
+    if (step === 1) {
+      setHeaderBackAction()
+      return
+    }
+
+    setHeaderBackAction(handlePreviousStep)
+
+    return () => setHeaderBackAction()
+  }, [handlePreviousStep, setHeaderBackAction, step])
 
   //zustand store에서 케어카드 실천여부
   const practiceCare = useCheckinFlowStore((state) => state.practiceCare)
@@ -133,25 +145,8 @@ export function CheckinPage() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col items-center gap-8 overflow-x-hidden bg-white">
-      
-      <div className="relative mt-[86px] h-[20px] w-full max-w-[393px] px-6 ">
-        {/*뒤로가기 버튼*/}
-        <Button
-          onClick={handlePrevStep}
-          className="absolute left-6 top-1/2 h-6 w-6 -translate-y-1/2 bg-transparent p-0 shadow-none hover:bg-transparent"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.6283 0C17.8319 0 18.0402 0.0804844 18.1964 0.236695C18.5088 0.549117 18.5088 1.06036 18.1964 1.37278L7.50286 12.071L18.0402 22.6083C18.3526 22.9207 18.3526 23.432 18.0402 23.7444C17.7277 24.0568 17.2165 24.0568 16.9041 23.7444L5.79877 12.6391C5.48635 12.3267 5.48635 11.8154 5.79877 11.503L17.0603 0.236719C17.2165 0.0805078 17.4248 4.6875e-05 17.6283 4.6875e-05L17.6283 0Z" fill="black"/>
-          </svg>
-        </Button>
-
-        {/*오늘의 체크인*/}
-        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-[13px] font-medium text-black font-['Pretendard']">
-          오늘의 체크인
-        </p>
-      </div>
       {/*진행도*/}
-      <div className="flex flex-col items- w-[291px] h-[10px] justify-between">
+      <div className="mt-8 flex h-[10px] w-[291px] flex-col justify-between">
         
         {/*진행상황, Progress 사용할 예정*/}
         <div className="self-end">      
