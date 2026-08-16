@@ -12,6 +12,7 @@ import SplashScreen from "@/shared/components/ui/splash-screen"
 
 export type AppOutletContext = {
   restartSplash: () => void
+  setHeaderBackAction: (action?: () => void) => void
 }
 
 type RouteHandle = {
@@ -20,11 +21,17 @@ type RouteHandle = {
 
 export default function App() {
   const [isLogoutDrawerOpen, setIsLogoutDrawerOpen] = useState(false)
+  const [pageHeaderBackAction, setPageHeaderBackAction] = useState<
+    (() => void) | undefined
+  >()
   const [showSplash, setShowSplash] = useState(true)
   const matches = useMatches()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const restartSplash = useCallback(() => setShowSplash(true), [])
+  const setHeaderBackAction = useCallback((action?: () => void) => {
+    setPageHeaderBackAction(() => action)
+  }, [])
   const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
     (currentLayout, match) =>
       (match.handle as RouteHandle | undefined)?.pageLayout ?? currentLayout,
@@ -61,15 +68,27 @@ export default function App() {
       ) : (
         <PageLayout
           {...pageLayout}
+          header={
+            pageHeaderBackAction
+              ? { ...pageLayout?.header, onBack: pageHeaderBackAction }
+              : pageLayout?.header
+          }
           onLogout={() => setIsLogoutDrawerOpen(true)}
         >
-          <Outlet context={{ restartSplash }} />
+          <Outlet context={{ restartSplash, setHeaderBackAction }} />
         </PageLayout>
       )}
 
       {isContentDetail ? (
-        <PageLayout {...pageLayout}>
-          <Outlet context={{ restartSplash }} />
+        <PageLayout
+          {...pageLayout}
+          header={
+            pageHeaderBackAction
+              ? { ...pageLayout?.header, onBack: pageHeaderBackAction }
+              : pageLayout?.header
+          }
+        >
+          <Outlet context={{ restartSplash, setHeaderBackAction }} />
         </PageLayout>
       ) : null}
 

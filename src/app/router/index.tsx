@@ -21,12 +21,19 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
-        handle: withPageLayout({ variant: "home" }),
+        handle: withPageLayout({
+          header: { variant: "default" },
+          variant: "home",
+        }),
       },
       {
         path: "checkin",
         element: <CheckinPage />,
-        handle: withPageLayout({ variant: "checkin" }),
+        handle: withPageLayout({
+          header: { title: "오늘의 체크인", variant: "back" },
+          showNavbar: false,
+          variant: "checkin",
+        }),
       },
       { path: "body-map" },
       { path: "camera" },
@@ -48,6 +55,7 @@ export const router = createBrowserRouter([
         path: "contents/:contentId",
         element: <ContentDetailPage />,
         handle: withPageLayout({
+          header: { title: "추천 콘텐츠", variant: "back" },
           showHeader: false,
           showNavbar: false,
           variant: "content",
@@ -63,6 +71,7 @@ export const router = createBrowserRouter([
         element: <ProfileEditPage />,
         handle: withPageLayout({
           showHeader: false,
+          header: { title: "회원정보 수정", variant: "back" },
           showNavbar: false,
           variant: "mypage",
         }),

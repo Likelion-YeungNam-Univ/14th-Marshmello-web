@@ -1,6 +1,10 @@
-import type { PropsWithChildren } from "react"
+import { useCallback, type PropsWithChildren } from "react"
+import { useNavigate } from "react-router-dom"
 
-import { Header } from "@/shared/components/ui/header"
+import {
+  Header,
+  type HeaderProps,
+} from "@/shared/components/ui/header"
 import { Navbar } from "@/shared/components/ui/navbar"
 import { cn } from "@/shared/lib/utils"
 
@@ -12,10 +16,21 @@ export type PageLayoutVariant =
   | "content"
   | "mypage"
 
+export type PageLayoutHeaderConfig = Pick<
+  HeaderProps,
+  | "className"
+  | "onBack"
+  | "rightAction"
+  | "showBackButton"
+  | "title"
+  | "variant"
+>
+
 export type PageLayoutConfig = {
   showHeader?: boolean
   showNavbar?: boolean
   variant?: PageLayoutVariant
+  header?: PageLayoutHeaderConfig
 }
 
 type PageLayoutProps = PropsWithChildren<
@@ -37,24 +52,32 @@ const backgroundClassByVariant: Record<PageLayoutVariant, string> = {
 export function PageLayout({
   children,
   className,
+  header,
   onLogout,
   showHeader = true,
   showNavbar = true,
   variant = "default",
 }: PageLayoutProps) {
+  const navigate = useNavigate()
+  const handleBack = useCallback(() => navigate(-1), [navigate])
+
   return (
     <div
       className={cn(
         "min-h-dvh",
         backgroundClassByVariant[variant],
-        showHeader && "pt-[var(--header-layout-height)]",
-        showNavbar && "pb-[82px]",
         className,
       )}
     >
-      {showHeader ? <Header onLogout={onLogout} /> : null}
+      {showHeader ? (
+        <Header
+          {...header}
+          onBack={header?.onBack ?? handleBack}
+          onLogout={onLogout}
+        />
+      ) : null}
 
-      <div>{children}</div>
+      <div className={cn(showNavbar && "pb-[82px]")}>{children}</div>
 
       {showNavbar ? <Navbar /> : null}
     </div>
