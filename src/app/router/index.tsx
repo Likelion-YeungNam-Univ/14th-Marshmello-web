@@ -10,7 +10,8 @@ import { MassageGuidePage } from "@/pages/massage-guide-page"
 import { MyPage } from "@/pages/mypage-page"
 import { NotFoundPage } from "@/pages/not-found-page"
 import { ProfileEditPage } from "@/pages/profile-edit-page"
-import { getMe } from "@/shared/api/auth"
+import { SignupProfilePage } from "@/pages/signup-profile-page"
+import { getMe, getUserProfile } from "@/shared/api/auth"
 import type { PageLayoutConfig } from "@/shared/components/layout/page-layout"
 
 const withPageLayout = (pageLayout: PageLayoutConfig) => ({
@@ -19,8 +20,6 @@ const withPageLayout = (pageLayout: PageLayoutConfig) => ({
 
 /**
  * 로그인 여부 확인
- *
- * 로그인되어 있지 않으면 로그인 페이지로 이동
  */
 async function requireAuth() {
   const me = await getMe()
@@ -33,22 +32,67 @@ async function requireAuth() {
 }
 
 /**
- * 로그인 페이지 접근 처리
- *
- * 이미 로그인된 사용자가 /login으로 들어오면 홈으로 이동
+ * 로그인 + 회원정보 등록 완료 확인
  */
-async function redirectIfAuthenticated() {
-  const me = await getMe()
+async function requireProfileComplete() {
+  await requireAuth()
 
-  if (me) {
-    throw redirect("/")
+  const profile = await getUserProfile()
+
+  if (!profile.profileCompleted) {
+    throw redirect("/signup/profile")
   }
 
-  return null
+  return profile
 }
 
 /**
- * 로그인 후 필요한 CSRF 토큰 준비
+ * 로그인 페이지 접근 처리
+ *
+ * 로그인 안 됨 → 로그인 화면
+ *
+ * 로그인 됨 + 회원정보 미완료 → 회원정보 등록
+ *
+ * 로그인 됨 + 회원정보 완료 → 홈
+ */
+async function loginPageLoader() {
+  const me = await getMe()
+
+  if (!me) {
+    return null
+  }
+
+  const profile = await getUserProfile()
+
+  if (!profile.profileCompleted) {
+    throw redirect("/signup/profile")
+  }
+
+  throw redirect("/")
+}
+
+/**
+ * 신규 회원정보 등록 페이지 접근 처리
+ *
+ * 로그인하지 않았다면 로그인으로
+ *
+ * 이미 회원정보 등록이 끝났다면 홈으로
+ */
+async function signupProfileLoader() {
+  await requireAuth()
+
+  const profile = await getUserProfile()
+
+  if (profile.profileCompleted) {
+    throw redirect("/")
+  }
+
+  return profile
+}
+
+/**
+ * 마이페이지 등
+ * 로그인만 필요한 페이지
  */
 async function authLoader() {
   return requireAuth()
@@ -62,11 +106,11 @@ export const router = createBrowserRouter([
       /**
        * 홈
        *
-       * 로그인한 사용자만 접근 가능
+       * 로그인 + 회원정보 등록 완료 필요
        */
       {
         index: true,
-        loader: authLoader,
+        loader: requireProfileComplete,
         element: <HomePage />,
         handle: withPageLayout({
           variant: "home",
@@ -75,53 +119,74 @@ export const router = createBrowserRouter([
 
       /**
        * 로그인
-       *
-       * 이미 로그인한 상태라면 홈으로 이동
        */
       {
         path: "login",
+        loader: loginPageLoader,
         element: <LoginPage />,
       },
 
       /**
-       * 로그인 필요
+       * 신규 회원정보 등록
+       */
+      {
+        path: "signup/profile",
+        loader: signupProfileLoader,
+        element: <SignupProfilePage />,
+        handle: withPageLayout({
+          showHeader: false,
+          showNavbar: false,
+        }),
+      },
+
+      /**
+       * 체크인
        */
       {
         path: "checkin",
-        loader: authLoader,
+        loader: requireProfileComplete,
         element: <CheckinPage />,
         handle: withPageLayout({
           variant: "checkin",
         }),
       },
 
+      /**
+       * 로그인 + 회원정보 등록 완료 필요
+       */
       {
         path: "body-map",
-        loader: authLoader,
+        loader: requireProfileComplete,
       },
 
       {
         path: "camera",
-        loader: authLoader,
+        loader: requireProfileComplete,
       },
 
       {
         path: "records",
-        loader: authLoader,
+        loader: requireProfileComplete,
       },
 
+      /**
+       * 케어
+       */
       {
         path: "care",
-        loader: authLoader,
+        loader: requireProfileComplete,
         element: <CarePage />,
         handle: withPageLayout({
           variant: "care",
         }),
       },
 
+      /**
+       * 마사지 가이드
+       */
       {
         path: "massage-guide",
-        loader: authLoader,
+        loader: requireProfileComplete,
         element: <MassageGuidePage />,
         handle: withPageLayout({
           showHeader: false,
@@ -129,15 +194,23 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 콘텐츠 상세
+       */
       {
         path: "contents/:contentId",
-        loader: authLoader,
+        loader: requireProfileComplete,
         element: <ContentDetailPage />,
         handle: withPageLayout({
           variant: "content",
         }),
       },
 
+      /**
+       * 마이페이지
+       *
+       * 로그인만 되어 있으면 접근 가능
+       */
       {
         path: "mypage",
         loader: authLoader,
@@ -147,6 +220,11 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 기존 회원의 회원정보 수정
+       *
+       * 이 페이지는 기존 코드 그대로 사용
+       */
       {
         path: "mypage/edit",
         loader: authLoader,
