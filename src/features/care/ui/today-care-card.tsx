@@ -1,3 +1,5 @@
+import { motion } from "framer-motion"
+
 import type { TodayCareCardData } from "@/features/care/model/today-care-card"
 
 type TodayCareCardProps = {
@@ -5,46 +7,62 @@ type TodayCareCardProps = {
 }
 
 export function TodayCareCard({ card }: TodayCareCardProps) {
+  const layerMotion = (delay: number, y: number, scale: number) => ({
+    animate: { opacity: 1, scale: 1, y: 0 },
+    initial: { opacity: 0, scale, y },
+    transition: {
+      delay,
+      duration: 1.1,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  })
+
   return (
     <section
       aria-labelledby="today-care-card-title"
-      className="relative mx-auto h-[458px] w-[341px]"
+      className="relative h-[398px] w-full"
     >
-      <div
+      <motion.div
         aria-hidden="true"
-        className="absolute left-[6px] top-0 h-[449px] w-[329px] -rotate-[1.5deg] rounded-[50px] border-2 border-white bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.4)_0%,rgba(200,238,231,0.7)_50%,#91ddcf_100%)] shadow-[inset_-5px_-5px_250px_rgba(255,255,255,0.02)]"
-      />
+        className="absolute inset-x-0 top-[7px] flex h-[436px] items-center justify-center"
+        {...layerMotion(0.06, 28, 0.92)}
+      >
+        <div className="h-[413px] w-full -rotate-[4deg] rounded-[28px] border border-white/55 bg-[#f19ed2]" />
+      </motion.div>
 
-      <article className="absolute left-[4px] top-[5px] h-[449px] w-[329px] overflow-hidden rounded-[50px] border-2 border-white bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.4)_0%,rgba(200,238,231,0.7)_50%,#91ddcf_100%)] shadow-[5px_5px_4px_rgba(255,255,255,0.1),inset_-5px_-5px_250px_rgba(255,255,255,0.02)]">
+      <motion.article
+        className="absolute inset-x-0 top-0 flex h-[430px] flex-col rounded-[26px] border border-white/70 bg-[#ffeefe] px-[26px] py-7"
+        {...layerMotion(0.28, 42, 0.95)}
+      >
+        <div className="flex h-[26px] items-center justify-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f19ed2]/12 px-3 py-1 text-[15px] leading-[18px] font-medium tracking-[-0.01em] text-[#484c52]">
+            <span aria-hidden="true" className="size-1.5 rounded-full bg-[#91ddcf]" />
+            오늘의 케어카드
+          </span>
+        </div>
+
         <h1
-          className="absolute inset-x-5 top-[55px] text-center text-[20px] leading-[1.4] font-semibold tracking-[-0.01em]"
+          className="mt-5 text-center text-[21px] leading-[30.45px] font-medium tracking-[-0.01em] text-[#2a2c30]"
           id="today-care-card-title"
         >
           {card.title}
         </h1>
 
-        <p className="absolute inset-x-[55px] top-[118px] text-center text-[14px] leading-[1.4] tracking-[-0.02em]">
-          {card.tip.map((line) => (
-            <span className="block" key={line}>
-              {line}
-            </span>
-          ))}
-        </p>
+        <div
+          aria-hidden="true"
+          className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-black/10 to-transparent"
+        />
 
-        <p className="absolute inset-x-[30px] top-[174px] text-center text-[11px] leading-[1.4] tracking-[-0.02em] text-[#484c52]">
-          {card.description.map((line) => (
-            <span className="block" key={line}>
-              {line}
-            </span>
-          ))}
+        <p className="mt-6 text-[15px] leading-[27.75px] tracking-[-0.01em] text-[#6b6f76]">
+          {card.description}
         </p>
 
         {card.source ? (
-          <p className="absolute inset-x-5 top-[338px] text-center text-[11px] leading-[1.4] tracking-[-0.02em] text-[#484c52]">
-            (출처: {card.source})
+          <p className="mt-6 text-[12px] leading-[18px] tracking-[-0.01em] text-[#6b6f76]/70">
+            출처: {card.source}
           </p>
         ) : null}
-      </article>
+      </motion.article>
     </section>
   )
 }

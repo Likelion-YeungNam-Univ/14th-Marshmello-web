@@ -46,7 +46,7 @@ const backgroundClassByVariant: Record<PageLayoutVariant, string> = {
   content: "bg-page-content",
   default: "bg-page-default",
   home: "bg-page-home",
-  mypage: "bg-page-mypage",
+  mypage: "bg-page-mypage mypage-page-background",
 }
 
 export function PageLayout({

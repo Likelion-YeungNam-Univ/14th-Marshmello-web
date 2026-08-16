@@ -2,21 +2,6 @@ import { useEffect, useMemo } from "react"
 
 import { WheelPickerColumn } from "@/features/mypage/ui/wheel-picker-column"
 
-const monthLabels = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-]
-
 export type WheelDate = {
   day: number
   month: number
@@ -90,16 +75,12 @@ export function DateWheelPicker({
   }
 
   return (
-    <div
-      aria-label="출산 예정일 선택"
-      className="grid w-full grid-cols-3 gap-2"
-      role="group"
-    >
+    <div aria-label="출산 예정일 선택" className="grid w-full grid-cols-3 gap-3" role="group">
       <div className="flex min-w-0 flex-col items-center">
-        <span className="flex h-7 min-w-[70px] items-center justify-center rounded-full bg-[#f4f4f4] px-4 text-[12px] font-light text-black">
-          Year
+        <span className="text-[12px] leading-[18px] font-medium text-[#7c747a]">
+          년
         </span>
-        <div className="mt-[43px] w-full">
+        <div className="mt-3 w-full">
           <WheelPickerColumn
             ariaLabel="연도 선택"
             items={years}
@@ -110,13 +91,12 @@ export function DateWheelPicker({
       </div>
 
       <div className="flex min-w-0 flex-col items-center">
-        <span className="flex h-7 min-w-[70px] items-center justify-center rounded-full bg-[#f4f4f4] px-4 text-[12px] font-light text-black">
-          Month
+        <span className="text-[12px] leading-[18px] font-medium text-[#7c747a]">
+          월
         </span>
-        <div className="mt-[43px] w-full">
+        <div className="mt-3 w-full">
           <WheelPickerColumn
             ariaLabel="월 선택"
-            getLabel={(item) => monthLabels[item - 1]}
             items={months}
             onChange={changeMonth}
             value={month}
@@ -125,10 +105,10 @@ export function DateWheelPicker({
       </div>
 
       <div className="flex min-w-0 flex-col items-center">
-        <span className="flex h-7 min-w-[60px] items-center justify-center rounded-full bg-[#f4f4f4] px-4 text-[12px] font-light text-black">
-          Day
+        <span className="text-[12px] leading-[18px] font-medium text-[#7c747a]">
+          일
         </span>
-        <div className="mt-[43px] w-full">
+        <div className="mt-3 w-full">
           <WheelPickerColumn
             ariaLabel="일 선택"
             items={days}

@@ -56,6 +56,8 @@ export const router = createBrowserRouter([
         element: <ContentDetailPage />,
         handle: withPageLayout({
           header: { title: "추천 콘텐츠", variant: "back" },
+          showHeader: false,
+          showNavbar: false,
           variant: "content",
         }),
       },
@@ -68,6 +70,7 @@ export const router = createBrowserRouter([
         path: "mypage/edit",
         element: <ProfileEditPage />,
         handle: withPageLayout({
+          showHeader: false,
           header: { title: "회원정보 수정", variant: "back" },
           showNavbar: false,
           variant: "mypage",
