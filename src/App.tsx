@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import { Outlet, useMatches, useNavigate } from "react-router-dom"
+import { Outlet, useMatches, useNavigate, useParams } from "react-router-dom"
 
 import { LogoutDrawer } from "@/features/auth/ui/logout-drawer"
 import { CarePage } from "@/pages/care-page"
@@ -23,7 +23,12 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const matches = useMatches()
   const navigate = useNavigate()
+  const { checkInId: checkInIdParam } = useParams()
   const queryClient = useQueryClient()
+  const parsedCheckInId = Number(checkInIdParam)
+  const checkInId = Number.isInteger(parsedCheckInId)
+    ? parsedCheckInId
+    : undefined
   const restartSplash = useCallback(() => setShowSplash(true), [])
   const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
     (currentLayout, match) =>
@@ -56,7 +61,7 @@ export default function App() {
           onLogout={() => setIsLogoutDrawerOpen(true)}
           variant="care"
         >
-          <CarePage />
+          <CarePage checkInId={checkInId} />
         </PageLayout>
       ) : (
         <PageLayout
