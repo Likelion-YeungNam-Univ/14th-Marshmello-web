@@ -77,7 +77,7 @@
     --page-background-care: var(--background);
     --page-background-checkin: var(--background);
     --page-background-content: #f5f6f7;
-    --page-background-mypage: var(--background);
+    --page-background-mypage: linear-gradient(163.326deg, #e8c5e5 19.65%, rgba(255, 234, 247, 0.71) 48.727%, #e8c5e5 77.804%);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
@@ -109,6 +109,10 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+}
+
+.mypage-page-background {
+    background-image: var(--page-background-mypage);
 }
 
 .dark {
