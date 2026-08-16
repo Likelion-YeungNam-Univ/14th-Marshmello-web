@@ -6,25 +6,37 @@ type CsrfResponse = {
   headerName: string
 }
 
-export async function getMe() {
-  const response = await fetch(`${API_BASE_URL}/api/me`, {
-    method: "GET",
-    credentials: "include",
-  })
-
-  if (!response.ok) {
-    return null
-  }
-  const contentType = response.headers.get("content-type") ?? ""
-
-  if (!contentType.includes("application/json")) {
-    return null
-  }
-
-  return response.json()
+export type UserProfile = {
+  nickname: string | null
+  expectedDeliveryDate: string | null
+  profileCompleted: boolean
 }
 
-export async function getUserProfile() {
+export async function getMe() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/me`, {
+      method: "GET",
+      credentials: "include",
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
+    const contentType = response.headers.get("content-type") ?? ""
+
+    if (!contentType.includes("application/json")) {
+      return null
+    }
+
+    return response.json()
+  } catch (error) {
+    console.error("GET /api/me 실패:", error)
+    return null
+  }
+}
+
+export async function getUserProfile(): Promise<UserProfile> {
   const response = await fetch(`${API_BASE_URL}/api/user`, {
     method: "GET",
     credentials: "include",
