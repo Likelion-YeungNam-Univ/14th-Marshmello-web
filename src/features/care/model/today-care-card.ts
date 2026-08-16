@@ -2,7 +2,9 @@ export type TodayCareCardData = {
   id: string
   title: string
   description: string
+  category?: string
   source?: string
+  createdDate?: string
 }
 
 export const mockTodayCareCard: TodayCareCardData = {

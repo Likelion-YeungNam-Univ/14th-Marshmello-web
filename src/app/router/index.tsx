@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
       { path: "camera" },
       { path: "records" },
       {
-        path: "care",
+        path: "care/:checkInId?",
         element: <CarePage />,
         handle: withPageLayout({ variant: "care" }),
       },
