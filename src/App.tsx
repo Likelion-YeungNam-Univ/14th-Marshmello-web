@@ -8,7 +8,7 @@ import {
   PageLayout,
   type PageLayoutConfig,
 } from "@/shared/components/layout/page-layout"
-import SplashScreen from "@/shared/components/ui/splash-screen"
+import SplashScreen from "@/shared/components/ui/splash/splash-screen"
 
 export type AppOutletContext = {
   restartSplash: () => void
@@ -19,12 +19,21 @@ type RouteHandle = {
   pageLayout?: PageLayoutConfig
 }
 
+// 같은 세션(탭)에서 스플래시를 이미 보여줬는지 기록하는 키.
+// 새로고침하거나 /home, /care 등 다른 라우트로 이동해도 다시 뜨지 않도록 막아줌.
+const SPLASH_SESSION_KEY = "poomgyeol:splash-shown"
+
+function hasSplashAlreadyShown() {
+  if (typeof window === "undefined") return false
+  return window.sessionStorage.getItem(SPLASH_SESSION_KEY) === "1"
+}
+
 export default function App() {
   const [isLogoutDrawerOpen, setIsLogoutDrawerOpen] = useState(false)
   const [pageHeaderBackAction, setPageHeaderBackAction] = useState<
     (() => void) | undefined
   >()
-  const [showSplash, setShowSplash] = useState(true)
+  const [showSplash, setShowSplash] = useState(() => !hasSplashAlreadyShown())
   const matches = useMatches()
   const navigate = useNavigate()
   const { checkInId: checkInIdParam } = useParams()
@@ -33,7 +42,11 @@ export default function App() {
   const checkInId = Number.isInteger(parsedCheckInId)
     ? parsedCheckInId
     : undefined
-  const restartSplash = useCallback(() => setShowSplash(true), [])
+  const restartSplash = useCallback(() => {
+    // 로그아웃 등 명시적으로 재진입 플로우를 태울 때만 스플래시를 다시 보여줌
+    window.sessionStorage.removeItem(SPLASH_SESSION_KEY)
+    setShowSplash(true)
+  }, [])
   const setHeaderBackAction = useCallback((action?: () => void) => {
     setPageHeaderBackAction(() => action)
   }, [])
@@ -56,7 +69,10 @@ export default function App() {
     return (
       <SplashScreen
         durationMs={5000}
-        onFinish={() => setShowSplash(false)}
+        onFinish={() => {
+          window.sessionStorage.setItem(SPLASH_SESSION_KEY, "1")
+          setShowSplash(false)
+        }}
       />
     )
   }
