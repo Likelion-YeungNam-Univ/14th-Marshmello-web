@@ -41,10 +41,5 @@ export async function createReport(
 }
 
 //## API 실행 테스트 함수
-const handleGetReport = async () => {
-  const report = await getReport("2026-08")
-
-  console.log(report)
-}
 
 

@@ -29,7 +29,6 @@ Promise<tokenStatusResponse> {
 
 //## API 실행 테스트 함수
 
-
 export const handleGetTokenStatus = async () => {
   const tokenStatus = await getTokenStatus()
 
