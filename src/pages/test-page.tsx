@@ -15,6 +15,8 @@ import {
 
 // check-in-controller 테스트 함수
 import {
+  getcheckInCount,
+  getcheckInRegion,
   handleCreateCheckIn,
   handleGetCheckInEmotions,
   handleGetCheckInsByDate,
@@ -525,6 +527,37 @@ export function TestPage() {
                 "GET /api/check-ins/emotions",
                 () =>
                   handleGetCheckInEmotions(
+                    emotionMonth,
+                  ),
+              )
+            }}
+          />
+                    {/* 선택한 월의 체크인 횟수 조회 */}
+          <ApiButton
+            currentApi={loadingApi}
+            disabled={emotionMonth === ""}
+            label="GET /api/check-ins/count"
+            onClick={() => {
+              void runRequest(
+                "GET /api/check-ins/count",
+                () =>
+                  getcheckInCount(
+                    emotionMonth,
+                  ),
+              )
+            }}
+          />
+
+          {/* 선택한 월에 가장 많이 불편함을 호소한 부위 조회 */}
+          <ApiButton
+            currentApi={loadingApi}
+            disabled={emotionMonth === ""}
+            label="GET /api/check-ins/body-diaries/top-region"
+            onClick={() => {
+              void runRequest(
+                "GET /api/check-ins/body-diaries/top-region",
+                () =>
+                  getcheckInRegion(
                     emotionMonth,
                   ),
               )

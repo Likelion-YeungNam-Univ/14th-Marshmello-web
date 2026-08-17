@@ -81,12 +81,12 @@ export type checkInEmotionResponse = {
 // GET /api/check-ins/count 응답 항목
 export type checkInCountResponse = {
   count: number
-  achievedCOunt: number
+  achievedCount: number
 }
 
 // GET /api/check-ins/body-diraries/top-region 응답 항목
 export type checkInRegion = {
-  bodyRegion: number
+  bodyRegion: number | null
 }
 
 //## 요청 함수
@@ -131,6 +131,31 @@ export async function getCheckInEmotions(
   return response.data
 }
 
+//체크인 한 횟수
+export async function getcheckInCount(
+  month: string,
+) : Promise<checkInCountResponse> {
+  const url = 
+    `/api/check-ins/count?month=${month}`
+
+  const response =
+    await apiClient.get<checkInCountResponse>(url)
+
+  return response.data
+}
+
+//그 달에 가장 많이 불편함을 호소한 부위
+export async function getcheckInRegion(
+  month: string,
+) : Promise<checkInRegion> {
+  const url = 
+    `/api/check-ins/body-diaries/top-region?month=${month}`
+
+  const response =
+    await apiClient.get<checkInRegion>(url)
+
+  return response.data
+}
 
 //## API 실행 테스트 함수
 
