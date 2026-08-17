@@ -1,0 +1,22 @@
+<svg
+  width="32"
+  height="32"
+  viewBox="0 0 32 32"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g
+    stroke="#6F7378"
+    stroke-width="3"
+    stroke-linecap="round"
+  >
+    <path d="M16 2V8" opacity="1" />
+    <path d="M25.9 6.1L21.7 10.3" opacity="0.85" />
+    <path d="M30 16H24" opacity="0.7" />
+    <path d="M25.9 25.9L21.7 21.7" opacity="0.55" />
+    <path d="M16 30V24" opacity="0.4" />
+    <path d="M6.1 25.9L10.3 21.7" opacity="0.3" />
+    <path d="M2 16H8" opacity="0.2" />
+    <path d="M6.1 6.1L10.3 10.3" opacity="0.12" />
+  </g>
+</svg>

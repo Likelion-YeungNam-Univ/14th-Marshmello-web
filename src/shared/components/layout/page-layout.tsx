@@ -1,6 +1,10 @@
-import type { PropsWithChildren } from "react"
+import { useCallback, useEffect, type PropsWithChildren } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
-import { Header } from "@/shared/components/ui/header"
+import {
+  Header,
+  type HeaderProps,
+} from "@/shared/components/ui/header"
 import { Navbar } from "@/shared/components/ui/navbar"
 import { cn } from "@/shared/lib/utils"
 
@@ -12,10 +16,21 @@ export type PageLayoutVariant =
   | "content"
   | "mypage"
 
+export type PageLayoutHeaderConfig = Pick<
+  HeaderProps,
+  | "className"
+  | "onBack"
+  | "rightAction"
+  | "showBackButton"
+  | "title"
+  | "variant"
+>
+
 export type PageLayoutConfig = {
   showHeader?: boolean
   showNavbar?: boolean
   variant?: PageLayoutVariant
+  header?: PageLayoutHeaderConfig
 }
 
 type PageLayoutProps = PropsWithChildren<
@@ -31,30 +46,43 @@ const backgroundClassByVariant: Record<PageLayoutVariant, string> = {
   content: "bg-page-content",
   default: "bg-page-default",
   home: "bg-page-home",
-  mypage: "bg-page-mypage",
+  mypage: "bg-page-mypage mypage-page-background",
 }
 
 export function PageLayout({
   children,
   className,
+  header,
   onLogout,
   showHeader = true,
   showNavbar = true,
   variant = "default",
 }: PageLayoutProps) {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const handleBack = useCallback(() => navigate(-1), [navigate])
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" })
+  }, [pathname])
+
   return (
     <div
       className={cn(
         "min-h-dvh",
         backgroundClassByVariant[variant],
-        showHeader && "pt-[var(--header-layout-height)]",
-        showNavbar && "pb-[82px]",
         className,
       )}
     >
-      {showHeader ? <Header onLogout={onLogout} /> : null}
+      {showHeader ? (
+        <Header
+          {...header}
+          onBack={header?.onBack ?? handleBack}
+          onLogout={onLogout}
+        />
+      ) : null}
 
-      <div>{children}</div>
+      <div className={cn(showNavbar && "pb-[82px]")}>{children}</div>
 
       {showNavbar ? <Navbar /> : null}
     </div>

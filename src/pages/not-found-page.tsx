@@ -6,11 +6,27 @@ import svgPaths from "./imports/404페이지/svg-aqhnyybvxb"
 const BG_GRADIENT =
   "linear-gradient(114.6569940554643deg, rgb(253, 241, 248) 0%, rgb(253, 243, 249) 7.1429%, rgb(254, 245, 250) 14.286%, rgb(254, 247, 251) 21.429%, rgb(254, 249, 252) 28.571%, rgb(254, 251, 253) 35.714%, rgb(255, 253, 254) 42.857%, rgb(255, 255, 255) 50%, rgb(253, 250, 253) 57.143%, rgb(252, 244, 250) 64.286%, rgb(250, 239, 248) 71.429%, rgb(248, 233, 245) 78.571%, rgb(247, 228, 243) 85.714%, rgb(245, 222, 240) 92.857%, rgb(243, 217, 238) 100%)"
 
-function NotFoundIllustration() {
+type ProfileIllustrationProps = {
+  className?: string
+  coreColor?: string
+  faceColor?: string
+  haloColor?: string
+  orbitColor?: string
+  orbitShadowColor?: string
+}
+
+export function ProfileIllustration({
+  className = "size-[208px] overflow-visible",
+  coreColor = "#f6cbe6",
+  faceColor = "#a06a91",
+  haloColor = "#fde7f5",
+  orbitColor = "#e0559a",
+  orbitShadowColor = "rgba(224, 85, 154, 0.45)",
+}: ProfileIllustrationProps) {
   return (
     <svg
       aria-hidden="true"
-      className="size-[208px] overflow-visible"
+      className={className}
       fill="none"
       preserveAspectRatio="none"
       viewBox="0 0 207.992 207.992"
@@ -18,19 +34,19 @@ function NotFoundIllustration() {
       <path
         className="not-found-halo"
         d={svgPaths.pff03871}
-        fill="#fde7f5"
+        fill={haloColor}
         opacity="0.567147"
       />
 
-      <path d={svgPaths.p2c99a500} fill="#f6cbe6" />
+      <path d={svgPaths.p2c99a500} fill={coreColor} />
 
       <g className="not-found-orbit">
         <circle
           cx="104"
           cy="30"
-          fill="#e0559a"
+          fill={orbitColor}
           r="7"
-          style={{ filter: "drop-shadow(0 0 5px rgba(224, 85, 154, 0.45))" }}
+          style={{ filter: `drop-shadow(0 0 5px ${orbitShadowColor})` }}
         />
       </g>
 
@@ -38,21 +54,21 @@ function NotFoundIllustration() {
         <path
           d={svgPaths.p2cf33d80}
           fill="none"
-          stroke="#a06a91"
+          stroke={faceColor}
           strokeLinecap="round"
           strokeWidth="4.15984"
         />
         <path
           d={svgPaths.p3059f200}
           fill="none"
-          stroke="#a06a91"
+          stroke={faceColor}
           strokeLinecap="round"
           strokeWidth="4.15984"
         />
         <path
           d={svgPaths.p31071980}
           fill="none"
-          stroke="#a06a91"
+          stroke={faceColor}
           strokeLinecap="round"
           strokeWidth="4.15984"
         />
@@ -86,7 +102,7 @@ export function NotFoundPage() {
         </p>
 
         <div className="mt-8">
-          <NotFoundIllustration />
+          <ProfileIllustration />
         </div>
 
         <h1 className="mt-8 text-[88px] leading-[88px] font-black tracking-[-2px] text-[#26292e]">

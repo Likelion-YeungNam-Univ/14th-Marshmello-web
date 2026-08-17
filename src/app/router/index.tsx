@@ -18,7 +18,6 @@ const withPageLayout = (pageLayout: PageLayoutConfig) => ({
   pageLayout,
 })
 
-
 async function requireAuth() {
   const me = await getMe()
 
@@ -30,9 +29,9 @@ async function requireAuth() {
 }
 
 /**
- * 로그인->회원정보 등록 완료 여부 확인
+ * 로그인 -> 회원정보 등록 완료 여부 확인
  *
- * 로그인 o, 회원정보 등록  x: 신규 회원정보 등록 화면으로 이동
+ * 로그인 o, 회원정보 등록 x: 신규 회원정보 등록 화면으로 이동
  */
 async function requireProfileComplete() {
   await requireAuth()
@@ -49,9 +48,8 @@ async function requireProfileComplete() {
 /**
  * 신규 회원정보 등록 페이지 접근 처리
  *
- * 로그인x: 로그인 화면으로 이동
- * 회원 정보 등록 o: 홈으로 이동
- *
+ * 로그인 x: 로그인 화면으로 이동
+ * 회원정보 등록 o: 홈으로 이동
  */
 async function signupProfileLoader() {
   await requireAuth()
@@ -64,7 +62,6 @@ async function signupProfileLoader() {
 
   return profile
 }
-
 
 async function homeLoader() {
   const loginStarted =
@@ -89,10 +86,10 @@ async function homeLoader() {
    */
   const profile = await getUserProfile()
 
-
   if (!profile.profileCompleted) {
     throw redirect("/signup/profile")
   }
+
   return profile
 }
 
@@ -115,6 +112,7 @@ export const router = createBrowserRouter([
         loader: homeLoader,
         element: <HomePage />,
         handle: withPageLayout({
+          header: { variant: "default" },
           variant: "home",
         }),
       },
@@ -128,6 +126,7 @@ export const router = createBrowserRouter([
           showNavbar: false,
         }),
       },
+
       {
         path: "home",
         loader: requireProfileComplete,
@@ -136,12 +135,17 @@ export const router = createBrowserRouter([
           variant: "home",
         }),
       },
-      
+
       {
         path: "checkin",
         loader: requireProfileComplete,
         element: <CheckinPage />,
         handle: withPageLayout({
+          header: {
+            title: "오늘의 체크인",
+            variant: "back",
+          },
+          showNavbar: false,
           variant: "checkin",
         }),
       },
@@ -162,7 +166,7 @@ export const router = createBrowserRouter([
       },
 
       {
-        path: "care",
+        path: "care/:checkInId?",
         loader: requireProfileComplete,
         element: <CarePage />,
         handle: withPageLayout({
@@ -185,6 +189,12 @@ export const router = createBrowserRouter([
         loader: requireProfileComplete,
         element: <ContentDetailPage />,
         handle: withPageLayout({
+          header: {
+            title: "추천 콘텐츠",
+            variant: "back",
+          },
+          showHeader: false,
+          showNavbar: false,
           variant: "content",
         }),
       },
@@ -204,12 +214,17 @@ export const router = createBrowserRouter([
         element: <ProfileEditPage />,
         handle: withPageLayout({
           showHeader: false,
+          header: {
+            title: "회원정보 수정",
+            variant: "back",
+          },
           showNavbar: false,
           variant: "mypage",
         }),
       },
     ],
   },
+
   {
     path: "*",
     element: <NotFoundPage />,

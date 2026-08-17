@@ -10,10 +10,10 @@ import {
 import { useNavigate, useOutletContext } from "react-router-dom"
 
 import type { AppOutletContext } from "@/App"
-import profilePlaceholder from "@/assets/mypage/profile-placeholder.svg"
 import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 import { AccountWithdrawalDialog } from "@/features/mypage/ui/account-withdrawal-dialog"
 import { UnavailableFeatureDialog } from "@/features/mypage/ui/unavailable-feature-dialog"
+import { ProfileIllustration } from "@/pages/not-found-page"
 
 type MyPageMenuItem = {
   icon: LucideIcon
@@ -28,29 +28,35 @@ const menuItems: MyPageMenuItem[] = [
 ]
 
 type MyPageMenuRowProps = MyPageMenuItem & {
+  isLast: boolean
   onClick?: () => void
 }
 
-function MyPageMenuRow({ icon: Icon, label, onClick }: MyPageMenuRowProps) {
+function MyPageMenuRow({
+  icon: Icon,
+  isLast,
+  label,
+  onClick,
+}: MyPageMenuRowProps) {
   return (
     <button
       aria-label={label}
-      className="flex h-[54px] w-full items-center border-b border-[#e8e8e8] text-[#555] transition-colors hover:text-[#181d27] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/40"
+      className={`flex h-[67px] w-full items-center gap-4 px-5 text-[#3d3d3d] transition-colors hover:bg-white/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/40 ${
+        isLast ? "" : "border-b-2 border-white"
+      }`}
       onClick={onClick}
       type="button"
     >
-      <span className="ml-4 flex size-6 shrink-0 items-center justify-center">
-        <Icon aria-hidden="true" className="size-6" strokeWidth={1.7} />
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-[12px] bg-[#fdf2f8] text-[#f19ed2]">
+        <Icon aria-hidden="true" className="size-5" strokeWidth={1.7} />
       </span>
 
-      <span aria-hidden="true" className="ml-[15px] h-9 w-px bg-[#e8e8e8]" />
-
-      <span className="ml-[15px] text-[16px] leading-[19.5px]">{label}</span>
+      <span className="text-[15px] leading-[22.5px]">{label}</span>
 
       <ChevronRight
         aria-hidden="true"
-        className="ml-auto mr-[5px] size-6 shrink-0"
-        strokeWidth={1.7}
+        className="ml-auto size-4 shrink-0 text-[#858b91]"
+        strokeWidth={1.8}
       />
     </button>
   )
@@ -78,31 +84,40 @@ export function MyPage() {
     <>
       <section
         aria-labelledby="mypage-user-name"
-        className="mx-auto min-h-[calc(100svh-82px)] w-full max-w-[393px] px-5 pt-[117px]"
+        className="mx-auto min-h-[calc(100svh-82px)] w-full max-w-[393px] px-5 pt-[69px]"
       >
         <div className="flex flex-col items-center text-center">
-          <img
-            alt={`${name} 프로필`}
-            className="size-[72px] shrink-0"
-            src={profilePlaceholder}
-          />
+          <div className="relative size-[100px] shrink-0">
+            <ProfileIllustration
+              className="absolute inset-0 size-full overflow-visible"
+              coreColor="#fcebf5"
+              faceColor="#000000"
+              haloColor="#ffe5f5"
+              orbitColor="transparent"
+              orbitShadowColor="#fbe0f2"
+            />
+          </div>
 
           <h1
-            className="mt-[21px] text-[16px] leading-6 font-bold text-[#181d27]"
+            className="mt-6 text-[16px] leading-6 font-bold text-[#181d27]"
             id="mypage-user-name"
           >
             {name}님
           </h1>
-          <p className="text-[13px] leading-[19.5px] text-[#ababab]">
+          <p className="mt-[3px] text-[13px] leading-[19.5px] text-[#484c52]">
             {email}
           </p>
         </div>
 
-        <ul aria-label="마이페이지 메뉴" className="mt-10 w-[343px] max-w-full">
-          {menuItems.map((item) => (
-            <li className="mb-[11px] last:mb-0" key={item.id}>
+        <ul
+          aria-label="마이페이지 메뉴"
+          className="mt-[51px] w-full overflow-hidden rounded-[16px] border-2 border-white bg-white/90"
+        >
+          {menuItems.map((item, index) => (
+            <li key={item.id}>
               <MyPageMenuRow
                 {...item}
+                isLast={index === menuItems.length - 1}
                 onClick={
                   item.id === "withdraw-account"
                     ? () => setIsWithdrawalDialogOpen(true)
