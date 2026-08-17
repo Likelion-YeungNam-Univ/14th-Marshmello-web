@@ -10,6 +10,9 @@ import { MyPage } from "@/pages/mypage-page"
 import { NotFoundPage } from "@/pages/not-found-page"
 import { ProfileEditPage } from "@/pages/profile-edit-page"
 import type { PageLayoutConfig } from "@/shared/components/layout/page-layout"
+//테스트 페이지라서 이거 지울거에요
+import { TestPage } from "@/pages/test-page"
+
 
 const withPageLayout = (pageLayout: PageLayoutConfig) => ({ pageLayout })
 
@@ -78,5 +81,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  //이거 테스트페이지라서 지울거에요
+  { path: "/test", element: <TestPage /> },
   { path: "*", element: <NotFoundPage /> },
 ])
