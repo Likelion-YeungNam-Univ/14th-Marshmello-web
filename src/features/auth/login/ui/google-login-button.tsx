@@ -4,9 +4,20 @@ import { GoogleIcon } from "./google-icon"
 const OIDC_LOGIN_URL =
   "https://marshmello-be.duckdns.org/oauth2/authorization/oidc"
 
-export function GoogleLoginButton() {
+type GoogleLoginButtonProps = {
+  onClick?: () => void
+}
+
+export function GoogleLoginButton({
+  onClick,
+}: GoogleLoginButtonProps) {
   const handleGoogleLogin = () => {
     localStorage.setItem("loginStarted", "true")
+
+    if (onClick) {
+      onClick()
+      return
+    }
 
     window.location.href = OIDC_LOGIN_URL
   }
