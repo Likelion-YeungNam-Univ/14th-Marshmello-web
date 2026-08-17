@@ -1,4 +1,4 @@
-import { apiClient } from "@/shared/api/axios"
+import { apiClient, saveCsrfToken } from "@/shared/api/axios"
 
 {/*------------------------------------------------------------ */}
 
@@ -23,7 +23,14 @@ Promise<csrfResponse> {
   const response =
     await apiClient.get<csrfResponse>(url)
 
-  return response.data
+  const csrf = response.data
+  
+  saveCsrfToken(
+    csrf.token,
+    csrf.headerName,
+  )
+
+  return csrf
 }
 
 //## API 실행 테스트 함수
