@@ -166,9 +166,6 @@ export function ProfileEditPage() {
               >
                 닉네임
               </label>
-              <span className="mt-0.5 block text-[12px] leading-[18px] text-[#8a8388]">
-                다른 사용자에게 표시되는 이름이에요.
-              </span>
             </div>
           </div>
 
@@ -177,7 +174,7 @@ export function ProfileEditPage() {
             autoComplete="nickname"
             className="mt-4 h-[50px] rounded-xl border-[#e8e2e6] bg-white px-4 text-[15px] font-medium tracking-[-0.2px] text-[#26292e] shadow-none placeholder:text-[#b6a6b1] focus-visible:border-[#f19ed2] focus-visible:ring-3 focus-visible:ring-[#f19ed2]/15"
             id="profile-name"
-            maxLength={20}
+            maxLength={15}
             onChange={(event) => setName(event.target.value)}
             placeholder="닉네임을 입력해 주세요"
             required
@@ -187,7 +184,7 @@ export function ProfileEditPage() {
             className="mt-2 text-right text-[11px] leading-[16.5px] text-[#aaa2a7]"
             id="profile-name-helper"
           >
-            {name.length}/20
+            {name.length}/15
           </p>
         </motion.section>
 
@@ -207,9 +204,6 @@ export function ProfileEditPage() {
               >
                 출산 예정일
               </h2>
-              <span className="mt-0.5 block text-[12px] leading-[18px] text-[#8a8388]">
-                휠을 위아래로 움직여 날짜를 선택해 주세요.
-              </span>
             </div>
           </div>
 
