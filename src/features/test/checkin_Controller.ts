@@ -3,19 +3,31 @@ import { apiClient } from "@/shared/api/axios"
 //# check-in-controller, /api/check-ins, /api/check-ins/emotions
 
 //## 요청보낼 양식 
+
+
 export type checkInRequest = {
   date: string
   //양식: YYYY-MM-DD
 }
 
+//GET 요청 /api/check-ins/count , /api/check-ins/body-diaries/top-region
+export type checkinCountRequest = {
+  month: string,
+  //YYYY-MM
+}
+
 //## 응답받는 양식
+
+//GET /api/check-ins 응답
 export type checkInResponse = [
   {
     checkInId: number,
     imageId: number,
-    checkInDate: string,
     achieved: boolean,
+    checkInDate: string,
+    diary: string,
     emotion: number,
+    bodyDiaries: bodyDiaryRequest[]
   }
 ]
 
@@ -66,6 +78,17 @@ export type checkInEmotionResponse = {
   emotion: number
 }
 
+// GET /api/check-ins/count 응답 항목
+export type checkInCountResponse = {
+  count: number
+  achievedCOunt: number
+}
+
+// GET /api/check-ins/body-diraries/top-region 응답 항목
+export type checkInRegion = {
+  bodyRegion: number
+}
+
 //## 요청 함수
 
 // 날짜를 이용해 체크인 목록 조회
@@ -110,3 +133,45 @@ export async function getCheckInEmotions(
 
 
 //## API 실행 테스트 함수
+
+// GET /api/check-ins 테스트
+export const handleGetCheckInsByDate =
+  async (date: string) => {
+    const result =
+      await getCheckInsByDate(date)
+
+    console.log(
+      "체크인 목록 조회 결과:",
+      result,
+    )
+
+    return result
+  }
+
+// POST /api/check-ins 테스트
+export const handleCreateCheckIn =
+  async (request: checkInCreateRequest) => {
+    const result =
+      await createCheckIn(request)
+
+    console.log(
+      "체크인 생성 결과:",
+      result,
+    )
+
+    return result
+  }
+
+// GET /api/check-ins/emotions 테스트
+export const handleGetCheckInEmotions =
+  async (month: string) => {
+    const result =
+      await getCheckInEmotions(month)
+
+    console.log(
+      "감정 기록 조회 결과:",
+      result,
+    )
+
+    return result
+  }
