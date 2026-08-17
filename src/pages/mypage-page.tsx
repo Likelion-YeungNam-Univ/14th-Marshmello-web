@@ -87,14 +87,14 @@ export function MyPage() {
         className="mx-auto min-h-[calc(100svh-82px)] w-full max-w-[393px] px-5 pt-[69px]"
       >
         <div className="flex flex-col items-center text-center">
-          <div className="relative size-[120px] shrink-0">
+          <div className="relative size-[100px] shrink-0">
             <ProfileIllustration
-              className="absolute -inset-[30px] size-[180px] overflow-visible"
-              coreColor="#fffaff"
-              faceColor="#484c52"
-              haloColor="#fcebf5"
-              orbitColor="#fcebf5"
-              orbitShadowColor="rgba(252, 235, 245, 0.45)"
+              className="absolute inset-0 size-full overflow-visible"
+              coreColor="#fcebf5"
+              faceColor="#000000"
+              haloColor="#ffe5f5"
+              orbitColor="transparent"
+              orbitShadowColor="#fbe0f2"
             />
           </div>
 
