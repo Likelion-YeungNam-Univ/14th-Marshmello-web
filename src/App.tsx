@@ -2,10 +2,10 @@ import { useCallback, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import {
   Outlet,
-  useLocation,
   useMatches,
   useNavigate,
   useParams,
+  useLocation,
 } from "react-router-dom"
 
 import { LogoutDrawer } from "@/features/auth/logout/ui/logout-drawer"
@@ -40,7 +40,9 @@ export default function App() {
     (() => void) | undefined
   >()
 
-  const [showSplash, setShowSplash] = useState(() => !hasSplashAlreadyShown())
+  const [showSplash, setShowSplash] = useState(
+    () => !hasSplashAlreadyShown(),
+  )
 
   const { pathname } = useLocation()
   const matches = useMatches()
@@ -67,7 +69,8 @@ export default function App() {
 
   const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
     (currentLayout, match) =>
-      (match.handle as RouteHandle | undefined)?.pageLayout ?? currentLayout,
+      (match.handle as RouteHandle | undefined)?.pageLayout ??
+      currentLayout,
     undefined,
   )
 
@@ -84,7 +87,7 @@ export default function App() {
   }, [navigate, queryClient, restartSplash])
 
   const isContentDetail = pageLayout?.variant === "content"
-  const isCareFlow = isContentDetail || pageLayout?.variant === "care"
+  const isCareFlow = pageLayout?.variant === "care"
 
   // Splash Screen
   if (showSplash) {
@@ -109,7 +112,6 @@ export default function App() {
     )
   }
 
-  // 나머지 페이지
   return (
     <>
       {isCareFlow ? (

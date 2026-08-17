@@ -53,7 +53,7 @@ export default function LoginPage() {
 
         {/* 구글 로그인 버튼 */}
         <div className="absolute bottom-[16%] left-6 right-6">
-          <GoogleLoginButton onClick={handleGoogleLogin} />
+          <GoogleLoginButton />
         </div>
       </div>
     </main>
