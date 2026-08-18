@@ -1,5 +1,5 @@
-import { useCallback, type PropsWithChildren } from "react"
-import { useNavigate } from "react-router-dom"
+import { useCallback, useEffect, type PropsWithChildren } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import {
   Header,
@@ -59,7 +59,12 @@ export function PageLayout({
   variant = "default",
 }: PageLayoutProps) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const handleBack = useCallback(() => navigate(-1), [navigate])
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" })
+  }, [pathname])
 
   return (
     <div

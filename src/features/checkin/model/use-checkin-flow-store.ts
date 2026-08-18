@@ -5,6 +5,8 @@ interface BodyPartAnswer {
   hasStretchMarks: boolean | null
 }
 
+export type CheckinMood = "sad" | "neutral" | "good" | "great"
+
 interface CheckinFlowState {
   step: number //checkin page에서 사용
   conditionScore: number | null //컨디션 스코어 저장용
@@ -12,6 +14,7 @@ interface CheckinFlowState {
   capturedPhoto: Blob | null //사진 저장용
   memo: string //checkin 4page에서 메모 저장용
   practiceCare: boolean | null //케어카드 여부 저장용
+  mood: CheckinMood | null //기분 상태 저장용
   bodyPartAnswers: Record<number, BodyPartAnswer>
 
   setStep: (step: number) => void
@@ -23,6 +26,7 @@ interface CheckinFlowState {
   setCapturedPhoto: (photo: Blob | null) => void
   setMemo: (memo : string) => void
   setPracticeCare: (care: boolean | null) => void 
+  setMood: (mood: CheckinMood | null) => void
   setBodyPartAnswer: (
     partId: number,
     answer: Partial<BodyPartAnswer>,
@@ -49,6 +53,7 @@ const initialState = {
   },
   memo: "",
   practiceCare: null,
+  mood: null,
 }
 
 export const useCheckinFlowStore = create<CheckinFlowState>((set) => ({
@@ -65,6 +70,7 @@ export const useCheckinFlowStore = create<CheckinFlowState>((set) => ({
   setMemo: (memo) => set({ memo }),
   setBodyPartAnswer: (partId, answer) => set((state) => ({bodyPartAnswers: {...state.bodyPartAnswers, [partId]: {...state.bodyPartAnswers[partId], ...answer,},},})),
   setPracticeCare: (practiceCare) => set({ practiceCare }), 
+  setMood: (mood) => set({ mood }),
 
   reset: () => set(initialState),
 }))

@@ -1,16 +1,21 @@
 import { useCallback, useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import { Outlet, useMatches, useNavigate, useParams } from "react-router-dom"
+import {
+  Outlet,
+  useLocation,
+  useMatches,
+  useNavigate,
+  useParams,
+} from "react-router-dom"
 
-import { LogoutDrawer } from "@/features/auth/ui/logout-drawer"
+import { LogoutDrawer } from "@/features/auth/logout/ui/logout-drawer"
 import { CarePage } from "@/pages/care-page"
 import {
   PageLayout,
   type PageLayoutConfig,
 } from "@/shared/components/layout/page-layout"
-import SplashScreen from "@/shared/components/ui/splash-screen"
+import SplashScreen from "@/shared/components/ui/splash/splash-screen"
 
-//Outlet으로 렌더링되는 자식 페이지에 전달할 공통 함수 타입
 export type AppOutletContext = {
   restartSplash: () => void
   setHeaderBackAction: (action?: () => void) => void
@@ -20,59 +25,90 @@ type RouteHandle = {
   pageLayout?: PageLayoutConfig
 }
 
+const SPLASH_SESSION_KEY = "poomgyeol:splash-shown"
+
+function hasSplashAlreadyShown() {
+  if (typeof window === "undefined") return false
+
+  return window.sessionStorage.getItem(SPLASH_SESSION_KEY) === "1"
+}
+
 export default function App() {
-  // 로그아웃 창, 헤더 뒤로가기 동작, 스플래시 표시 여부 관리
   const [isLogoutDrawerOpen, setIsLogoutDrawerOpen] = useState(false)
+
   const [pageHeaderBackAction, setPageHeaderBackAction] = useState<
     (() => void) | undefined
   >()
-  const [showSplash, setShowSplash] = useState(true)
 
-  // 현재 라우트 정보, 페이지 이동 함수, URL의 checkInId를 가져옴
+  const [showSplash, setShowSplash] = useState(
+    () => !hasSplashAlreadyShown(),
+  )
+
+  const { pathname } = useLocation()
   const matches = useMatches()
   const navigate = useNavigate()
   const { checkInId: checkInIdParam } = useParams()
   const queryClient = useQueryClient()
 
-  // URL에서 받은 checkInId를 숫자로 변환하고 유효하지 않으면 undefined 처리
+  // 로그인 페이지에서는 PageLayout을 사용하지 않음
+  const isLoginPage = pathname === "/login"
+
   const parsedCheckInId = Number(checkInIdParam)
+
   const checkInId = Number.isInteger(parsedCheckInId)
     ? parsedCheckInId
     : undefined
 
-  // 스플래시 화면을 다시 표시
-  const restartSplash = useCallback(() => setShowSplash(true), [])
+  const restartSplash = useCallback(() => {
+    window.sessionStorage.removeItem(SPLASH_SESSION_KEY)
+    setShowSplash(true)
+  }, [])
 
-  // 현재 페이지에서 사용할 헤더 뒤로가기 동작을 등록
   const setHeaderBackAction = useCallback((action?: () => void) => {
     setPageHeaderBackAction(() => action)
   }, [])
 
-  // 현재 매칭된 라우트 중 가장 구체적인 페이지 레이아웃 설정을 선택
   const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
     (currentLayout, match) =>
-      (match.handle as RouteHandle | undefined)?.pageLayout ?? currentLayout,
+      (match.handle as RouteHandle | undefined)?.pageLayout ??
+      currentLayout,
     undefined,
   )
 
-  //로그아웃 처리
   const logout = useCallback(() => {
     queryClient.clear()
     window.sessionStorage.clear()
+
     setIsLogoutDrawerOpen(false)
+
     navigate("/", { replace: true })
+
     restartSplash()
   }, [navigate, queryClient, restartSplash])
+
   const isContentDetail = pageLayout?.variant === "content"
   const isCareFlow = isContentDetail || pageLayout?.variant === "care"
 
-  
+  // Splash Screen
   if (showSplash) {
     return (
       <SplashScreen
         durationMs={5000}
-        onFinish={() => setShowSplash(false)}
+        onFinish={() => {
+          window.sessionStorage.setItem(SPLASH_SESSION_KEY, "1")
+          setShowSplash(false)
+        }}
       />
+    )
+  }
+
+  // 로그인 페이지
+  // PageLayout / Header / Navbar 전부 사용하지 않음
+  if (isLoginPage) {
+    return (
+      <main className="min-h-dvh w-full">
+        <Outlet context={{ restartSplash, setHeaderBackAction }} />
+      </main>
     )
   }
 
@@ -90,7 +126,10 @@ export default function App() {
           {...pageLayout}
           header={
             pageHeaderBackAction
-              ? { ...pageLayout?.header, onBack: pageHeaderBackAction }
+              ? {
+                  ...pageLayout?.header,
+                  onBack: pageHeaderBackAction,
+                }
               : pageLayout?.header
           }
           onLogout={() => setIsLogoutDrawerOpen(true)}
@@ -104,7 +143,10 @@ export default function App() {
           {...pageLayout}
           header={
             pageHeaderBackAction
-              ? { ...pageLayout?.header, onBack: pageHeaderBackAction }
+              ? {
+                  ...pageLayout?.header,
+                  onBack: pageHeaderBackAction,
+                }
               : pageLayout?.header
           }
         >
