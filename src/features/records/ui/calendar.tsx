@@ -1,7 +1,12 @@
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import {
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 import { useMemo } from "react"
 
-import type { EmotionByDate } from "@/features/records/api/records"
+import type {
+  EmotionByDate,
+} from "@/features/records/model/types"
 
 import {
   buildCalendarDays,
@@ -106,11 +111,11 @@ export function RecordsCalendar({
     [requestMonth],
   )
 
-  const monthLabel = formatMonth(requestMonth)
+  const monthLabel =
+    formatMonth(requestMonth)
 
   return (
     <section className="relative z-30 mt-[24px] rounded-t-[5px] bg-white px-[25px] pb-[120px] pt-[22px]">
-      {/* 월 이동 */}
       <div className="flex items-center justify-center gap-[5px]">
         <button
           aria-label="이전 달"
@@ -133,7 +138,6 @@ export function RecordsCalendar({
         </button>
       </div>
 
-      {/* 요일 */}
       <div className="mt-[24px] grid grid-cols-7 gap-x-[11px] text-center">
         {[
           "일",
@@ -153,7 +157,6 @@ export function RecordsCalendar({
         ))}
       </div>
 
-      {/* 날짜 */}
       <div className="mt-[20px] grid grid-cols-7 gap-x-[11px] gap-y-[18px]">
         {Array.from({
           length: firstDayOfMonth,

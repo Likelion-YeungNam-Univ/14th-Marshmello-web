@@ -1,5 +1,8 @@
-import type { EmotionByDate } from "@/features/records/api/records"
-import type { CalendarDay, MoodType } from "@/features/records/model/types"
+import type {
+  CalendarDay,
+  EmotionByDate,
+  MoodType,
+} from "@/features/records/model/types"
 
 /**
  * 백엔드 emotion enum
@@ -40,19 +43,30 @@ export function getBodyRegionLabel(
     0: "옆구리",
   }
 
-  return bodyRegionMap[bodyRegion] ?? `부위 ${bodyRegion}`
+  return (
+    bodyRegionMap[bodyRegion] ??
+    `부위 ${bodyRegion}`
+  )
 }
 
-export function getDaysInMonth(yearMonth: string): number {
-  const [year, month] = yearMonth.split("-").map(Number)
+export function getDaysInMonth(
+  yearMonth: string,
+): number {
+  const [year, month] =
+    yearMonth.split("-").map(Number)
 
-  return new Date(year, month, 0).getDate()
+  return new Date(
+    year,
+    month,
+    0,
+  ).getDate()
 }
 
 export function getFirstDayOfMonth(
   yearMonth: string,
 ): number {
-  const [year, month] = yearMonth.split("-").map(Number)
+  const [year, month] =
+    yearMonth.split("-").map(Number)
 
   return new Date(
     year,
@@ -64,7 +78,8 @@ export function getFirstDayOfMonth(
 export function formatMonth(
   yearMonth: string,
 ): string {
-  const [year, month] = yearMonth.split("-")
+  const [year, month] =
+    yearMonth.split("-")
 
   return `${year}년 ${Number(month)}월`
 }
@@ -80,11 +95,11 @@ export function buildCalendarDays(
     ]),
   )
 
-  const [year, month] = yearMonth
-    .split("-")
-    .map(Number)
+  const [year, month] =
+    yearMonth.split("-").map(Number)
 
-  const daysInMonth = getDaysInMonth(yearMonth)
+  const daysInMonth =
+    getDaysInMonth(yearMonth)
 
   return Array.from(
     { length: daysInMonth },
@@ -99,7 +114,8 @@ export function buildCalendarDays(
 
       return {
         date: day,
-        emotion: emotionMap.get(date) ?? null,
+        emotion:
+          emotionMap.get(date) ?? null,
       }
     },
   )
