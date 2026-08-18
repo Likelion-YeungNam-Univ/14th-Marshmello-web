@@ -16,6 +16,7 @@ import {
   getUserProfile,
 } from "@/shared/api/auth"
 import type { PageLayoutConfig } from "@/shared/components/layout/page-layout"
+import { TestPage } from "@/pages/test-page"
 
 const withPageLayout = (pageLayout: PageLayoutConfig) => ({
   pageLayout,
@@ -302,6 +303,11 @@ export const router = createBrowserRouter([
         }),
       },
     ],
+  },
+
+  {
+    path: "/test",
+    element: <TestPage />,
   },
 
   {
