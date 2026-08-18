@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { CircleCheck } from "lucide-react"
 import { useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Textarea } from "@/shared/components/ui/textarea"
@@ -21,6 +23,8 @@ import rightLegSvg from "@/features/checkin/bodymap/right-leg.svg?no-inline"
 
 const BODY_MAP_WIDTH = 262
 const BODY_MAP_HEIGHT = 411
+const SUCCESS_OVERLAY_DURATION_MS = 1200
+const SUCCESS_OVERLAY_EXIT_DURATION_MS = 180
 
 export function CheckinPage() {
 
@@ -76,18 +80,9 @@ export function CheckinPage() {
 
   //버튼에 따라서 애니메이션 방향 변경을 위한 useState
   const [direction, setDirection] = useState<CheckinDirection>(1)
-
-  //버튼 클릭 시 애니메이션 + 다음 페이지 이동
-  const handleNextStep = () => {
-    if (step === 4) {
-      // TODO: Swagger 확인 후 체크인 저장 API 성공 시에만 홈으로 이동
-      navigate("/", { replace: true })
-      return
-    }
-
-    setDirection(1)
-    nextStep()
-  }
+  const [isCheckinSuccessVisible, setIsCheckinSuccessVisible] = useState(false)
+  const hideSuccessTimeoutRef = useRef<number | null>(null)
+  const navigateTimeoutRef = useRef<number | null>(null)
 
   const handlePreviousStep = useCallback(() => {
     setDirection(-1)
@@ -105,6 +100,19 @@ export function CheckinPage() {
     return () => setHeaderBackAction()
   }, [handlePreviousStep, setHeaderBackAction, step])
 
+  useEffect(
+    () => () => {
+      if (hideSuccessTimeoutRef.current !== null) {
+        window.clearTimeout(hideSuccessTimeoutRef.current)
+      }
+
+      if (navigateTimeoutRef.current !== null) {
+        window.clearTimeout(navigateTimeoutRef.current)
+      }
+    },
+    [],
+  )
+
   //zustand store에서 케어카드 실천여부
   const practiceCare = useCheckinFlowStore((state) => state.practiceCare)
   const setPracticeCare = useCheckinFlowStore((state) => state.setPracticeCare)
@@ -112,6 +120,44 @@ export function CheckinPage() {
   //zustand store에서 추천행동 만족도 여부
   const conditionScore = useCheckinFlowStore((state) => state.conditionScore)
   const setConditionScore = useCheckinFlowStore((state) => state.setConditionScore)
+  const capturedPhoto = useCheckinFlowStore((state) => state.capturedPhoto)
+  const mood = useCheckinFlowStore((state) => state.mood)
+  const setMood = useCheckinFlowStore((state) => state.setMood)
+
+  const isCurrentStepValid = (() => {
+    switch (step) {
+      case 1:
+        return practiceCare !== null && conditionScore !== null
+      case 2:
+        return capturedPhoto !== null
+      case 3:
+        return true
+      case 4:
+        return mood !== null
+      default:
+        return false
+    }
+  })()
+
+  //버튼 클릭 시 애니메이션 + 다음 페이지 이동
+  const handleNextStep = () => {
+    if (!isCurrentStepValid) return
+
+    if (step === 4) {
+      // TODO: Swagger 확인 후 체크인 저장 API 성공 시에만 홈으로 이동
+      setIsCheckinSuccessVisible(true)
+      hideSuccessTimeoutRef.current = window.setTimeout(() => {
+        setIsCheckinSuccessVisible(false)
+      }, SUCCESS_OVERLAY_DURATION_MS)
+      navigateTimeoutRef.current = window.setTimeout(() => {
+        navigate("/", { replace: true })
+      }, SUCCESS_OVERLAY_DURATION_MS + SUCCESS_OVERLAY_EXIT_DURATION_MS)
+      return
+    }
+
+    setDirection(1)
+    nextStep()
+  }
 
   //버튼 별 만족도 맵핑
   const satisfactionOptions = [
@@ -422,7 +468,12 @@ export function CheckinPage() {
               {/*기분상태 이모티콘 선택*/}
               <div className="mt-[14px] flex w-[291px] self-center flex-row items-center justify-center gap-4">
                 {/*우울해요*/}
-                <div className="flex flex-col items-center justify-center gap-1 hover:scale-110">
+                <button
+                  type="button"
+                  onClick={() => setMood("sad")}
+                  aria-pressed={mood === "sad"}
+                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "sad" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                >
                   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="22" cy="22" r="22" fill="#8DDBC4"/>
                     <ellipse cx="23.279" cy="17.9447" rx="4.34884" ry="5.40953" fill="white"/>
@@ -434,10 +485,15 @@ export function CheckinPage() {
                   <p className="text-[12px] font-medium font-['Pretendard']">
                     우울해요
                   </p>
-                </div>
+                </button>
 
                 {/*그냥 그래요*/}
-                <div className="flex flex-col items-center justify-center gap-1 hover:scale-110">
+                <button
+                  type="button"
+                  onClick={() => setMood("neutral")}
+                  aria-pressed={mood === "neutral"}
+                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "neutral" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                >
                   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
                     className="cursor-pointer transition-all duration-300 hover:drop-shadow-[0_0_8px_#F4B7A3]"
                   >
@@ -451,10 +507,15 @@ export function CheckinPage() {
                   <p className="text-[12px] font-medium font-['Pretendard']">
                     그냥 그래요
                   </p>
-                </div>
+                </button>
 
                 {/*좋아요*/}
-                <div className="flex flex-col items-center justify-center gap-1 hover:scale-110">
+                <button
+                  type="button"
+                  onClick={() => setMood("good")}
+                  aria-pressed={mood === "good"}
+                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "good" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                >
                   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="22" cy="22" r="22" fill="#E8C6E8"/>
                     <circle cx="17.0118" cy="17.7793" r="5.24419" fill="white"/>
@@ -467,10 +528,15 @@ export function CheckinPage() {
                   <p className="text-[12px] font-medium font-['Pretendard']">
                     좋아요
                   </p>
-                </div>
+                </button>
 
                 {/*최고에요*/}
-                <div className="flex flex-col items-center justify-center gap-1 hover:scale-110">
+                <button
+                  type="button"
+                  onClick={() => setMood("great")}
+                  aria-pressed={mood === "great"}
+                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "great" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                >
                   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="22" cy="22" r="22" fill="#EF9BCE"/>
                     <circle cx="27.2442" cy="17.0118" r="5.24419" fill="white"/>
@@ -482,7 +548,7 @@ export function CheckinPage() {
                   <p className="text-[12px] font-medium font-['Pretendard']">
                     최고에요
                   </p>
-                </div>
+                </button>
               </div>  
               {/*메모칸*/}
               <Textarea 
@@ -500,10 +566,40 @@ export function CheckinPage() {
        
       {/*다음 버튼, button 컴포넌트 사용*/}
       <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+24px)] z-40 mx-auto w-full max-w-[393px] px-8">
-        <Button onClick={handleNextStep} className="h-[50px] w-full rounded-[15px] bg-[#484C52] text-[12px] text-white">
-          다음
+        <Button
+          onClick={handleNextStep}
+          disabled={!isCurrentStepValid || isCheckinSuccessVisible}
+          className="h-[50px] w-full rounded-[15px] bg-[#484C52] text-[12px] text-white"
+        >
+          {step === 4 ? "완료" : "다음"}
         </Button>
       </div>
+
+      <AnimatePresence>
+        {isCheckinSuccessVisible ? (
+          <motion.div
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-[2px]"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+          >
+            <motion.div
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex size-24 items-center justify-center rounded-full bg-[#26292E] shadow-[0_12px_32px_rgba(0,0,0,0.3)]"
+              exit={{ opacity: 0, scale: 0.92 }}
+              initial={{ opacity: 0, scale: 0.56 }}
+              transition={{ type: "spring", stiffness: 360, damping: 22 }}
+            >
+              <CircleCheck
+                aria-label="체크인 완료"
+                className="size-14 text-white"
+                strokeWidth={1.8}
+              />
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
       
     </div>
   )
