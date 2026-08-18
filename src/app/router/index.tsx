@@ -10,6 +10,7 @@ import { MassageGuidePage } from "@/pages/massage-guide-page"
 import { MyPage } from "@/pages/mypage-page"
 import { NotFoundPage } from "@/pages/not-found-page"
 import { ProfileEditPage } from "@/pages/profile-edit-page"
+import { RecordsPage } from "@/pages/records-page"
 import { SignupProfilePage } from "@/pages/signup-profile-page"
 import {
   getCsrf,
@@ -50,12 +51,6 @@ async function requireAuth() {
 
 /**
  * 로그인 + 회원정보 등록 완료 여부 확인
- *
- * profileCompleted === false
- * → 신규 회원정보 등록
- *
- * profileCompleted === true
- * → 서비스 이용 가능
  */
 async function requireProfileComplete() {
   const profile = await requireAuth()
@@ -69,12 +64,6 @@ async function requireProfileComplete() {
 
 /**
  * 신규 회원정보 등록 페이지 접근 처리
- *
- * 로그인하지 않음
- * → /login
- *
- * 이미 회원정보 등록 완료
- * → /
  */
 async function signupProfileLoader() {
   const profile = await requireAuth()
@@ -88,61 +77,29 @@ async function signupProfileLoader() {
 
 /**
  * 첫 화면 처리
- *
- * 로그인 버튼을 누르기 전:
- * → /login
- *
- * 로그인 버튼을 누른 후 Google OAuth 완료:
- * → GET /api/csrf
- * → GET /api/user
- *
- * profileCompleted === false
- * → /signup/profile
- *
- * profileCompleted === true
- * → HomePage
  */
 async function homeLoader() {
   const loginStarted =
     localStorage.getItem("loginStarted") === "true"
 
-  /**
-   * 로그인 버튼을 누르지 않았다면
-   * API 호출 없이 로그인 화면으로 이동
-   */
   if (!loginStarted) {
     throw redirect("/login")
   }
 
   try {
-    /**
-     * 로그인 후 CSRF 확인
-     */
     await getCsrf()
 
-    /**
-     * 서비스 회원정보 확인
-     */
     const profile = await getUserProfile()
 
-    /**
-     * 로그인되지 않은 상태
-     */
     if (!profile) {
       localStorage.removeItem("loginStarted")
       throw redirect("/login")
     }
 
-    /**
-     * 신규 회원
-     */
     if (!profile.profileCompleted) {
       throw redirect("/signup/profile")
     }
 
-    /**
-     * 기존 회원
-     */
     return profile
   } catch (error) {
     if (error instanceof Response) {
@@ -166,8 +123,6 @@ async function authLoader() {
 export const router = createBrowserRouter([
   /**
    * 로그인 페이지
-   *
-   * App 밖에 있어서 Header / Navbar가 표시되지 않는다.
    */
   {
     path: "/login",
@@ -182,7 +137,7 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       /**
-       * 로그인 + 회원정보 등록 완료 필요
+       * 홈
        */
       {
         index: true,
@@ -196,6 +151,9 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 신규 회원정보 등록
+       */
       {
         path: "signup/profile",
         loader: signupProfileLoader,
@@ -206,6 +164,9 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 별도 홈 경로
+       */
       {
         path: "home",
         loader: requireProfileComplete,
@@ -215,6 +176,9 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 체크인
+       */
       {
         path: "checkin",
         loader: requireProfileComplete,
@@ -229,21 +193,37 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * Body Map
+       */
       {
         path: "body-map",
         loader: requireProfileComplete,
       },
 
+      /**
+       * Camera
+       */
       {
         path: "camera",
         loader: requireProfileComplete,
       },
 
+      /**
+       * Records
+       */
       {
         path: "records",
         loader: requireProfileComplete,
+        element: <RecordsPage />,
+        handle: withPageLayout({
+          variant: "records",
+        }),
       },
 
+      /**
+       * Care
+       */
       {
         path: "care/:checkInId?",
         loader: requireProfileComplete,
@@ -253,6 +233,9 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 마사지 가이드
+       */
       {
         path: "massage-guide",
         loader: requireProfileComplete,
@@ -263,6 +246,9 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 콘텐츠 상세
+       */
       {
         path: "contents/:contentId",
         loader: requireProfileComplete,
@@ -278,6 +264,9 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 마이페이지
+       */
       {
         path: "mypage",
         loader: authLoader,
@@ -287,6 +276,9 @@ export const router = createBrowserRouter([
         }),
       },
 
+      /**
+       * 기존 회원정보 수정
+       */
       {
         path: "mypage/edit",
         loader: authLoader,
@@ -304,6 +296,9 @@ export const router = createBrowserRouter([
     ],
   },
 
+  /**
+   * 404
+   */
   {
     path: "*",
     element: <NotFoundPage />,
