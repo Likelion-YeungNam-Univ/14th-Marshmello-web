@@ -105,6 +105,7 @@ export async function getCheckInsByDate(
 
 // 체크인 JSON을 백엔드로 보내서 새로운 체크인 생성
 export async function createCheckIn(
+  date: string,
   request: checkInCreateRequest,
 ): Promise<checkInCreateResponse> {
   const url = "/api/check-ins"
@@ -113,6 +114,11 @@ export async function createCheckIn(
     await apiClient.post<checkInCreateResponse>(
       url,
       request,
+      {
+        params: {
+          date,
+        },
+      },  
     )
 
   return response.data
@@ -175,9 +181,9 @@ export const handleGetCheckInsByDate =
 
 // POST /api/check-ins 테스트
 export const handleCreateCheckIn =
-  async (request: checkInCreateRequest) => {
+  async (date: string, request: checkInCreateRequest) => {
     const result =
-      await createCheckIn(request)
+      await createCheckIn(date, request)
 
     console.log(
       "체크인 생성 결과:",

@@ -7,6 +7,7 @@ import { Textarea } from "@/shared/components/ui/textarea"
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/shared/components/ui/drawer"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 import { CameraCapture } from "@/features/camera/camera-capture"
+import { createCheckIn} from "@/features/test/checkin_Controller"
 
 import { CheckinAnimation, type CheckinDirection,} from "@/features/checkin/ui/checkin-animation"
 import type { AppOutletContext } from "@/App"
@@ -120,7 +121,7 @@ export function CheckinPage() {
   //zustand store에서 추천행동 만족도 여부
   const conditionScore = useCheckinFlowStore((state) => state.conditionScore)
   const setConditionScore = useCheckinFlowStore((state) => state.setConditionScore)
-  const capturedPhoto = useCheckinFlowStore((state) => state.capturedPhoto)
+  const imageId =useCheckinFlowStore( (state) => state.imageId,)
   const mood = useCheckinFlowStore((state) => state.mood)
   const setMood = useCheckinFlowStore((state) => state.setMood)
 
@@ -129,7 +130,7 @@ export function CheckinPage() {
       case 1:
         return practiceCare !== null && conditionScore !== null
       case 2:
-        return capturedPhoto !== null
+        return imageId !== null
       case 3:
         return true
       case 4:

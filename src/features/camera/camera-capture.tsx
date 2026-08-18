@@ -7,7 +7,7 @@ import { Button } from "@/shared/components/ui/button"
 import loadingSpinner from "./loading-spinner.svg"
 
 //api연결시 밑에꺼 axios 활성화
-//import { validatePhoto } from "./api/validate-photo"
+import { validatePhoto } from "./api/validate-photo"
 
 /* 
 카메라 상태 
@@ -20,29 +20,16 @@ import loadingSpinner from "./loading-spinner.svg"
 */
 type CameraStatus = "idle" | "opening" | "preview" | "captured" | "validating" | "rejected" | "error"
 
-//api 연결 전 로딩 화면 테스트 데이터 값
-const MOCK_PHOTO_IS_VALID = true
-
-//
-function mockValidatePhoto(_blob: Blob): Promise<boolean> {
-  return new Promise((resolve) => {
-    window.setTimeout(() => {
-      resolve(MOCK_PHOTO_IS_VALID)
-    }, 2000)
-  })
-}
-
 export function CameraCapture() {
-  //zustand에 카메라 정보 저장
-  const capturedPhoto = useCheckinFlowStore((state) => state.capturedPhoto)
-  const setCapturedPhoto = useCheckinFlowStore((state) => state.setCapturedPhoto)
+  //해당 페이지에 카메라 사용 및 전송(api)
+  const [capturedFile, setCapturedFile,] = useState<File | null>(null)
+
+  const setImageId = useCheckinFlowStore((state) => state.setImageId,)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
-  const [cameraStatus, setCameraStatus] = useState<CameraStatus>(
-    capturedPhoto ? "captured" : "idle",
-  )
+ const [cameraStatus,setCameraStatus,] = useState<CameraStatus>("idle")
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -66,17 +53,17 @@ export function CameraCapture() {
   {/*저장된 사진 useEffect 처리과정 */}
   useEffect(() => {
     {/*만약 사진이 안찍혔으면*/}
-    if (!capturedPhoto) {
+    if (!capturedFile) {
       setPreviewUrl(null)
       return
     }
 
     {/*캡쳐된 사진을 img 태그에 넣을 url로 변환 */}
-    const objectUrl = URL.createObjectURL(capturedPhoto)
+    const objectUrl = URL.createObjectURL(capturedFile)
     setPreviewUrl(objectUrl)
 
     return (() => URL.revokeObjectURL(objectUrl))
-  }, [capturedPhoto])
+  }, [capturedFile])
 
   useEffect(() => {
     return ( 
@@ -110,7 +97,7 @@ export function CameraCapture() {
       setCameraStream(stream)
       setCameraStatus("preview")
     } catch (error) {
-      setCameraStatus(capturedPhoto ? "captured" : "idle")
+      setCameraStatus(capturedFile ? "captured" : "idle")
 
       if (error instanceof DOMException && error.name === "NotAllowedError") {
         setErrorMessage("사진 촬영을 위해 카메라 권한을 허용해주세요.")
@@ -129,7 +116,7 @@ export function CameraCapture() {
   {/*카메라 닫기 함수*/}
   const closeCamera = () => {
     stopCamera()
-    setCameraStatus(capturedPhoto ? "captured" : "idle")
+    setCameraStatus( capturedFile ? "captured" : "idle")
   }
 
   {/*사진 저장 함수*/}
@@ -169,24 +156,45 @@ export function CameraCapture() {
         stopCamera()
         setCameraStatus("validating")
 
+        const imageFile =
+          new File(
+            [blob],
+            "checkin.jpg",
+            {
+              type:
+                blob.type ||
+                "image/jpeg",
+            },
+          )
+
+          // 미리보기와 API 전송에
+          // 동일한 File 사용
+          setCapturedFile(imageFile)
+
+          // 이전 이미지 ID 제거
+          setImageId(null)
+
         //일단 boolean으로 판단 데이터 받기로 함(이건 바뀔수도 )
         try{
-          //const isValid = await validatePhoto(blob)
+          const result = await validatePhoto(imageFile)
 
-          //api 연결 전 임시 테스트(api연결 떈 이거 주석처리하셔야 합니다)
-          const isValid = await mockValidatePhoto(blob)
-
-          if(isValid){
-            setCapturedPhoto(blob)
+          if(result.detected && Number.isInteger(result.imageId) && result.imageId > 0){
+            setImageId(result.imageId,)
             setCameraStatus("captured")
+            return
           }
-          else {
-            setCapturedPhoto(null)
-            setErrorMessage("사진에서 배 부위를 확인하지 못했어요. \n 다시 촬영해 주세요.")
-            setCameraStatus("rejected")
-          }
-        } catch{
-          setCapturedPhoto(null)
+          
+          setCapturedFile(null)
+          setImageId(null)
+          setErrorMessage("사진에서 배 부위를 확인하지 못했어요. \n 다시 촬영해 주세요.")
+          setCameraStatus("rejected")
+        } catch (error){
+          console.error(
+            "이미지 분석 실패:",
+            error,
+          )
+          setCapturedFile(null)
+          setImageId(null)
           setErrorMessage("사진 전송에 실패하였습니다. 잠시 후 다시 시도해 주세요.",)
           setCameraStatus("error")
         }
@@ -200,6 +208,9 @@ export function CameraCapture() {
 
   {/*재촬영*/}
   const retakePhoto = () => {
+    setCapturedFile(null)
+    setImageId(null)
+    
     void startCamera()
   }
 
