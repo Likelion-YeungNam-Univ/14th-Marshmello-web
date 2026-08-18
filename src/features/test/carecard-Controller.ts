@@ -95,6 +95,16 @@ export async function updateCareCardFeedback(
   return response.data
 }
 
+//최근에 케어카드를 받은 날짜
+export async function getCareCardLatest(): Promise<createCareCardResponse> {
+  const url = "/api/care-cards/latest"
+
+  const response =
+    await apiClient.get<createCareCardResponse>(url)
+
+  return response.data
+}
+
 //## API 실행 테스트 함수
 
 export const handleGetCareCard = async (checkInId: number,) => {

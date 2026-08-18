@@ -30,6 +30,7 @@ import {
 
 // care-card-controller 테스트 함수
 import {
+  getCareCardLatest,
   handleCreateCareCard,
   handleGetCareCard,
   handleUpdateCareCardFeedback,
@@ -56,6 +57,7 @@ import {
   handleGetAuthMe,
   handleGetModelGate,
 } from "@/features/test/auth-Controller"
+
 
 // 테스트 결과를 화면에 표시하기 위한 양식
 type TestResult = {
@@ -643,10 +645,22 @@ export function TestPage() {
               )
             }}
           />
-        </ApiSection>
+        </ApiSection>  
 
         {/* 케어카드 조회, 생성 및 피드백 전송 */}
         <ApiSection title="care-card-controller">
+          {/* 가장 최근에 생성된 케어카드 조회 */}
+          <ApiButton
+            currentApi={loadingApi}
+            label="GET /api/care-cards/latest"
+            onClick={() => {
+              void runRequest(
+                "GET /api/care-cards/latest",
+                getCareCardLatest,
+              )
+            }}
+          />  
+          
           <label>
             <span className="mb-2 block text-sm font-medium">
               체크인 ID
