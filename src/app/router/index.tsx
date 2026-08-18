@@ -11,32 +11,54 @@ import { MyPage } from "@/pages/mypage-page"
 import { NotFoundPage } from "@/pages/not-found-page"
 import { ProfileEditPage } from "@/pages/profile-edit-page"
 import { SignupProfilePage } from "@/pages/signup-profile-page"
-import { getMe, getUserProfile } from "@/shared/api/auth"
+import {
+  getCsrf,
+  getUserProfile,
+} from "@/shared/api/auth"
 import type { PageLayoutConfig } from "@/shared/components/layout/page-layout"
 
 const withPageLayout = (pageLayout: PageLayoutConfig) => ({
   pageLayout,
 })
 
+/**
+ * 로그인 상태 확인
+ *
+ * GET /api/csrf
+ * GET /api/user
+ */
 async function requireAuth() {
-  const me = await getMe()
+  try {
+    await getCsrf()
 
-  if (!me) {
+    const profile = await getUserProfile()
+
+    if (!profile) {
+      throw redirect("/login")
+    }
+
+    return profile
+  } catch (error) {
+    if (error instanceof Response) {
+      throw error
+    }
+
+    console.error("로그인 확인 실패:", error)
     throw redirect("/login")
   }
-
-  return me
 }
 
 /**
- * 로그인 -> 회원정보 등록 완료 여부 확인
+ * 로그인 + 회원정보 등록 완료 여부 확인
  *
- * 로그인 o, 회원정보 등록 x: 신규 회원정보 등록 화면으로 이동
+ * profileCompleted === false
+ * → 신규 회원정보 등록
+ *
+ * profileCompleted === true
+ * → 서비스 이용 가능
  */
 async function requireProfileComplete() {
-  await requireAuth()
-
-  const profile = await getUserProfile()
+  const profile = await requireAuth()
 
   if (!profile.profileCompleted) {
     throw redirect("/signup/profile")
@@ -48,13 +70,14 @@ async function requireProfileComplete() {
 /**
  * 신규 회원정보 등록 페이지 접근 처리
  *
- * 로그인 x: 로그인 화면으로 이동
- * 회원정보 등록 o: 홈으로 이동
+ * 로그인하지 않음
+ * → /login
+ *
+ * 이미 회원정보 등록 완료
+ * → /
  */
 async function signupProfileLoader() {
-  await requireAuth()
-
-  const profile = await getUserProfile()
+  const profile = await requireAuth()
 
   if (profile.profileCompleted) {
     throw redirect("/")
@@ -63,56 +86,112 @@ async function signupProfileLoader() {
   return profile
 }
 
+/**
+ * 첫 화면 처리
+ *
+ * 로그인 버튼을 누르기 전:
+ * → /login
+ *
+ * 로그인 버튼을 누른 후 Google OAuth 완료:
+ * → GET /api/csrf
+ * → GET /api/user
+ *
+ * profileCompleted === false
+ * → /signup/profile
+ *
+ * profileCompleted === true
+ * → HomePage
+ */
 async function homeLoader() {
   const loginStarted =
     localStorage.getItem("loginStarted") === "true"
 
+  /**
+   * 로그인 버튼을 누르지 않았다면
+   * API 호출 없이 로그인 화면으로 이동
+   */
   if (!loginStarted) {
     throw redirect("/login")
   }
 
-  /**
-   * Google/OIDC 인증 확인
-   */
-  const me = await getMe()
+  try {
+    /**
+     * 로그인 후 CSRF 확인
+     */
+    await getCsrf()
 
-  if (!me) {
+    /**
+     * 서비스 회원정보 확인
+     */
+    const profile = await getUserProfile()
+
+    /**
+     * 로그인되지 않은 상태
+     */
+    if (!profile) {
+      localStorage.removeItem("loginStarted")
+      throw redirect("/login")
+    }
+
+    /**
+     * 신규 회원
+     */
+    if (!profile.profileCompleted) {
+      throw redirect("/signup/profile")
+    }
+
+    /**
+     * 기존 회원
+     */
+    return profile
+  } catch (error) {
+    if (error instanceof Response) {
+      throw error
+    }
+
+    console.error("로그인 확인 실패:", error)
+
     localStorage.removeItem("loginStarted")
     throw redirect("/login")
   }
-
-  /**
-   * 우리 서비스의 회원정보 확인
-   */
-  const profile = await getUserProfile()
-
-  if (!profile.profileCompleted) {
-    throw redirect("/signup/profile")
-  }
-
-  return profile
 }
 
+/**
+ * 로그인만 필요한 페이지
+ */
 async function authLoader() {
   return requireAuth()
 }
 
 export const router = createBrowserRouter([
+  /**
+   * 로그인 페이지
+   *
+   * App 밖에 있어서 Header / Navbar가 표시되지 않는다.
+   */
   {
     path: "/login",
     element: <LoginPage />,
   },
 
+  /**
+   * 서비스 영역
+   */
   {
     path: "/",
     element: <App />,
     children: [
+      /**
+       * 로그인 + 회원정보 등록 완료 필요
+       */
       {
         index: true,
         loader: homeLoader,
         element: <HomePage />,
         handle: withPageLayout({
-          header: { variant: "default" },
+          header: {
+            variant: "default",
+          },
           variant: "home",
         }),
       },

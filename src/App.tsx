@@ -25,11 +25,11 @@ type RouteHandle = {
   pageLayout?: PageLayoutConfig
 }
 
-// 같은 세션(탭)에서 스플래시를 이미 보여줬는지 기록하는 키.
 const SPLASH_SESSION_KEY = "poomgyeol:splash-shown"
 
 function hasSplashAlreadyShown() {
   if (typeof window === "undefined") return false
+
   return window.sessionStorage.getItem(SPLASH_SESSION_KEY) === "1"
 }
 
@@ -40,7 +40,9 @@ export default function App() {
     (() => void) | undefined
   >()
 
-  const [showSplash, setShowSplash] = useState(() => !hasSplashAlreadyShown())
+  const [showSplash, setShowSplash] = useState(
+    () => !hasSplashAlreadyShown(),
+  )
 
   const { pathname } = useLocation()
   const matches = useMatches()
@@ -48,10 +50,11 @@ export default function App() {
   const { checkInId: checkInIdParam } = useParams()
   const queryClient = useQueryClient()
 
-  // 로그인 화면에서는 PageLayout을 사용하지 않음
+  // 로그인 페이지에서는 PageLayout을 사용하지 않음
   const isLoginPage = pathname === "/login"
 
   const parsedCheckInId = Number(checkInIdParam)
+
   const checkInId = Number.isInteger(parsedCheckInId)
     ? parsedCheckInId
     : undefined
@@ -67,11 +70,11 @@ export default function App() {
 
   const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
     (currentLayout, match) =>
-      (match.handle as RouteHandle | undefined)?.pageLayout ?? currentLayout,
+      (match.handle as RouteHandle | undefined)?.pageLayout ??
+      currentLayout,
     undefined,
   )
 
-  // 로그아웃
   const logout = useCallback(() => {
     queryClient.clear()
     window.sessionStorage.clear()
@@ -109,7 +112,6 @@ export default function App() {
     )
   }
 
-  // 나머지 페이지
   return (
     <>
       {isCareFlow ? (
@@ -135,6 +137,22 @@ export default function App() {
           <Outlet context={{ restartSplash, setHeaderBackAction }} />
         </PageLayout>
       )}
+
+      {isContentDetail ? (
+        <PageLayout
+          {...pageLayout}
+          header={
+            pageHeaderBackAction
+              ? {
+                  ...pageLayout?.header,
+                  onBack: pageHeaderBackAction,
+                }
+              : pageLayout?.header
+          }
+        >
+          <Outlet context={{ restartSplash, setHeaderBackAction }} />
+        </PageLayout>
+      ) : null}
 
       <LogoutDrawer
         onConfirm={logout}
