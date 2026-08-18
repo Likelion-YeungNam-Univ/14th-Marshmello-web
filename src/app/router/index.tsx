@@ -307,6 +307,7 @@ export const router = createBrowserRouter([
 
   {
     path: "/test",
+    loader: requireAuth,
     element: <TestPage />,
   },
 
