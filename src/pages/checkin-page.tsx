@@ -42,13 +42,17 @@ const EMOTION_BY_MOOD = {
 } as const
 
 //오늘 날짜 함수 
-function getTodayDate() {
-  const today = new Date()
+function getDateByOffset(offsetDays = 0) {
+  const date = new Date()
+
+    date.setDate(
+    date.getDate() + offsetDays,
+  )
 
   return [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0"),
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
   ].join("-")
 }
 
@@ -138,7 +142,7 @@ export function CheckinPage() {
 
   const [createdCheckInId, setCreatedCheckInId] = useState<number | null>(null)
 
-  const latestCareCardQuery = useQuery({ queryKey: [ "care-card", "previous", getTodayDate(),],
+  const latestCareCardQuery = useQuery({ queryKey: [ "care-card", "previous", getDateByOffset(),],
     queryFn: getPreviousCareCard,
 
     // 체크인 진행 중 자동 조회로
@@ -152,9 +156,13 @@ export function CheckinPage() {
     staleTime: Infinity,
   })
 
-  const previousCareCardId = latestCareCardQuery.data?.careCardId ?? null
+  const latestCareCard =latestCareCardQuery.data
 
-  const hasPreviousCheckIn = latestCareCardQuery.data?.checkInId != null
+  const isYesterdayCareCard = latestCareCard != null && latestCareCard.createdDate.slice(0, 10) === getDateByOffset(-1)
+
+  const hasPreviousCheckIn = isYesterdayCareCard && latestCareCard.checkInId > 0
+
+  const previousCareCardId = hasPreviousCheckIn ? latestCareCard.careCardId : null
 
   useEffect(() => {
   if (!latestCareCardQuery.isSuccess ||isStepInitialized)  return
@@ -271,7 +279,7 @@ export function CheckinPage() {
     let checkInId = createdCheckInId
 
     if (checkInId === null) {
-      const createdCheckIn = await createCheckIn(getTodayDate(),
+      const createdCheckIn = await createCheckIn(getDateByOffset(),
           { imageId,
 
             // 1단계를 생략한 경우에는
