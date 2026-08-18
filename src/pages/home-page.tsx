@@ -12,7 +12,7 @@ const dueDate = new Date("2027-02-03")
 const userName = "다미"
 const defaultMessage = "체크인 후에 만나요"
 // TODO(Care Card API): 체크인 저장 API 성공 여부 또는 서버의 체크인 상태로 교체합니다.
-const isCheckinCompleted = true
+const isCheckinCompleted = false
 // TODO(Care Card API): 체크인 저장 API의 checkInId로 교체합니다.
 const checkInId = 1
 // TODO(Care Card API): 실제 API 연동 시 false로 변경합니다.
@@ -77,7 +77,9 @@ export function HomePage() {
   ].join("-")
 
   const isCareCardLoading = isCareCardInitialLoading || isCareCardFetching
-  const displayMessage = careCard?.actionName ?? defaultMessage
+  const displayMessage = isCheckinCompleted
+    ? careCard?.actionName ?? defaultMessage
+    : defaultMessage
 
   return (
     <main className="w-full px-4 pb-16 pt-6 text-black sm:px-6">
