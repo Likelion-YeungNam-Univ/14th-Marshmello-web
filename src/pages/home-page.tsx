@@ -101,7 +101,7 @@ export function HomePage() {
     (PREGNANCY_TOTAL_DAYS - remainingDays) / 7,
   )
 
-  const currentWeekInfo = pregnancyWeek !== null && pregnancyWeek >= 4 && pregnancyWeek <= 40
+  const currentWeekInfo = pregnancyWeek !== null && pregnancyWeek >= 0 && pregnancyWeek <= 40
     ? pregnancyWeekInfo[String(pregnancyWeek)] : undefined
 
   //오늘 날짜를 '8월 7일' 형식으로 표시
