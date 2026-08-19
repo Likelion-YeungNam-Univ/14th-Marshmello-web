@@ -15,6 +15,7 @@ export type PageLayoutVariant =
   | "checkin"
   | "content"
   | "mypage"
+  | "records"
 
 export type PageLayoutHeaderConfig = Pick<
   HeaderProps,
@@ -47,6 +48,7 @@ const backgroundClassByVariant: Record<PageLayoutVariant, string> = {
   default: "bg-page-default",
   home: "bg-page-home",
   mypage: "bg-page-mypage mypage-page-background",
+  records: "bg-page-records",
 }
 
 export function PageLayout({
@@ -60,7 +62,10 @@ export function PageLayout({
 }: PageLayoutProps) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const handleBack = useCallback(() => navigate(-1), [navigate])
+
+  const handleBack = useCallback(() => {
+    navigate(-1)
+  }, [navigate])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" })
@@ -82,7 +87,9 @@ export function PageLayout({
         />
       ) : null}
 
-      <div className={cn(showNavbar && "pb-[82px]")}>{children}</div>
+      <div className={cn(showNavbar && "pb-[82px]")}>
+        {children}
+      </div>
 
       {showNavbar ? <Navbar /> : null}
     </div>

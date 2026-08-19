@@ -80,6 +80,7 @@ export type checkInEmotionResponse = {
 
 // GET /api/check-ins/count 응답 항목
 export type checkInCountResponse = {
+  requestMonth: string
   count: number
   achievedCount: number
 }

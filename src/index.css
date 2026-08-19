@@ -60,6 +60,8 @@
     --color-page-checkin: var(--page-background-checkin);
     --color-page-content: var(--page-background-content);
     --color-page-mypage: var(--page-background-mypage);
+    --color-page-mypage: var(--page-background-mypage);
+    --color-page-records: var(--page-background-records);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -78,6 +80,7 @@
     --page-background-checkin: var(--background);
     --page-background-content: #f5f6f7;
     --page-background-mypage: linear-gradient(163.326deg, #e8c5e5 19.65%, rgba(255, 234, 247, 0.71) 48.727%, #e8c5e5 77.804%);
+    --page-background-records: #e8c5e5;
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
