@@ -1,24 +1,19 @@
+import axios from "axios"
+import { getDateByOffset } from "@/shared/lib/date"
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "react-router-dom"
 
-import { getCareCard } from "@/features/care/api/create-care-card"
-import { getMockCareCard } from "@/features/care/model/mock-care-card"
+import { getCareCardLatest } from "@/features/test/carecard-Controller"
 import pregnancyWeekInfoData from "@/data/pregnancy-week-info.json"
 import { Button } from "@/shared/components/ui/button"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 
+import { useProfileStore } from "@/features/mypage/model/use-profile-store"
+
 //user이름, 출산 예정일 정보는 추후 db에서 받아와야 함
 const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24
 const PREGNANCY_TOTAL_DAYS = 40 * 7
-const dueDate = new Date("2027-01-03")
-const userName = "다미"
 const defaultMessage = "체크인 후에 만나요"
-// TODO(Care Card API): 체크인 저장 API 성공 여부 또는 서버의 체크인 상태로 교체합니다.
-const isCheckinCompleted = false
-// TODO(Care Card API): 체크인 저장 API의 checkInId로 교체합니다.
-const checkInId = 1
-// TODO(Care Card API): 실제 API 연동 시 false로 변경합니다.
-const useMockCareCard = true
 const pregnancyWeekInfo: Record<string, { message?: string }> =
   pregnancyWeekInfoData
 
@@ -50,29 +45,64 @@ function getRemainingPregnancyTime(date: Date) {
   }
 }
 
+// 최근 케어카드가 오늘 생성된 카드인 경우에만 반환
+async function getTodayCareCard(todayDate: string) {
+  try {
+    const latestCareCard = await getCareCardLatest()
+
+    // 생성된 케어카드가 없는 경우
+    if (latestCareCard == null) return null
+    
+    // 가장 최근 케어카드가 오늘 생성된 카드가 아닌 경우
+    if (latestCareCard.createdDate.slice(0, 10) !== todayDate) {
+      return null
+    }
+
+    return latestCareCard
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      // 아직 생성된 케어카드가 없는 정상적인 상태
+      return null
+    }
+
+    // 인증 오류나 서버 오류는 실제 오류로 처리
+    throw error
+  }
+}
+
 export function HomePage() {
+  const profileName = useProfileStore((state) => state.name)
+  const expectedDeliveryDate = useProfileStore((state) => state.dueDate)
+  
+  const userName = profileName.trim() || "-"
+  const dueDate = expectedDeliveryDate ? new Date(`${expectedDeliveryDate}T00:00:00`) : null
+  const todayDate = getDateByOffset()
+
   const {
     data: careCard,
     isError: isCareCardError,
     isFetching: isCareCardFetching,
     isLoading: isCareCardInitialLoading,
     refetch: refetchCareCard,
-  } = useQuery({
-    queryKey: ["careCard", checkInId, useMockCareCard],
-    // TODO(Care Card API): Mock 단계가 끝나면 getCareCard(checkInId!)만 남깁니다.
-    queryFn: () =>
-      useMockCareCard ? getMockCareCard() : getCareCard(checkInId),
-    enabled: isCheckinCompleted && Boolean(checkInId),
-  })
+  } = useQuery({queryKey: [ "care-card", "today", todayDate,], queryFn: () => getTodayCareCard(todayDate),
+
+  // 404 여부를 getTodayCareCard에서 직접 구분
+  retry: false,
+})
+
   const today = new Date()
   //아기와 만나기까지 남은 기간
-  const { weeks, days, remainingDays } = getRemainingPregnancyTime(dueDate)
-  const pregnancyDays = PREGNANCY_TOTAL_DAYS - remainingDays
-  const pregnancyWeek = Math.floor(pregnancyDays / 7)
-  const currentWeekInfo =
-    pregnancyWeek >= 1 && pregnancyWeek <= 40
-      ? pregnancyWeekInfo[String(pregnancyWeek)]
-      : undefined
+  const pregnancyTime = dueDate ? getRemainingPregnancyTime(dueDate) : null
+  const weeks = pregnancyTime?.weeks
+  const days = pregnancyTime?.days
+  const remainingDays = pregnancyTime?.remainingDays
+
+  const pregnancyWeek = remainingDays == null ? null: Math.floor(
+    (PREGNANCY_TOTAL_DAYS - remainingDays) / 7,
+  )
+
+  const currentWeekInfo = pregnancyWeek !== null && pregnancyWeek >= 4 && pregnancyWeek <= 40
+    ? pregnancyWeekInfo[String(pregnancyWeek)] : undefined
 
   //오늘 날짜를 '8월 7일' 형식으로 표시
   const todayLabel = new Intl.DateTimeFormat("ko-KR", {
@@ -80,17 +110,15 @@ export function HomePage() {
     day: "numeric",
   }).format(today)
 
-  //time 태그의 dateTime 속성에 사용할 날짜 형식
-  const todayDateTime = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0"),
-  ].join("-")
+  const todayDateTime = todayDate
 
   const isCareCardLoading = isCareCardInitialLoading || isCareCardFetching
-  const displayMessage = isCheckinCompleted
-    ? careCard?.actionName ?? defaultMessage
-    : defaultMessage
+
+// 오늘 케어카드가 있으면 오늘 체크인 완료
+  const isCheckinCompleted = careCard != null
+ 
+  // 오늘 케어카드의 actionName을 홈에 표시
+  const displayMessage = careCard?.actionName ?? defaultMessage
 
   return (
     <main className="w-full px-4 pb-16 pt-6 text-black sm:px-6">
@@ -113,7 +141,7 @@ export function HomePage() {
             id="home-pregnancy-countdown"
             className="mt-1 text-[42px] font-bold leading-none tracking-[-0.04em] sm:text-[46px] mt-[6px]"
           >
-            {weeks}주 {days}일
+            {weeks ?? "-"}주 {days ?? "-"}일
           </h1>
         </div>
 
@@ -138,7 +166,7 @@ export function HomePage() {
               {todayLabel}
             </time>
 
-            {isCheckinCompleted && isCareCardLoading ? (
+            {isCareCardLoading ? (
               <div
                 aria-label="케어카드를 불러오는 중"
                 className="flex flex-1 flex-col justify-center gap-3 pb-1"
@@ -147,7 +175,7 @@ export function HomePage() {
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-4/5" />
               </div>
-            ) : isCheckinCompleted && isCareCardError ? (
+            ) : isCareCardError ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 pb-1 text-center">
                 <p className="text-[15px] leading-[1.5] tracking-[-0.02em] text-[#6b6f76]">
                   케어카드를 불러오지 못했어요.
@@ -162,9 +190,9 @@ export function HomePage() {
                   다시 시도
                 </Button>
               </div>
-            ) : isCheckinCompleted && careCard ? (
+            ) : isCheckinCompleted ? (
               <div className="flex flex-1 flex-col justify-center pb-1">
-                <p className="text-left text-[24px] font-medium leading-[1.4] tracking-[-0.04em] text-black">
+                <p className="text-center text-[24px] font-medium leading-[1.4] tracking-[-0.04em] text-black">
                   {displayMessage}
                 </p>
               </div>
