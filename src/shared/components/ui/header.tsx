@@ -35,7 +35,7 @@ export function Header({
       {...props}
     >
       {isBackHeader ? (
-        <div className="relative mx-auto flex h-[52px] w-full max-w-[430px] items-center px-5 pt-5">
+        <div className="relative mx-auto flex h-[52px] w-full max-w-[393px] items-center px-5 pt-5">
           <button
             aria-label="이전 페이지로 이동"
             className="flex size-6 shrink-0 items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -56,7 +56,7 @@ export function Header({
           </div>
         </div>
       ) : (
-        <div className="mx-auto flex h-[52px] w-full max-w-[430px] items-center justify-between px-5 pt-5">
+        <div className="mx-auto flex h-[52px] w-full max-w-[393px] items-center justify-between px-5 pt-5">
           <span className="logo text-2xl leading-none" aria-label="품결">
             품결
           </span>

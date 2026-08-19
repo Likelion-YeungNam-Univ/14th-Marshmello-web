@@ -26,7 +26,7 @@ import {
 
 const SCREEN_DURATION_MS = 5000
 const STEP_FRAME_CLASS_NAME =
-  "mx-auto h-[852px] w-full max-w-[393px] overflow-hidden bg-transparent"
+  "mx-auto min-h-dvh w-full max-w-[393px] overflow-hidden bg-transparent"
 const STEP_HEADER_CLASS_NAME =
   "relative z-10 flex h-[66px] items-center justify-between bg-[#e8c5e5] px-5 pt-6"
 const STEP_CONTENT_CLASS_NAME =
@@ -174,7 +174,7 @@ type MassageGuideIntroProps = {
 
 function MassageGuideIntro({ onStart }: MassageGuideIntroProps) {
   return (
-    <article className="mx-auto flex min-h-[849px] w-full max-w-[393px] flex-col bg-white">
+    <article className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col bg-white">
       <header className="flex items-center px-5 pt-6">
         <Link
           aria-label="케어 화면으로 돌아가기"

@@ -25,7 +25,7 @@ export function TimelineDetail({
   onBack,
 }: TimelineDetailProps) {
   return (
-    <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-white text-black">
+    <main className="mx-auto min-h-dvh w-full max-w-[393px] overflow-y-auto bg-white text-black">
       <header className="relative flex h-[96px] items-end justify-center pb-[14px]">
         <button
           aria-label="뒤로가기"

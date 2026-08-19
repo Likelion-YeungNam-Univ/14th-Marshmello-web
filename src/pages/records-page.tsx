@@ -171,7 +171,7 @@ export function RecordsPage() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto min-h-[852px] w-full max-w-[393px] bg-[#e8c5e5] px-[15px] pt-[110px]">
+      <main className="mx-auto min-h-dvh w-full max-w-[393px] bg-[#e8c5e5] px-[15px] pt-[110px]">
         <p className="text-center text-[14px] text-[#7a4e88]">
           기록을 불러오는 중이에요.
         </p>
@@ -184,7 +184,7 @@ export function RecordsPage() {
     !data
   ) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-6">
+      <main className="mx-auto flex min-h-dvh w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-6">
         <p className="text-center text-[14px] leading-[1.6] text-[#6c7278]">
           {errorMessage ??
             "기록을 불러오지 못했어요."}
@@ -209,7 +209,7 @@ export function RecordsPage() {
     "---"
 
   return (
-    <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-[#e8c5e5] text-black">
+    <main className="mx-auto min-h-dvh w-full max-w-[393px] overflow-y-auto bg-[#e8c5e5] text-black">
       <section className="relative px-[15px] pb-[8px] pt-[20px]">
         <RecordsSummary
           monthText={monthText}
