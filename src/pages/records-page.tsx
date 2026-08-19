@@ -40,18 +40,20 @@ import {
   RecordsSummary,
 } from "@/features/records/ui/summary"
 
+function getCurrentMonth() {
+  const now = new Date()
+
+  return `${now.getFullYear()}-${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}`
+}
+
 export function RecordsPage() {
   const [data, setData] =
     useState<RecordsData | null>(null)
 
   const [requestMonth, setRequestMonth] =
-    useState(() => {
-      const now = new Date()
-
-      return `${now.getFullYear()}-${String(
-        now.getMonth() + 1,
-      ).padStart(2, "0")}`
-    })
+    useState(() => getCurrentMonth())
 
   const [isLoading, setIsLoading] =
     useState(true)
@@ -91,20 +93,27 @@ export function RecordsPage() {
           | ReportResponse
           | null = null
 
-        try {
-          await createReport(
-            requestMonth,
-          )
+        const currentMonth =
+          getCurrentMonth()
 
-          report =
-            await getReport(
+        // 현재 월은 보고서 생성/조회 대상이 아니므로
+        // /api/reports 요청을 보내지 않는다.
+        if (requestMonth !== currentMonth) {
+          try {
+            await createReport(
               requestMonth,
             )
-        } catch (reportError) {
-          console.error(
-            "월간 리포트 조회 실패:",
-            reportError,
-          )
+
+            report =
+              await getReport(
+                requestMonth,
+              )
+          } catch (reportError) {
+            console.error(
+              "월간 리포트 조회 실패:",
+              reportError,
+            )
+          }
         }
 
         if (cancelled) {

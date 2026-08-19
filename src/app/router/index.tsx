@@ -20,6 +20,7 @@ import {
 } from "@/shared/api/auth"
 import type { PageLayoutConfig } from "@/shared/components/layout/page-layout"
 import { TestPage } from "@/pages/test-page"
+import {StatusPage} from "@/pages/status-page"
 
 const withPageLayout = (pageLayout: PageLayoutConfig) => ({
   pageLayout,
@@ -234,6 +235,15 @@ export const router = createBrowserRouter([
           variant: "records",
         }),
       },
+      {
+  path: "status",
+  loader: requireProfileComplete,
+  element: <StatusPage />,
+  handle: withPageLayout({
+    showHeader: false,
+    showNavbar: false,
+  }),
+},
 
       /**
        * Care
