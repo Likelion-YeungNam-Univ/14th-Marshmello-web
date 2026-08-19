@@ -1,7 +1,11 @@
 import type {
-  EmotionByDate,
   ReportResponse,
-} from "@/features/records/api/records"
+} from "@/features/test/report-Controller"
+
+export type EmotionByDate = {
+  date: string
+  emotion: number
+}
 
 export type MoodType = "good" | "normal" | "bad" | "none"
 

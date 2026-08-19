@@ -2,8 +2,7 @@ import { apiClient } from "@/shared/api/axios"
 
 //# check-in-controller, /api/check-ins, /api/check-ins/emotions
 
-//## 요청보낼 양식 
-
+//## 요청보낼 양식
 
 export type checkInRequest = {
   date: string
@@ -119,7 +118,7 @@ export async function createCheckIn(
         params: {
           date,
         },
-      },  
+      },
     )
 
   return response.data
@@ -141,8 +140,8 @@ export async function getCheckInEmotions(
 //체크인 한 횟수
 export async function getcheckInCount(
   month: string,
-) : Promise<checkInCountResponse> {
-  const url = 
+): Promise<checkInCountResponse> {
+  const url =
     `/api/check-ins/count?month=${month}`
 
   const response =
@@ -154,8 +153,8 @@ export async function getcheckInCount(
 //그 달에 가장 많이 불편함을 호소한 부위
 export async function getcheckInRegion(
   month: string,
-) : Promise<checkInRegion> {
-  const url = 
+): Promise<checkInRegion> {
+  const url =
     `/api/check-ins/body-diaries/top-region?month=${month}`
 
   const response =
@@ -182,7 +181,10 @@ export const handleGetCheckInsByDate =
 
 // POST /api/check-ins 테스트
 export const handleCreateCheckIn =
-  async (date: string, request: checkInCreateRequest) => {
+  async (
+    date: string,
+    request: checkInCreateRequest,
+  ) => {
     const result =
       await createCheckIn(date, request)
 
