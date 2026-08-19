@@ -159,20 +159,20 @@ export function CheckinPage() {
   // 최신 케어카드 조회 결과
   const latestCareCard =latestCareCardQuery.data
 
- // 최신 케어카드의 생성일이 어제인지 확인
-  const isYesterdayCareCard = latestCareCard != null && latestCareCard.createdDate.slice(0, 10) === getDateByOffset(-1)
-
-  // 어제 생성된 케어카드에 연결된 체크인 ID가 있는지 확인
-  const hasPreviousCheckIn = isYesterdayCareCard && latestCareCard.checkInId > 0
+  // ↓ 최신 케어카드와 정상적인 careCardId가 있으면 1단계 시작
+  const hasLatestCareCard =
+    latestCareCard != null &&
+    Number.isInteger(latestCareCard.careCardId) &&
+    latestCareCard.careCardId > 0
 
   // 전날 케어카드 만족도 PATCH에 사용할 careCardId
-  const previousCareCardId = hasPreviousCheckIn ? latestCareCard.careCardId : null
+  const previousCareCardId = hasLatestCareCard ? latestCareCard.careCardId : null
 
   // 어제 케어카드가 있으면 1단계, 없으면 2단계부터 체크인 시작
   useEffect(() => {
     if (!latestCareCardQuery.isSuccess ||isStepInitialized)  return
 
-    if (hasPreviousCheckIn) {
+    if (hasLatestCareCard) {
       // 어제 케어카드가 있으므로 실천 여부와 만족도 입력부터 시작
       setStep(1)
     } else {
@@ -181,19 +181,19 @@ export function CheckinPage() {
     }
 
     setIsStepInitialized(true)
-  }, [ hasPreviousCheckIn, isStepInitialized, latestCareCardQuery.isSuccess, setStep,]
+  }, [ hasLatestCareCard, isStepInitialized, latestCareCardQuery.isSuccess, setStep,]
   )
 
   //뒤로가기 함수
   const handlePreviousStep = useCallback(() => {
     // 1단계를 건너뛴 사용자는 2단계에서 뒤로 가면 홈으로 이동
-    if (step === 2 &&!hasPreviousCheckIn) {
+    if (step === 2 &&!hasLatestCareCard) {
       navigate("/", {replace: true,})
       return
     }
     setDirection(-1)
     prevStep()
-  }, [hasPreviousCheckIn, navigate, prevStep, step,])
+  }, [hasLatestCareCard, navigate, prevStep, step,])
 
   useEffect(() => {
     if (step === 1) {
@@ -293,10 +293,11 @@ export function CheckinPage() {
     if (checkInId === null) {
       const createdCheckIn = await createCheckIn(getDateByOffset(),
           { imageId,
-
-            // 1단계를 생략한 경우에는
-            // achieved 자체를 전송하지 않음
-            ...(practiceCare !== null ? { achieved: practiceCare,} : {}),
+            // 최신 케어카드가 있으면 1단계 선택값,
+            // 첫날 또는 케어카드가 없으면 true
+            achieved: hasLatestCareCard
+              ? (practiceCare ?? true)
+              : true,
 
             diary: memo.trim(),
             emotion:
