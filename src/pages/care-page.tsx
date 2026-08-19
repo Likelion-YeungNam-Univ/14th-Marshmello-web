@@ -1,6 +1,9 @@
-import { useEffect, useRef } from "react"
+import { useQuery } from "@tanstack/react-query"
 
-import { useCreateCareCardMutation } from "@/features/care/model/use-create-care-card-mutation"
+import {
+  getCareCard,
+  getLatestCareCard,
+} from "@/features/care/api/create-care-card"
 import { ContentRecommendationSection } from "@/features/care/ui/content-recommendation-section"
 import { MassageGuideButton } from "@/features/care/ui/massage-guide-button"
 import { TodayCareCard } from "@/features/care/ui/today-care-card"
@@ -13,21 +16,18 @@ type CarePageProps = {
 
 export function CarePage({ checkInId }: CarePageProps) {
   const nickname = useProfileStore((state) => state.name)
-  const { data: careCard, isError, isPending, mutate: createCareCard } =
-    useCreateCareCardMutation()
-  const requestedCheckInId = useRef<number>()
-
-  useEffect(() => {
-    if (
-      checkInId === undefined ||
-      requestedCheckInId.current === checkInId
-    ) {
-      return
-    }
-
-    requestedCheckInId.current = checkInId
-    createCareCard(checkInId)
-  }, [checkInId, createCareCard])
+  const {
+    data: careCard,
+    isError,
+    isPending,
+  } = useQuery({
+    queryKey: ["care-card", checkInId ?? "latest"],
+    queryFn: () =>
+      checkInId === undefined
+        ? getLatestCareCard()
+        : getCareCard(checkInId),
+    retry: false,
+  })
 
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-[393px] flex-col gap-[14px] overflow-x-hidden px-5 pt-4 pb-10">
