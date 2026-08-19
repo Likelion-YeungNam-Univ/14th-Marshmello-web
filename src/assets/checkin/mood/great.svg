@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="FaceGreat" clip-path="url(#clip0_0_4)">
+<path id="Vector" d="M23 46C35.7025 46 46 35.7025 46 23C46 10.2975 35.7025 0 23 0C10.2975 0 0 10.2975 0 23C0 35.7025 10.2975 46 23 46Z" fill="#EF9BCE" fill-opacity="0.567"/>
+<path id="Vector_2" d="M14.95 20.9091C16.4833 19.1667 18.0167 19.1667 19.55 20.9091" stroke="#B83C7C" stroke-width="1.35909" stroke-linecap="round"/>
+<path id="Vector_3" d="M26.45 20.9091C27.9833 19.1667 29.5167 19.1667 31.05 20.9091" stroke="#B83C7C" stroke-width="1.35909" stroke-linecap="round"/>
+<path id="Vector_4" d="M17.7727 27.4432C21.2576 31.7992 24.7424 31.7992 28.2273 27.4432H17.7727Z" fill="#B83C7C"/>
+<g id="Group" opacity="0.15">
+<path id="Vector_5" d="M14.6364 26.3455C15.8777 26.3455 16.8841 25.6668 16.8841 24.8295C16.8841 23.9923 15.8777 23.3136 14.6364 23.3136C13.395 23.3136 12.3886 23.9923 12.3886 24.8295C12.3886 25.6668 13.395 26.3455 14.6364 26.3455Z" fill="#B83C7C"/>
+<path id="Vector_6" d="M31.3636 26.3455C32.605 26.3455 33.6114 25.6668 33.6114 24.8295C33.6114 23.9923 32.605 23.3136 31.3636 23.3136C30.1223 23.3136 29.1159 23.9923 29.1159 24.8295C29.1159 25.6668 30.1223 26.3455 31.3636 26.3455Z" fill="#B83C7C"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_4">
+<rect width="46" height="46" fill="white"/>
+</clipPath>
+</defs>
+</svg>
