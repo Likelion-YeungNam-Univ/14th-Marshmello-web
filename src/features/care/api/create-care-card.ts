@@ -23,6 +23,14 @@ export async function getCareCard(
   return response.data
 }
 
+export async function getLatestCareCard(): Promise<CareCardResponse> {
+  const response = await apiClient.get<CareCardResponse>(
+    "/api/care-cards/latest",
+  )
+
+  return response.data
+}
+
 // TODO(Care Card API): 현재 서버 생성 API 명세를 확인한 뒤 유지하거나 제거합니다.
 export async function createCareCard(
   checkInId: number,
