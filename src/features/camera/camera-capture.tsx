@@ -281,14 +281,14 @@ export function CameraCapture() {
             className="absolute inset-0 h-full w-full object-cover"
           />
           
-          {/*안내 문구*/}
-          <p className="absolute inset-x-0 top-[calc(env(safe-area-inset-top)+150px)] z-20 text-center text-[19px] text-white">
-            표시선에 배꼽 위치를 맞춰 촬영해주세요.
-          </p>
+         
           {/*검은색 화면, 촬영가이드 */}
           <div className="pointer-events-none absolute left-1/2 top-[46%] z-10 h-[360px] w-[280px]
         -translate-x-1/2 -translate-y-1/2 rounded-[16px] border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.58)]">
-
+             {/*안내 문구*/}
+            <p className="absolute bottom-[calc(100%+16px)] left-1/2 w-[calc(100vw-32px)] max-w-[345px] -translate-x-1/2 text-center text-[19px] text-white">
+              표시선에 배꼽 위치를 맞춰 촬영해주세요.
+            </p>
           {/*촬영 가이드 라인*/}
               {/* 세로 보조선 */}
             <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/40" />
@@ -326,7 +326,7 @@ export function CameraCapture() {
 
       {/*촬영 후 */}
       {cameraStatus === "captured" && previewUrl ? (
-        <div className="relative h-[248px] w-full overflow-hidden rounded-[20px] border border-[#eea5d1] bg-[#fdeef7]">
+        <div className="relative mx-auto aspect-[7/9] w-[min(70vw,280px)] overflow-hidden rounded-[20px] border border-[#eea5d1] bg-[#fdeef7]">
           {/*촬영한 사진*/}
           <img
             src={previewUrl}
