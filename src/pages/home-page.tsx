@@ -12,7 +12,6 @@ import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 //user이름, 출산 예정일 정보는 추후 db에서 받아와야 함
 const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24
 const PREGNANCY_TOTAL_DAYS = 40 * 7
-const dueDate = new Date("2027-01-03")
 const defaultMessage = "체크인 후에 만나요"
 // TODO(Care Card API): 체크인 저장 API 성공 여부 또는 서버의 체크인 상태로 교체합니다.
 const isCheckinCompleted = false
@@ -53,7 +52,10 @@ function getRemainingPregnancyTime(date: Date) {
 
 export function HomePage() {
   const profileName = useProfileStore((state) => state.name)
+  const expectedDeliveryDate = useProfileStore((state) => state.dueDate)
+  
   const userName = profileName.trim() || "-"
+  const dueDate = expectedDeliveryDate ? new Date(`${expectedDeliveryDate}T00:00:00`) : null
 
   const {
     data: careCard,
@@ -71,13 +73,17 @@ export function HomePage() {
   })
   const today = new Date()
   //아기와 만나기까지 남은 기간
-  const { weeks, days, remainingDays } = getRemainingPregnancyTime(dueDate)
-  const pregnancyDays = PREGNANCY_TOTAL_DAYS - remainingDays
-  const pregnancyWeek = Math.floor(pregnancyDays / 7)
-  const currentWeekInfo =
-    pregnancyWeek >= 4 && pregnancyWeek <= 40
-      ? pregnancyWeekInfo[String(pregnancyWeek)]
-      : undefined
+  const pregnancyTime = dueDate ? getRemainingPregnancyTime(dueDate) : null
+  const weeks = pregnancyTime?.weeks
+  const days = pregnancyTime?.days
+  const remainingDays = pregnancyTime?.remainingDays
+
+  const pregnancyWeek = remainingDays == null ? null: Math.floor(
+    (PREGNANCY_TOTAL_DAYS - remainingDays) / 7,
+  )
+
+  const currentWeekInfo = pregnancyWeek !== null && pregnancyWeek >= 4 && pregnancyWeek <= 40
+    ? pregnancyWeekInfo[String(pregnancyWeek)] : undefined
 
   //오늘 날짜를 '8월 7일' 형식으로 표시
   const todayLabel = new Intl.DateTimeFormat("ko-KR", {
@@ -118,7 +124,7 @@ export function HomePage() {
             id="home-pregnancy-countdown"
             className="mt-1 text-[42px] font-bold leading-none tracking-[-0.04em] sm:text-[46px] mt-[6px]"
           >
-            {weeks}주 {days}일
+            {weeks ?? "-"}주 {days ?? "-"}일
           </h1>
         </div>
 
