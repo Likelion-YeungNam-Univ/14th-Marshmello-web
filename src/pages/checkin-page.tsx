@@ -4,7 +4,7 @@ import { useMutation, useQuery,} from "@tanstack/react-query"
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { CircleCheck } from "lucide-react"
+import { Check, CircleCheck } from "lucide-react"
 import { useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Textarea } from "@/shared/components/ui/textarea"
@@ -27,6 +27,10 @@ import leftArmSvg from "@/features/checkin/bodymap/left-arm.svg?no-inline"
 import rightArmSvg from "@/features/checkin/bodymap/right-arm.svg?no-inline"
 import leftLegSvg from "@/features/checkin/bodymap/left-leg.svg?no-inline"
 import rightLegSvg from "@/features/checkin/bodymap/right-leg.svg?no-inline"
+import moodSad from "@/assets/checkin/mood/sad.svg"
+import moodNeutral from "@/assets/checkin/mood/neutral.svg"
+import moodGood from "@/assets/checkin/mood/good.svg"
+import moodGreat from "@/assets/checkin/mood/great.svg"
 
 const BODY_MAP_WIDTH = 262
 const BODY_MAP_HEIGHT = 411
@@ -355,19 +359,16 @@ export function CheckinPage() {
   //진행도 표시 컴포넌트
   const CheckinStep = ({ step }: { step: number }) => {
     return (
-      <div className="flex w-[150px] origin-center scale-75 items-center">
+      <div className="flex items-center gap-[6px]" aria-label={`${step} / 4 단계`}>
         {[1, 2, 3, 4].map((item) => (
-          <div key={item} className="flex flex-1 items-center last:flex-none">
-            {/* 동그라미 */}
-            <div className={`h-[8px] w-[8px] rounded-full ${item === step ? "bg-[#F19ED2]" : "bg-[#D9D9D9]"}`}/>
-
-            {/* 선 */}
-            {item !== 4 && (<div className="h-[1px] flex-1 bg-[#D9D9D9]" />)}
-          </div>
+          <span
+            key={item}
+            className={`block rounded-full ${item === step ? "h-[7px] w-5 bg-[#eea5d1]" : "size-[7px] bg-[#e6e1e4]"}`}
+          />
         ))}
       </div>
-    );
-}
+    )
+  }
 
   const selectedBodyPartAnswer = selectedBodyPart === null ? null : bodyPartAnswers[selectedBodyPart]
 
@@ -397,107 +398,122 @@ export function CheckinPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col items-center gap-8 overflow-x-hidden bg-white">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col overflow-x-hidden bg-white">
       {/*진행도*/}
-      <div className="mt-8 flex h-[10px] w-[291px] flex-col justify-between">
-        
-        {/*진행상황, Progress 사용할 예정*/}
-        <div className="self-end">      
+      <div className="mt-[58px] flex h-[7px] w-full justify-end px-6">
+        <div>
           <CheckinStep step={step} />
-        </div>    
+        </div>
       </div>
         
       {/*page 별 활성화*/}
-      <div className="flex w-full flex-col items-center justify-start gap-4 px-6">
+      <div className="mt-[23px] flex w-full flex-col items-center justify-start px-6">
         <CheckinAnimation  step = {step} direction={direction}>
           {/*page1*/}
           {(step === 1) && (
-            <div className="flex flex-col w-[344px] items-start justify-center gap-8">
-              {/*어제 케어카드를 실천하셨나요?, page1*/}
-              <p className="text-black font-medium text-[20px]">
-                어제 케어카드를 실천하셨나요?
-              </p>
+            <div className="w-full max-w-[345px] pt-[30px]">
+              <h2 className="mb-[22px] text-[24px] font-medium leading-[31px] tracking-[-0.48px] text-black">
+                어제의 케어는 어땠나요?
+              </h2>
 
-              <div className="flex text-[11px] gap-2">
-                {/*케어카드 '네' 버튼*/}
-                <Button 
-                  aria-pressed={practiceCare === true}
-                  onClick={() => setPracticeCare(true)}
-                  className={`transition-colors duration-200 border border-[#787D84] text-[20px] font-light  w-[157px] h-[40px] rounded-[20px] font-['Pretendard'] ${practiceCare === true ? "bg-[#F19ED2] text-white" : "bg-[#FFFFFF] text-black"}`}
-                  >
-                  네
-                </Button>
+              <div className="flex flex-col gap-[14px]">
+                <section className="rounded-[20px] border border-[#f0eef0] bg-[#fbfafb] p-5">
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#fdeef7] text-[13px] font-bold leading-none text-[#7a3f63]">1</span>
+                    <h3 className="pt-px text-[17px] font-semibold leading-[23px] tracking-[-0.34px] text-[#2b2b2b]">어제 케어카드를 실천하셨나요?</h3>
+                  </div>
 
-                {/*케어카드 '아니요' 버튼*/}
-                <Button
-                  aria-pressed={practiceCare === false}
-                  onClick={() => setPracticeCare(false)}
-                  className={`transition-colors duration-200 border border-[#787D84] text-[20px] font-light  w-[157px] h-[40px] rounded-[20px] font-['Pretendard'] ${practiceCare === false ? "bg-[#F19ED2] text-white" : "bg-[#FFFFFF] text-black"}`}
-                  >
-                  아니요
-                </Button>
-              </div>
+                  <div className="mt-[18px] grid grid-cols-2 gap-[13px]">
+                    {[
+                      { label: "네", value: true },
+                      { label: "아니요", value: false },
+                    ].map(({ label, value }) => {
+                      const isSelected = practiceCare === value
+                      return (
+                        <button
+                          aria-pressed={isSelected}
+                          className={`flex h-[50px] items-center justify-center rounded-full border text-[17px] tracking-[-0.4px] transition-colors ${isSelected ? "border-[#eea5d1] bg-[#fdeef7] font-semibold text-[#7a3f63]" : "border-[#dedede] bg-white font-normal text-[#3a3a3a]"}`}
+                          key={label}
+                          onClick={() => setPracticeCare(value)}
+                          type="button"
+                        >
+                          {isSelected ? <Check aria-hidden="true" className="mr-1.5 size-4" strokeWidth={2.5} /> : null}
+                          {label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
 
-              {/*질문, 추천행동이 마음에 드셨나요?*/}
-              <p className="text-black font-medium text-[20px]">
-                추천행동이 마음에 드셨나요?
-              </p>
+                <section className="rounded-[20px] border border-[#f0eef0] bg-[#fbfafb] p-5">
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#fdeef7] text-[13px] font-bold leading-none text-[#7a3f63]">2</span>
+                    <h3 className="pt-px text-[17px] font-semibold leading-[23px] tracking-[-0.34px] text-[#2b2b2b]">추천 행동이 마음에 드셨나요?</h3>
+                  </div>
 
-              {/*만족도 조사, RadioGroup*/}
-              <div className="flex w-full justify-between">
-                {satisfactionOptions.map((option) => {
-                  const isSelected = conditionScore === option.score
-
-                  return (
-                    <div key={option.score} className="flex flex-col items-center gap-2">
-                      <Button
-                        role="radio"
-                        aria-checked={isSelected}
-                        onClick={() => setConditionScore(option.score)}
-                        className={`h-5 w-5 rounded-full shadow-md border transition-colors ${isSelected ? "border-[#F19ED2] bg-[#F19ED2]" : "border-[#D9D9D9] bg-white"}`}
-                      />
-
-                      {(option.score === 1 || option.score === 5) && (
-                        <span className="whitespace-nowrap rounded-md bg-[#E6A3D2] px-2 py-1 text-[8px] text-black">
-                          {option.label}
-                        </span>
-                      )}
+                  <div className="relative mt-[44px] h-7">
+                    <div className="absolute left-[14px] right-[14px] top-[13px] h-0.5 rounded-full bg-[#ececec]" />
+                    <div className="relative flex h-7 items-center justify-between">
+                      {satisfactionOptions.map((option) => {
+                        const isSelected = conditionScore === option.score
+                        return (
+                          <button
+                            aria-checked={isSelected}
+                            aria-label={option.label}
+                            className="relative z-10 flex size-7 items-center justify-center"
+                            key={option.score}
+                            onClick={() => setConditionScore(option.score)}
+                            role="radio"
+                            type="button"
+                          >
+                            {isSelected ? <span className="absolute bottom-[42px] whitespace-nowrap rounded-lg bg-[#eea5d1] px-[9px] py-1 text-[11px] font-semibold leading-[17px] text-[#7a3f63] after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-x-[5px] after:border-t-[6px] after:border-x-transparent after:border-t-[#eea5d1]">{option.label}</span> : null}
+                            <span className={`rounded-full ${isSelected ? "size-[26px] bg-[#eea5d1] shadow-[0_4px_10px_rgba(238,165,209,0.5)]" : "size-[18px] border-2 border-[#d4d4d4] bg-white"}`} />
+                          </button>
+                        )
+                      })}
                     </div>
-                  )
-                })}
+                  </div>
+                  <div className="mt-[14px] flex justify-between text-[11px] font-medium leading-[17px] text-[#9a9299]">
+                    <span>매우 불만족</span><span>매우 만족</span>
+                  </div>
+                </section>
               </div>
-              {/*만족도 조사*/}
             </div>
           )}
 
           {(step === 2) && (
-            <div className="flex w-[344px] flex-col items-start justify-center gap-8">
-              {/*page2*/}
-               
-            {/*오늘 배의 피부결을 확인해보아요, page2*/}
-               <p className="text-black font-medium text-[20px]">
-                 사진을 업로드 해주세요
+            <div className="w-full max-w-[345px] pt-[30px]">
+              <h2 className="text-[24px] font-medium leading-[31px] tracking-[-0.48px] text-black">
+                오늘의 배를 찍어주세요
+              </h2>
+              <p className="mt-2 text-[14px] leading-[21px] text-[#9a9299]">
+                실천한 순간을 기록하면 회고할 때 도움이 돼요.
               </p>
-               
-              {/*사진 촬영 기능*/}
+
+              <div className="mt-6">
               <CameraCapture />
+              </div>
+
+              <p className="mt-4 flex items-start gap-2 rounded-[14px] bg-[#faf8f9] px-[14px] py-3 text-[11px] leading-[19.5px] text-[#8a8188]">
+                <span aria-hidden="true" className="mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full bg-[#fdeef7] font-bold text-[#7a3f63]">i</span>
+                사진은 AI 분석에만 사용되고, 외부로 유출되지 않습니다.
+              </p>
             </div>    
           )}
 
           {(step === 3) && (
-            <div className="flex flex-col w-[344px] items-start justify-center gap-5">      
-              {/*오늘, 특별히 불편한 부위가 있나요?, page3*/}
-              <p className="text-black font-medium text-[20px]">
-                오늘, 특별히 불편한 부위가 있었나요?
-              </p>
-              
-              {/*해당 부위를 터치해보세요 문구*/}
-              <p className="text-[#484C52] font-Medium text-[16px] font-['Pretendard']">
-              해당 부위를 터치해보세요
+            <div className="w-full max-w-[345px] pt-[30px]">
+              <h2 className="text-[24px] font-medium leading-[31px] tracking-[-0.48px] text-black">
+                특별히 불편한 부위가 있었나요?
+              </h2>
+              <p className="mt-2 whitespace-pre-line text-[14px] leading-[21px] text-[#9a9299]">
+                해당 부위를 터치해서 알려주세요.{"\n"}여러 곳을 선택할 수 있어요.
               </p>
 
               {/*바디맵, 팝업창 : 전신 svg에 각 부위 별 svg를 덧댐 / 원래대로 하고 싶다면 -translate-y-6만 삭제해 */}
-              <div className="relative aspect-[262/411] w-[262px] max-w-full self-center">
+              <div className="relative mx-auto mt-[25px] aspect-[262/411] w-[250px] max-w-full">
+                <span aria-hidden="true" className="absolute left-6 top-[82px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">R</span>
+                <span aria-hidden="true" className="absolute right-6 top-[85px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">L</span>
               
                 {/*바디맵 전신  svg*/}
                 <img
@@ -553,9 +569,11 @@ export function CheckinPage() {
                           }`}
                         />
                       </g>
-                    </svg>
+                </svg>
                   )
                 })}
+
+              </div>
 
                 {/*Drawer 팝업 창*/}
                   <Drawer
@@ -662,34 +680,27 @@ export function CheckinPage() {
                     )}  
                   </DrawerContent>  
                 </Drawer>
-              </div>  
+
              </div> 
           )}    
 
           {(step === 4) && (
-            <div className="flex flex-col w-[344px] items-start justify-center gap-5"> 
+            <div className="w-full max-w-[345px] pt-[30px]">
             {/*오늘의 한 줄 일기를 남겨보세요, page4*/}
-              <p className="text-black font-medium text-[20px]">
+              <h2 className="text-[24px] font-medium leading-[31px] tracking-[-0.48px] text-black">
                 오늘의 한 줄 일기를 남겨보세요
-              </p>
+              </h2>
               {/*기분상태 이모티콘 선택*/}
-              <div className="mt-[14px] flex w-[291px] self-center flex-row items-center justify-center gap-4">
+              <div className="mt-[28px] grid w-full grid-cols-4 gap-2">
                 {/*우울해요*/}
                 <button
                   type="button"
                   onClick={() => setMood("sad")}
                   aria-pressed={mood === "sad"}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "sad" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                  className={`flex h-[100px] flex-col items-center justify-center gap-2 rounded-[16px] border py-3 transition-colors ${mood === "sad" ? "border-[#eea5d1] bg-[#fdeef7]" : "border-transparent bg-transparent"}`}
                 >
-                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="22" cy="22" r="22" fill="#8DDBC4"/>
-                    <ellipse cx="23.279" cy="17.9447" rx="4.34884" ry="5.40953" fill="white"/>
-                    <ellipse cx="22.106" cy="18.0761" rx="1.90925" ry="2.37492" fill="black"/>
-                    <ellipse cx="31.9768" cy="17.9447" rx="4.34884" ry="5.40953" fill="white"/>
-                    <ellipse cx="30.8038" cy="18.0761" rx="1.90925" ry="2.37492" fill="black"/>
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M25.1428 30.125C24.6096 30.306 24.0299 30.022 23.8465 29.489C23.6625 28.9547 23.9466 28.3724 24.481 28.1885L24.814 29.156C24.481 28.1885 24.4813 28.1884 24.4815 28.1883L24.4833 28.1877L24.486 28.1868L24.4928 28.1845C24.4979 28.1827 24.5043 28.1806 24.5119 28.1782C24.527 28.1733 24.5469 28.1669 24.5715 28.1594C24.6205 28.1444 24.6882 28.1248 24.773 28.1024C24.9427 28.0576 25.1819 28.0018 25.4799 27.951C26.0748 27.8495 26.9111 27.7665 27.8992 27.8339C28.8891 27.9015 29.6675 28.0953 30.2108 28.2795C30.4823 28.3715 30.6949 28.4611 30.846 28.5314C30.9216 28.5666 30.9818 28.5969 31.0263 28.6204C31.0486 28.6321 31.0669 28.6421 31.0813 28.6501C31.0885 28.6541 31.0947 28.6576 31.0999 28.6606L31.107 28.6646L31.11 28.6664L31.1114 28.6672L31.112 28.6675C31.1123 28.6677 31.1126 28.6679 30.5954 29.5508L31.1126 28.6679C31.6002 28.9536 31.7639 29.5804 31.4783 30.068C31.1941 30.5531 30.5722 30.7176 30.0857 30.4381C30.0839 30.4371 30.0797 30.4348 30.0733 30.4314C30.0572 30.423 30.0269 30.4075 29.9827 30.3869C29.8943 30.3458 29.7504 30.2843 29.5537 30.2176C29.1605 30.0843 28.556 29.9301 27.7598 29.8757C26.9619 29.8212 26.2904 29.8888 25.8241 29.9684C25.5915 30.008 25.4117 30.0504 25.295 30.0812C25.2367 30.0966 25.1944 30.109 25.1692 30.1167C25.1566 30.1205 25.1484 30.1232 25.1446 30.1244C25.1438 30.1247 25.1432 30.1249 25.1428 30.125Z" fill="black"/>
-                  </svg>
-                  <p className="text-[12px] font-medium font-['Pretendard']">
+                  <img src={moodSad} alt="" aria-hidden="true" className="size-[46px]" />
+                  <p className={`text-[13px] font-medium tracking-[-0.26px] ${mood === "sad" ? "text-[#7a3f63]" : "text-[#5a5560]"}`}>
                     우울해요
                   </p>
                 </button>
@@ -699,19 +710,10 @@ export function CheckinPage() {
                   type="button"
                   onClick={() => setMood("neutral")}
                   aria-pressed={mood === "neutral"}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "neutral" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                  className={`flex h-[100px] flex-col items-center justify-center gap-2 rounded-[16px] border py-3 transition-colors ${mood === "neutral" ? "border-[#eea5d1] bg-[#fdeef7]" : "border-transparent bg-transparent"}`}
                 >
-                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    className="cursor-pointer transition-all duration-300 hover:drop-shadow-[0_0_8px_#F4B7A3]"
-                  >
-                    <circle cx="22" cy="22" r="22" fill="#C9CDFE"/>
-                    <circle cx="16.7559" cy="17.0118" r="5.24419" fill="white"/>
-                    <circle cx="16.8839" cy="17.1392" r="2.30233" fill="black"/>
-                    <circle cx="27.2442" cy="17.0118" r="5.24419" fill="white"/>
-                    <circle cx="27.3722" cy="17.1392" r="2.30233" fill="black"/>
-                    <path d="M21.8545 24.2969C22.2615 24.2564 22.7769 24.4287 23.3594 24.8574C23.9335 25.28 24.5199 25.9146 25.0479 26.6865C26.1085 28.2374 26.872 30.25 26.8721 32.0068C26.8721 33.7414 26.2034 34.8621 25.2715 35.5635C24.3185 36.2807 23.0422 36.5938 21.8047 36.5938C20.5679 36.5937 19.3294 36.281 18.4121 35.5684C17.5144 34.8708 16.8721 33.7503 16.8721 32.0068C16.8721 30.2478 17.6083 28.2917 18.6377 26.7705C19.1501 26.0133 19.7224 25.3836 20.2881 24.9482C20.8611 24.5073 21.3827 24.2989 21.8047 24.2988H21.8301L21.8545 24.2969Z" fill="#FF4141" stroke="black"/>
-                  </svg>
-                  <p className="text-[12px] font-medium font-['Pretendard']">
+                  <img src={moodNeutral} alt="" aria-hidden="true" className="size-[46px]" />
+                  <p className={`text-[13px] font-medium tracking-[-0.26px] ${mood === "neutral" ? "text-[#7a3f63]" : "text-[#5a5560]"}`}>
                     그냥 그래요
                   </p>
                 </button>
@@ -721,18 +723,10 @@ export function CheckinPage() {
                   type="button"
                   onClick={() => setMood("good")}
                   aria-pressed={mood === "good"}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "good" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                  className={`flex h-[100px] flex-col items-center justify-center gap-2 rounded-[16px] border py-3 transition-colors ${mood === "good" ? "border-[#eea5d1] bg-[#fdeef7]" : "border-transparent bg-transparent"}`}
                 >
-                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="22" cy="22" r="22" fill="#E8C6E8"/>
-                    <circle cx="17.0118" cy="17.7793" r="5.24419" fill="white"/>
-                    <circle cx="17.1397" cy="17.9068" r="2.30233" fill="black"/>
-                    <circle cx="27.5" cy="17.7793" r="5.24419" fill="white"/>
-                    <circle cx="27.628" cy="17.9068" r="2.30233" fill="black"/>
-                    <path d="M25.8818 25.8428C30.6687 25.8428 34.5555 30.2879 30.9529 33.4401C28.6501 35.455 25.5269 36.587 22.2703 36.587C19.0137 36.587 15.8904 35.455 13.5877 33.4401C9.9851 30.2879 13.8718 25.8428 18.6588 25.8428L22.2703 25.8428H25.8818Z" fill="black"/>
-                    <path d="M22.2075 30.2354C24.2413 30.2354 26.1921 30.9618 27.6304 32.2539C28.3861 32.933 28.9643 33.7416 29.3462 34.6191C27.2888 35.8892 24.8207 36.5869 22.269 36.5869C19.6758 36.5869 17.1684 35.8675 15.0913 34.5576C15.4734 33.7034 16.0452 32.9175 16.7837 32.2539C18.222 30.9616 20.1735 30.2354 22.2075 30.2354Z" fill="#FF4141"/>
-                  </svg>
-                  <p className="text-[12px] font-medium font-['Pretendard']">
+                  <img src={moodGood} alt="" aria-hidden="true" className="size-[46px]" />
+                  <p className={`text-[13px] font-medium tracking-[-0.26px] ${mood === "good" ? "text-[#7a3f63]" : "text-[#5a5560]"}`}>
                     좋아요
                   </p>
                 </button>
@@ -742,29 +736,25 @@ export function CheckinPage() {
                   type="button"
                   onClick={() => setMood("great")}
                   aria-pressed={mood === "great"}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-lg p-1 transition-transform hover:scale-110 ${mood === "great" ? "ring-2 ring-[#F19ED2]" : ""}`}
+                  className={`flex h-[100px] flex-col items-center justify-center gap-2 rounded-[16px] border py-3 transition-colors ${mood === "great" ? "border-[#eea5d1] bg-[#fdeef7]" : "border-transparent bg-transparent"}`}
                 >
-                  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="22" cy="22" r="22" fill="#EF9BCE"/>
-                    <circle cx="27.2442" cy="17.0118" r="5.24419" fill="white"/>
-                    <path d="M25.9651 14.5811C25.1881 14.5811 24.5581 15.2168 24.5581 16.0012C24.5581 16.6343 24.8043 18.1371 27.228 19.6562C27.2714 19.6831 27.3212 19.6973 27.3721 19.6973C27.4229 19.6973 27.4727 19.6831 27.5161 19.6562C29.9398 18.1371 30.186 16.6343 30.186 16.0012C30.186 15.2168 29.556 14.5811 28.779 14.5811C28.0021 14.5811 27.3721 15.4417 27.3721 15.4417C27.3721 15.4417 26.742 14.5811 25.9651 14.5811Z" fill="#C70451"/>
-                    <circle cx="16.7559" cy="17.0118" r="5.24419" fill="white"/>
-                    <path d="M15.4768 14.5811C14.6999 14.5811 14.0698 15.2168 14.0698 16.0012C14.0698 16.6343 14.316 18.1371 16.7397 19.6562C16.7831 19.6831 16.833 19.6973 16.8838 19.6973C16.9346 19.6973 16.9844 19.6831 17.0279 19.6562C19.4515 18.1371 19.6977 16.6343 19.6977 16.0012C19.6977 15.2168 19.0677 14.5811 18.2908 14.5811C17.5138 14.5811 16.8838 15.4417 16.8838 15.4417C16.8838 15.4417 16.2537 14.5811 15.4768 14.5811Z" fill="#C70451"/>
-                    <path d="M14.251 28.3848C14.251 28.3848 17.4456 31.5715 22.2204 31.5715C26.9952 31.5715 29.7065 28.3848 29.7065 28.3848" stroke="#C70451" stroke-width="17" stroke-linecap="round"/>
-                  </svg>
-                  <p className="text-[12px] font-medium font-['Pretendard']">
+                  <img src={moodGreat} alt="" aria-hidden="true" className="size-[46px]" />
+                  <p className={`text-[13px] font-medium tracking-[-0.26px] ${mood === "great" ? "text-[#7a3f63]" : "text-[#5a5560]"}`}>
                     최고에요
                   </p>
                 </button>
               </div>  
               {/*메모칸*/}
-              <Textarea 
-                value={memo}
-                onChange={(event) => {setMemo(event.target.value)}}
-                maxLength={50}
-                placeholder="특별한 일이 있었나요?" 
-                className="mt-[10px] h-[87px] w-[313px] self-center rounded-[15px] bg-[#D1D5DB] border-[1px] border-[#1A1714] text-[14px] text-[#7A6F66]"
-              />  
+              <div className="mt-6 rounded-[16px] border border-[#efe7ec] bg-[#faf8f9] px-4 py-[14px]">
+                <Textarea
+                  value={memo}
+                  onChange={(event) => {setMemo(event.target.value)}}
+                  maxLength={200}
+                  placeholder="특별한 일이 있었나요?"
+                  className="h-[99px] min-h-[99px] w-full resize-none border-0 bg-transparent p-0 text-[15px] leading-[22.5px] text-[#2b2b2b] shadow-none placeholder:text-[#b7aeb4] focus-visible:ring-0"
+                />
+                <p className="mt-0.5 text-right text-[12px] leading-[18px] text-[#b7aeb4]">{memo.length} / 200</p>
+              </div>
             {/*케어카드를 작성중입니다. */}       
             </div>
           )}  
@@ -772,13 +762,13 @@ export function CheckinPage() {
       </div>  
        
       {/*다음 버튼, button 컴포넌트 사용*/}
-      <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+24px)] z-40 mx-auto w-full max-w-[393px] px-8">
+      <div className={`fixed inset-x-0 z-40 mx-auto w-full max-w-[393px] px-6 ${step >= 1 && step <= 4 ? "bottom-[calc(env(safe-area-inset-bottom)+54px)]" : "bottom-[calc(env(safe-area-inset-bottom)+24px)]"}`}>
         <Button
           onClick={handleNextStep}
           disabled={!isCurrentStepValid || isCheckinSuccessVisible || submitCheckInMutation.isPending}
-          className="h-[50px] w-full rounded-[15px] bg-[#484C52] text-[12px] text-white"
+          className={`h-[52px] w-full rounded-[16px] text-[16px] font-semibold text-white ${isCurrentStepValid ? "bg-[#484c52]" : "bg-[#d9d9d9]"}`}
         >
-          {submitCheckInMutation.isPending ? "저장 중..." : step === 4 ? "완료" : "다음"}
+          {submitCheckInMutation.isPending ? "저장 중..." : step === 4 ? "체크인 완료" : "다음"}
         </Button>
       </div>
 
