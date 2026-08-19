@@ -84,6 +84,24 @@ export function formatMonth(
   return `${year}년 ${Number(month)}월`
 }
 
+export function changeMonth(
+  yearMonth: string,
+  amount: number,
+): string {
+  const [year, month] =
+    yearMonth.split("-").map(Number)
+
+  const date = new Date(
+    year,
+    month - 1 + amount,
+    1,
+  )
+
+  return `${date.getFullYear()}-${String(
+    date.getMonth() + 1,
+  ).padStart(2, "0")}`
+}
+
 export function buildCalendarDays(
   yearMonth: string,
   emotions: EmotionByDate[],

@@ -10,6 +10,7 @@ import type {
 
 import {
   buildCalendarDays,
+  changeMonth,
   formatMonth,
   getFirstDayOfMonth,
   getMoodType,
@@ -18,6 +19,7 @@ import {
 type RecordsCalendarProps = {
   requestMonth: string
   emotions: EmotionByDate[]
+  onMonthChange: (month: string) => void
 }
 
 type MoodFaceProps = {
@@ -93,6 +95,7 @@ function MoodFace({
 export function RecordsCalendar({
   requestMonth,
   emotions,
+  onMonthChange,
 }: RecordsCalendarProps) {
   const calendarDays = useMemo(
     () =>
@@ -114,13 +117,22 @@ export function RecordsCalendar({
   const monthLabel =
     formatMonth(requestMonth)
 
+  const previousMonth =
+    changeMonth(requestMonth, -1)
+
+  const nextMonth =
+    changeMonth(requestMonth, 1)
+
   return (
     <section className="relative z-30 mt-[24px] rounded-t-[5px] bg-white px-[25px] pb-[120px] pt-[22px]">
       <div className="flex items-center justify-center gap-[5px]">
         <button
-          aria-label="이전 달"
+          aria-label={`${formatMonth(previousMonth)}로 이동`}
           className="flex size-5 items-center justify-center"
           type="button"
+          onClick={() =>
+            onMonthChange(previousMonth)
+          }
         >
           <ChevronLeft size={12} />
         </button>
@@ -130,9 +142,12 @@ export function RecordsCalendar({
         </p>
 
         <button
-          aria-label="다음 달"
+          aria-label={`${formatMonth(nextMonth)}로 이동`}
           className="flex size-5 items-center justify-center"
           type="button"
+          onClick={() =>
+            onMonthChange(nextMonth)
+          }
         >
           <ChevronRight size={12} />
         </button>
@@ -161,7 +176,9 @@ export function RecordsCalendar({
         {Array.from({
           length: firstDayOfMonth,
         }).map((_, index) => (
-          <div key={`empty-${index}`} />
+          <div
+            key={`empty-${index}`}
+          />
         ))}
 
         {calendarDays.map((day) => (

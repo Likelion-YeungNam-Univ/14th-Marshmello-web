@@ -44,6 +44,15 @@ export function RecordsPage() {
   const [data, setData] =
     useState<RecordsData | null>(null)
 
+  const [requestMonth, setRequestMonth] =
+    useState(() => {
+      const now = new Date()
+
+      return `${now.getFullYear()}-${String(
+        now.getMonth() + 1,
+      ).padStart(2, "0")}`
+    })
+
   const [isLoading, setIsLoading] =
     useState(true)
 
@@ -58,30 +67,20 @@ export function RecordsPage() {
         setIsLoading(true)
         setErrorMessage(null)
 
-        const now = new Date()
-
-        const requestMonth =
-          `${now.getFullYear()}-${String(
-            now.getMonth() + 1,
-          ).padStart(2, "0")}`
-
         const count =
           await getcheckInCount(
             requestMonth,
           )
-
-        const currentMonth =
-          requestMonth
 
         const [
           emotionsResponse,
           topBodyRegion,
         ] = await Promise.all([
           getCheckInEmotions(
-            currentMonth,
+            requestMonth,
           ),
           getcheckInRegion(
-            currentMonth,
+            requestMonth,
           ),
         ])
 
@@ -94,12 +93,12 @@ export function RecordsPage() {
 
         try {
           await createReport(
-            currentMonth,
+            requestMonth,
           )
 
           report =
             await getReport(
-              currentMonth,
+              requestMonth,
             )
         } catch (reportError) {
           console.error(
@@ -113,7 +112,7 @@ export function RecordsPage() {
         }
 
         setData({
-          requestMonth: currentMonth,
+          requestMonth,
           count: count.count,
           achievedCount:
             count.achievedCount,
@@ -145,7 +144,7 @@ export function RecordsPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [requestMonth])
 
   if (isLoading) {
     return (
@@ -172,7 +171,7 @@ export function RecordsPage() {
     data.requestMonth.slice(5)
 
   const monthText =
-    `${monthNumber}월`
+    `${Number(monthNumber)}월`
 
   const topBodyRegionLabel =
     getBodyRegionLabel(
@@ -206,6 +205,9 @@ export function RecordsPage() {
           data.requestMonth
         }
         emotions={data.emotions}
+        onMonthChange={
+          setRequestMonth
+        }
       />
     </main>
   )
