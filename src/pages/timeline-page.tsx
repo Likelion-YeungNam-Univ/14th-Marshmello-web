@@ -143,7 +143,7 @@ export function TimelinePage() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-white">
+      <main className="mx-auto flex min-h-dvh w-full max-w-[393px] items-center justify-center bg-white">
         <p className="text-[14px] text-[#6c7278]">
           기록을 불러오는 중이에요.
         </p>
@@ -156,7 +156,7 @@ export function TimelinePage() {
     !data
   ) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-white px-6">
+      <main className="mx-auto flex min-h-dvh w-full max-w-[393px] items-center justify-center bg-white px-6">
         <div className="text-center">
           <p className="text-[14px] leading-[1.6] text-[#6c7278]">
             {errorMessage ??

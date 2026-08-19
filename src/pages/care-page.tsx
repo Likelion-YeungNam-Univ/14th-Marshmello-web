@@ -30,7 +30,7 @@ export function CarePage({ checkInId }: CarePageProps) {
   })
 
   return (
-    <main className="mx-auto flex min-h-svh w-full max-w-[393px] flex-col gap-[14px] overflow-x-hidden px-5 pt-4 pb-10">
+    <main className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col gap-[14px] overflow-x-hidden px-5 pt-4 pb-10">
       <p className="text-[17px] leading-[25.5px] tracking-[-0.01em] text-[#2a2c30]">
         <strong className="font-bold">{nickname}</strong>님, 오늘도{" "}
         <strong className="font-bold text-black">건강한 피부</strong>를

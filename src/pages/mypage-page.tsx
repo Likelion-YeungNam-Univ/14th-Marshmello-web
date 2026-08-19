@@ -117,7 +117,7 @@ export function MyPage() {
     <>
       <section
         aria-labelledby="mypage-user-name"
-        className="mx-auto min-h-[calc(100svh-82px)] w-full max-w-[393px] px-5 pt-[69px]"
+        className="mx-auto min-h-[calc(100dvh-82px)] w-full max-w-[393px] px-5 pt-[69px]"
       >
         <div className="flex flex-col items-center text-center">
           <div className="relative size-[100px] shrink-0">

@@ -38,7 +38,7 @@ export default function SplashScreen({
 
   return (
     <div
-      className={`fixed left-1/2 top-0 z-50 flex h-[852px] w-[393px] -translate-x-1/2 flex-col items-center justify-center overflow-hidden transition-opacity duration-300 ease-out ${
+      className={`fixed inset-x-0 top-0 z-50 mx-auto flex min-h-dvh w-full max-w-[393px] flex-col items-center justify-center overflow-hidden transition-opacity duration-300 ease-out ${
         isFadingOut ? "opacity-0" : "opacity-100"
       }`}
       role="status"
