@@ -45,9 +45,17 @@ export function CarePage({ checkInId }: CarePageProps) {
       ) : null}
 
       {isError ? (
-        <p className="py-10 text-center text-[15px] text-[#6b6f76]" role="alert">
-          케어카드를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
-        </p>
+        <section
+          aria-label="생성된 케어카드 없음"
+          className="relative h-[398px] w-full"
+        >
+          <Skeleton className="h-[430px] w-full rounded-[26px] bg-[#ffeefe]" />
+          <p className="absolute inset-x-6 top-0 flex h-[430px] items-center justify-center text-center text-[17px] leading-[28px] font-medium tracking-[-0.01em] text-[#6b6f76]">
+            아직 생성된 케어카드가 없어요.
+            <br />
+            먼저 오늘의 체크인을 완료해주세요.
+          </p>
+        </section>
       ) : null}
 
       {!isError && careCard ? (

@@ -10,16 +10,20 @@ import {
 } from "@/shared/components/ui/dialog"
 
 type AccountWithdrawalDialogProps = {
+  isWithdrawing: boolean
   onComplete: () => void
   onOpenChange: (open: boolean) => void
+  onWithdraw: () => Promise<void>
   open: boolean
 }
 
 type DialogStep = "confirm" | "complete"
 
 export function AccountWithdrawalDialog({
+  isWithdrawing,
   onComplete,
   onOpenChange,
+  onWithdraw,
   open,
 }: AccountWithdrawalDialogProps) {
   const [step, setStep] = useState<DialogStep>("confirm")
@@ -31,8 +35,18 @@ export function AccountWithdrawalDialog({
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen && !isComplete) {
+    if (!nextOpen && !isComplete && !isWithdrawing) {
       closeDialog()
+    }
+  }
+
+  const handleWithdraw = async () => {
+    try {
+      await onWithdraw()
+      setStep("complete")
+    } catch (error) {
+      console.error("회원 탈퇴 실패:", error)
+      alert("회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.")
     }
   }
 
@@ -103,13 +117,15 @@ export function AccountWithdrawalDialog({
             <div className="flex w-[234px] gap-2.5">
               <button
                 className="h-[50px] w-[114px] rounded-[15px] border-[1.25px] border-[#e5e7eb] bg-[#fafafa] text-[14px] leading-[21px] font-medium text-[#6b7280] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ca8a04]/40"
-                onClick={() => setStep("complete")}
+                disabled={isWithdrawing}
+                onClick={handleWithdraw}
                 type="button"
               >
-                탈퇴할게요
+                {isWithdrawing ? "처리 중..." : "탈퇴할게요"}
               </button>
               <button
                 className="h-[50px] w-[114px] rounded-[15px] bg-[#f59e0b] text-[14px] leading-[21px] font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b]/50 focus-visible:ring-offset-2"
+                disabled={isWithdrawing}
                 onClick={closeDialog}
                 type="button"
               >
