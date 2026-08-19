@@ -2,8 +2,7 @@ import { apiClient } from "@/shared/api/axios"
 
 //# check-in-controller, /api/check-ins, /api/check-ins/emotions
 
-//## 요청보낼 양식 
-
+//## 요청보낼 양식
 
 export type checkInRequest = {
   date: string
@@ -143,7 +142,7 @@ export async function getCheckInEmotions(
 export async function getcheckInCount(
   month: string,
 ) : Promise<checkInCountResponse> {
-  const url = 
+  const url =
     `/api/check-ins/count?month=${month}`
 
   const response =
@@ -156,7 +155,7 @@ export async function getcheckInCount(
 export async function getcheckInRegion(
   month: string,
 ) : Promise<checkInRegion> {
-  const url = 
+  const url =
     `/api/check-ins/body-diaries/top-region?month=${month}`
 
   const response =
