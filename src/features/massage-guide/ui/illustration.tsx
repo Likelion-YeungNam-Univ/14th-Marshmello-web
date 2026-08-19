@@ -107,7 +107,7 @@ export default function Illustration({ step }: IllustrationProps) {
             fill="#f4a9d0"
             r="9"
             style={{
-              animation: "orbit 2.8s linear 0.6s infinite",
+              animation: "orbit 2.8s linear 0.6s infinite reverse",
               filter: SOFT_GLOW,
               transformOrigin: "134px 128px",
             }}
