@@ -125,8 +125,6 @@ export function SignupProfilePage() {
 
             <div className="mt-[23px] w-full">
               <DateWheelPicker
-                maxYear={2035}
-                minYear={2025}
                 onChange={setDate}
                 value={date}
               />

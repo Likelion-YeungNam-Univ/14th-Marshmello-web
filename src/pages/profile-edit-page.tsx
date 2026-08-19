@@ -226,8 +226,6 @@ export function ProfileEditPage() {
 
           <div className="mt-5 border-t border-[#f1edf0] pt-5">
             <DateWheelPicker
-              maxYear={2035}
-              minYear={2025}
               onChange={setDate}
               value={date}
             />
