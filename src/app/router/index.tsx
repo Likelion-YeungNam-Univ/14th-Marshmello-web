@@ -4,6 +4,7 @@ import App from "@/App"
 import { CarePage } from "@/pages/care-page"
 import { CheckinPage } from "@/pages/checkin-page"
 import { ContentDetailPage } from "@/pages/content-detail-page"
+import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 import { HomePage } from "@/pages/home-page"
 import LoginPage from "@/pages/login-page"
 import { MassageGuidePage } from "@/pages/massage-guide-page"
@@ -15,6 +16,7 @@ import { SignupProfilePage } from "@/pages/signup-profile-page"
 import {
   getCsrf,
   getUserProfile,
+  type UserProfile,
 } from "@/shared/api/auth"
 import type { PageLayoutConfig } from "@/shared/components/layout/page-layout"
 import { TestPage } from "@/pages/test-page"
@@ -22,6 +24,13 @@ import { TestPage } from "@/pages/test-page"
 const withPageLayout = (pageLayout: PageLayoutConfig) => ({
   pageLayout,
 })
+
+function syncProfileStore(profile: UserProfile) {
+  useProfileStore.getState().updateProfile({
+    dueDate: profile.expectedDeliveryDate,
+    name: profile.nickname,
+  })
+}
 
 /**
  * 로그인 상태 확인
@@ -38,6 +47,8 @@ async function requireAuth() {
     if (!profile) {
       throw redirect("/login")
     }
+
+    syncProfileStore(profile)
 
     return profile
   } catch (error) {
@@ -96,6 +107,8 @@ async function homeLoader() {
       localStorage.removeItem("loginStarted")
       throw redirect("/login")
     }
+
+    syncProfileStore(profile)
 
     if (!profile.profileCompleted) {
       throw redirect("/signup/profile")
@@ -302,6 +315,7 @@ export const router = createBrowserRouter([
    */
   {
     path: "/test",
+    loader: requireAuth,
     element: <TestPage />,
   },
 

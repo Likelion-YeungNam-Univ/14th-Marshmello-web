@@ -600,37 +600,40 @@ export function TestPage() {
                 "POST /api/check-ins",
                 async () => {
                   const response =
-                    await handleCreateCheckIn({
-                      imageId:
-                        Number(
-                          checkInImageId,
-                        ),
+                    await handleCreateCheckIn(
+                      checkInDate,
+                      {
+                        imageId:
+                          Number(
+                            checkInImageId,
+                          ),
 
-                      // 케어카드 실천 여부
-                      achieved: true,
+                        // 케어카드 실천 여부
+                        achieved: true,
 
-                      // 오늘의 한 줄 일기
-                      diary:
-                        "API 연결 테스트입니다.",
+                        // 오늘의 한 줄 일기
+                        diary:
+                          "API 연결 테스트입니다.",
 
-                      // 감정 범위 1~4
-                      emotion: 3,
+                        // 감정 범위 1~4
+                        emotion: 3,
 
-                      // 신체 부위별 정보
-                      bodyDiaries: [
-                        {
-                          // 신체 부위 번호 1~8
-                          bodyRegion: 2,
+                        // 신체 부위별 정보
+                        bodyDiaries: [
+                          {
+                            // 신체 부위 번호 1~8
+                            bodyRegion: 2,
 
-                          // 튼살 여부
-                          stretchMark: false,
+                            // 튼살 여부
+                            stretchMark: false,
 
-                          // 부위별 메모, 최대 50자
-                          comment:
-                            "API 연결 테스트",
-                        },
-                      ],
-                    })
+                            // 부위별 메모, 최대 50자
+                            comment:
+                              "API 연결 테스트",
+                          },
+                        ],
+                      },  
+                    )
 
                   // 체크인 생성 성공 후 받은 checkInId를
                   // 케어카드 입력칸에 자동으로 넣음
@@ -660,7 +663,7 @@ export function TestPage() {
               )
             }}
           />  
-          
+
           <label>
             <span className="mb-2 block text-sm font-medium">
               체크인 ID

@@ -1,3 +1,5 @@
+import { apiClient, saveCsrfToken } from "./axios"
+import  axios  from "axios"
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export type CsrfResponse = {
@@ -7,25 +9,29 @@ export type CsrfResponse = {
 }
 
 export type UserProfile = {
-  nickname: string | null
-  expectedDeliveryDate: string | null
+  nickname: string
+  expectedDeliveryDate: string
   profileCompleted: boolean
+}
+
+export type UpdateUserProfileRequest = {
+  nickname: string
+  expectedDeliveryDate: string
 }
 
 /**
  * CSRF 토큰 조회
  */
 export async function getCsrf(): Promise<CsrfResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/csrf`, {
-    method: "GET",
-    credentials: "include",
-  })
+  const response = 
+    await apiClient.get<CsrfResponse>("/api/csrf")
 
-  if (!response.ok) {
-    throw new Error(`CSRF 조회 실패: ${response.status}`)
-  }
-
-  return response.json()
+    //csrf토큰 받아서 axios 공통 저장소에 저장
+    saveCsrfToken(
+      response.data.token,
+      response.data.headerName,
+    )
+  return response.data
 }
 
 /**
@@ -34,53 +40,37 @@ export async function getCsrf(): Promise<CsrfResponse> {
  * 로그인하지 않은 상태에서는 401을 반환하므로
  * null로 처리한다.
  */
-export async function getUserProfile(): Promise<UserProfile | null> {
+export async function getUserProfile():
+Promise<UserProfile | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/user`, {
-      method: "GET",
-      credentials: "include",
-    })
+    const response = await apiClient.get<UserProfile>("/api/user")
 
-    if (response.status === 401) {
+    return response.data
+  } 
+  catch (error) {
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.status === 401
+    ) {
       return null
     }
 
-    if (!response.ok) {
-      throw new Error(`회원정보 조회 실패: ${response.status}`)
-    }
-
-    return response.json()
-  } catch (error) {
     console.error("GET /api/user 실패:", error)
-    return null
-  }
+    throw error
+  }  
 }
 
 /**
  * 회원정보 등록 / 수정
- *
- * GET /api/csrf
- * → PATCH /api/user
+ * csrf 토큰 조회 (axios 저장소에서 가져옴)
  */
-export async function updateUserProfile(data: {
-  nickname: string
-  expectedDeliveryDate: string
-}) {
-  const csrf = await getCsrf()
+export async function updateUserProfile(
+  data: UpdateUserProfileRequest,
+): Promise<UserProfile> {
+  const response = await apiClient.patch<UserProfile>(
+    "/api/user", //url
+    data, 
+  )
 
-  const response = await fetch(`${API_BASE_URL}/api/user`, {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      [csrf.headerName]: csrf.token,
-    },
-    body: JSON.stringify(data),
-  })
-
-  if (!response.ok) {
-    throw new Error(`회원정보 등록 실패: ${response.status}`)
-  }
-
-  return response.json()
+  return response.data
 }
