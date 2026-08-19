@@ -56,35 +56,20 @@ export function TimelineSummary({
 
   return (
     <>
-      <div className="mt-[41px] flex items-center justify-center gap-[16px]">
-        <button
-          aria-label="이전 날짜"
-          className="text-[12px] font-semibold text-black"
-          type="button"
-        >
-          {"<"}
-        </button>
+     
+     {checkIn.achieved && (
+          <div className="ml-[55px] mt-[20px] w-fit rounded-[15px] border border-[#91ddcf] bg-[rgba(145,221,207,0.66)] px-[12px] py-[7px]">
+            <span className="text-[11px] tracking-[-0.11px] text-black">
+              케어카드 실천 완료
+            </span>
+          </div>
+        )}
 
-        <p className="text-[14px] font-semibold tracking-[-0.14px]">
-          {formatTimelineDate(
-            checkIn.checkInDate,
-          )}
-        </p>
-
-        <button
-          aria-label="다음 날짜"
-          className="text-[12px] font-semibold text-black"
-          type="button"
-        >
-          {">"}
-        </button>
-      </div>
-
-      <div className="mt-[34px] px-[59px]">
+      <div className="mt-[15px] px-[59px]">
         <div className="flex items-center gap-[16px]">
           <div className="flex size-[44px] items-center justify-center rounded-full bg-[#f6c5df]">
             <span className="text-[21px]">
-              ♥
+                여기에 emotion 넣기
             </span>
           </div>
 
@@ -101,13 +86,6 @@ export function TimelineSummary({
           </div>
         )}
 
-        {checkIn.achieved && (
-          <div className="mt-[14px] w-fit rounded-[15px] border border-[#91ddcf] bg-[rgba(145,221,207,0.66)] px-[12px] py-[7px]">
-            <span className="text-[11px] tracking-[-0.11px] text-black">
-              케어카드 실천 완료
-            </span>
-          </div>
-        )}
       </div>
     </>
   )
