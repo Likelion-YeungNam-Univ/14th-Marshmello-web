@@ -75,7 +75,7 @@ export function SignupProfilePage() {
   const handleTermsComplete = () => {
     setIsTermsOpen(false)
 
-    navigate("/care", {
+    navigate("/", {
       replace: true,
     })
   }
