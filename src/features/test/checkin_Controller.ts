@@ -119,7 +119,7 @@ export async function createCheckIn(
         params: {
           date,
         },
-      },
+      },  
     )
 
   return response.data

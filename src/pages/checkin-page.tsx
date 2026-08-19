@@ -1,3 +1,7 @@
+import axios from "axios"
+
+import { useMutation, useQuery,} from "@tanstack/react-query"
+
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { CircleCheck } from "lucide-react"
@@ -7,6 +11,9 @@ import { Textarea } from "@/shared/components/ui/textarea"
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/shared/components/ui/drawer"
 import { useCheckinFlowStore } from "@/features/checkin/model/use-checkin-flow-store"
 import { CameraCapture } from "@/features/camera/camera-capture"
+
+import { createCheckIn } from "@/features/test/checkin_Controller"
+import { createCareCard, getCareCardLatest, updateCareCardFeedback,} from "@/features/test/carecard-Controller"
 
 import { CheckinAnimation, type CheckinDirection,} from "@/features/checkin/ui/checkin-animation"
 import type { AppOutletContext } from "@/App"
@@ -25,6 +32,51 @@ const BODY_MAP_WIDTH = 262
 const BODY_MAP_HEIGHT = 411
 const SUCCESS_OVERLAY_DURATION_MS = 1200
 const SUCCESS_OVERLAY_EXIT_DURATION_MS = 180
+
+//Mood 별 숫자 매핑 (이거 추가안할려면 zustand 바꿔야 함)
+const EMOTION_BY_MOOD = {
+  sad: 1,
+  neutral: 2,
+  good: 3,
+  great: 4,
+} as const
+
+// 오늘을 기준으로 offsetDays만큼 이동한 날짜를 YYYY-MM-DD 형식으로 반환
+function getDateByOffset(offsetDays = 0) {
+  const date = new Date()
+
+    date.setDate(
+    date.getDate() + offsetDays,
+  )
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-")
+}
+
+// 가장 최근 케어카드를 조회하고, 케어카드가 없으면 null 반환
+async function getPreviousCareCard() {
+  try {
+    const careCard =
+      await getCareCardLatest() // /api/care-cards/latest 힘수 연결
+
+    // 백엔드가 204를 반환하는 경우까지 대응
+    return careCard ?? null
+  } catch (error) {
+    if (
+      axios.isAxiosError(error) &&
+      error.response?.status === 404
+    ) {
+      // 전날 체크인 데이터 없음
+      return null
+    }
+
+    // 401, 403, 500은 실제 오류로 전달
+    throw error
+  }
+}
 
 export function CheckinPage() {
 
@@ -75,8 +127,10 @@ export function CheckinPage() {
 
   //zustand store에서 step과 nextStep 가져오기
   const step = useCheckinFlowStore((state) => state.step)
+  const setStep = useCheckinFlowStore((state) => state.setStep)
   const nextStep = useCheckinFlowStore((state) => state.nextStep)
   const prevStep = useCheckinFlowStore((state) => state.prevStep)
+  const reset = useCheckinFlowStore((state) => state.reset)
 
   //버튼에 따라서 애니메이션 방향 변경을 위한 useState
   const [direction, setDirection] = useState<CheckinDirection>(1)
@@ -84,10 +138,65 @@ export function CheckinPage() {
   const hideSuccessTimeoutRef = useRef<number | null>(null)
   const navigateTimeoutRef = useRef<number | null>(null)
 
+  // 전날 케어카드 조회 후 시작 단계를 한 번만 설정하기 위한 상태
+  const [isStepInitialized, setIsStepInitialized] = useState(false)
+
+  // 체크인 생성 후 받은 ID를 보관하여 케어카드 생성 및 실패 재시도에 사용
+  const [createdCheckInId, setCreatedCheckInId] = useState<number | null>(null)
+
+  // 최근 케어카드를 조회하여 전날 케어카드 존재 여부를 판단
+  const latestCareCardQuery = useQuery({ queryKey: [ "care-card", "previous", getDateByOffset(),],
+    queryFn: getPreviousCareCard,
+
+    // 체크인 진행 중 자동 조회로
+    // 시작 단계가 바뀌는 것을 방지
+    refetchOnWindowFocus: false,
+
+    // 404를 포함해서 불필요한 자동 재시도 방지
+    retry: false,
+
+    // 같은 날짜에 체크인 화면이 다시 렌더링되어도 기존 조회 결과를 재사용
+    staleTime: Infinity,
+  })
+
+  // 최신 케어카드 조회 결과
+  const latestCareCard =latestCareCardQuery.data
+
+ // 최신 케어카드의 생성일이 어제인지 확인
+  const isYesterdayCareCard = latestCareCard != null && latestCareCard.createdDate.slice(0, 10) === getDateByOffset(-1)
+
+  // 어제 생성된 케어카드에 연결된 체크인 ID가 있는지 확인
+  const hasPreviousCheckIn = isYesterdayCareCard && latestCareCard.checkInId > 0
+
+  // 전날 케어카드 만족도 PATCH에 사용할 careCardId
+  const previousCareCardId = hasPreviousCheckIn ? latestCareCard.careCardId : null
+
+  // 어제 케어카드가 있으면 1단계, 없으면 2단계부터 체크인 시작
+  useEffect(() => {
+    if (!latestCareCardQuery.isSuccess ||isStepInitialized)  return
+
+    if (hasPreviousCheckIn) {
+      // 어제 케어카드가 있으므로 실천 여부와 만족도 입력부터 시작
+      setStep(1)
+    } else {
+       // 평가할 어제 케어카드가 없으므로 사진 촬영 단계부터 시작
+      setStep(2)
+    }
+
+    setIsStepInitialized(true)
+  }, [ hasPreviousCheckIn, isStepInitialized, latestCareCardQuery.isSuccess, setStep,]
+  )
+
+  //뒤로가기 함수
   const handlePreviousStep = useCallback(() => {
+    // 1단계를 건너뛴 사용자는 2단계에서 뒤로 가면 홈으로 이동
+    if (step === 2 &&!hasPreviousCheckIn) {
+      navigate("/", {replace: true,})
+      return
+    }
     setDirection(-1)
     prevStep()
-  }, [prevStep])
+  }, [hasPreviousCheckIn, navigate, prevStep, step,])
 
   useEffect(() => {
     if (step === 1) {
@@ -120,16 +229,18 @@ export function CheckinPage() {
   //zustand store에서 추천행동 만족도 여부
   const conditionScore = useCheckinFlowStore((state) => state.conditionScore)
   const setConditionScore = useCheckinFlowStore((state) => state.setConditionScore)
-  const capturedPhoto = useCheckinFlowStore((state) => state.capturedPhoto)
+  const imageId =useCheckinFlowStore( (state) => state.imageId,)
   const mood = useCheckinFlowStore((state) => state.mood)
   const setMood = useCheckinFlowStore((state) => state.setMood)
+  const bodyPartAnswers = useCheckinFlowStore((state) => state.bodyPartAnswers,)
+  const setBodyPartAnswer = useCheckinFlowStore((state) => state.setBodyPartAnswer,)
 
   const isCurrentStepValid = (() => {
     switch (step) {
       case 1:
         return practiceCare !== null && conditionScore !== null
       case 2:
-        return capturedPhoto !== null
+        return imageId !== null
       case 3:
         return true
       case 4:
@@ -139,19 +250,92 @@ export function CheckinPage() {
     }
   })()
 
-  //버튼 클릭 시 애니메이션 + 다음 페이지 이동
-  const handleNextStep = () => {
-    if (!isCurrentStepValid) return
+  /*전날 만족도 PATCH
+    → 오늘 체크인 POST
+    → 응답 checkInId 보관
+    → 오늘 케어카드 POST
+    → 홈으로 응답 전달
+  */
+  const submitCheckInMutation = useMutation({
+  mutationFn: async () => {
+    if ( imageId === null || mood === null) {
+      throw new Error( "체크인 필수 값이 없습니다.",)
+    }
 
-    if (step === 4) {
-      // TODO: Swagger 확인 후 체크인 저장 API 성공 시에만 홈으로 이동
-      setIsCheckinSuccessVisible(true)
-      hideSuccessTimeoutRef.current = window.setTimeout(() => {
+    // 전날 체크인을 한 사용자만
+    // 전날 케어카드 만족도 PATCH
+    if (previousCareCardId !== null && conditionScore !== null) {
+      await updateCareCardFeedback(
+        {careCardId:previousCareCardId,},
+        {helpfulnessScore:conditionScore,},
+      )
+    }
+
+    // 입력값이 있는 신체 부위만 체크인 API의 bodyDiaries 형식으로 변환
+    const bodyDiaries = Object.entries(bodyPartAnswers).filter(([, answer]) => {
+          return ( answer.hasStretchMarks !== null || answer.bodymapMemo.trim() !== "" )
+        }).map(([partId, answer]) => {
+          const comment = answer.bodymapMemo.trim()
+
+          return {
+            bodyRegion: Number(partId),
+            ...(answer.hasStretchMarks !== null ? { stretchMark:answer.hasStretchMarks, } : {}),
+            ...(comment !== "" ? { comment, } : {}),
+          }
+    })
+
+    // 케어카드 생성만 실패했던 경우에는
+    // 기존에 생성한 체크인 ID 재사용
+    let checkInId = createdCheckInId
+
+    if (checkInId === null) {
+      const createdCheckIn = await createCheckIn(getDateByOffset(),
+          { imageId,
+
+            // 1단계를 생략한 경우에는
+            // achieved 자체를 전송하지 않음
+            ...(practiceCare !== null ? { achieved: practiceCare,} : {}),
+
+            diary: memo.trim(),
+            emotion:
+              EMOTION_BY_MOOD[mood],
+            bodyDiaries,
+          },
+        )
+
+      checkInId = createdCheckIn.checkInId
+      setCreatedCheckInId(checkInId)
+    }
+
+    // 오늘 생성된 checkInId로 새로운 케어카드 생성
+    const createdCareCard = await createCareCard({ checkInId,})
+    return createdCareCard
+  },
+
+  onSuccess: (createdCareCard) => {
+    setIsCheckinSuccessVisible(true)
+
+    hideSuccessTimeoutRef.current = window.setTimeout(() => {
         setIsCheckinSuccessVisible(false)
       }, SUCCESS_OVERLAY_DURATION_MS)
-      navigateTimeoutRef.current = window.setTimeout(() => {
-        navigate("/", { replace: true })
-      }, SUCCESS_OVERLAY_DURATION_MS + SUCCESS_OVERLAY_EXIT_DURATION_MS)
+
+    navigateTimeoutRef.current = window.setTimeout(() => {
+        // 체크인과 케어카드가 모두 생성된 뒤 초기화
+        reset()
+
+        navigate("/", { replace: true, state: { careCard: createdCareCard, }, })
+      }, ( SUCCESS_OVERLAY_DURATION_MS + SUCCESS_OVERLAY_EXIT_DURATION_MS)
+    )
+  },
+
+  onError: (error) => { console.error("체크인 제출 실패:", error, ) },})
+
+  //버튼 클릭 시 애니메이션 + 다음 페이지 이동
+  const handleNextStep = () => {
+    if (!isCurrentStepValid || submitCheckInMutation.isPending) return
+  
+    if (step === 4) {
+      submitCheckInMutation.mutate()
       return
     }
 
@@ -185,9 +369,32 @@ export function CheckinPage() {
     );
 }
 
-  const bodyPartAnswers = useCheckinFlowStore((state) => state.bodyPartAnswers,)
-  const setBodyPartAnswer = useCheckinFlowStore((state) => state.setBodyPartAnswer,)
   const selectedBodyPartAnswer = selectedBodyPart === null ? null : bodyPartAnswers[selectedBodyPart]
+
+  if (latestCareCardQuery.isError) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
+        <p>
+          전날 체크인 정보를 불러오지 못했어요.
+        </p>
+
+        <Button
+          type="button"
+          onClick={() => { void latestCareCardQuery.refetch() }}
+        >
+          다시 시도
+        </Button>
+      </div>
+    )
+  }
+
+  if ( latestCareCardQuery.isPending ||!isStepInitialized) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        전날 체크인 정보를 확인하고 있어요.
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[393px] flex-col items-center gap-8 overflow-x-hidden bg-white">
@@ -422,7 +629,7 @@ export function CheckinPage() {
 
                             setBodyPartAnswer(selectedBodyPart, {bodymapMemo: event.target.value,})
                           }}
-                          maxLength={100}
+                          maxLength={50}
                           rows={4}
                           placeholder="메모를 입력하세요.."
                           className="
@@ -554,7 +761,7 @@ export function CheckinPage() {
               <Textarea 
                 value={memo}
                 onChange={(event) => {setMemo(event.target.value)}}
-                maxLength={100}
+                maxLength={50}
                 placeholder="특별한 일이 있었나요?" 
                 className="mt-[10px] h-[87px] w-[313px] self-center rounded-[15px] bg-[#D1D5DB] border-[1px] border-[#1A1714] text-[14px] text-[#7A6F66]"
               />  
@@ -568,10 +775,10 @@ export function CheckinPage() {
       <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+24px)] z-40 mx-auto w-full max-w-[393px] px-8">
         <Button
           onClick={handleNextStep}
-          disabled={!isCurrentStepValid || isCheckinSuccessVisible}
+          disabled={!isCurrentStepValid || isCheckinSuccessVisible || submitCheckInMutation.isPending}
           className="h-[50px] w-full rounded-[15px] bg-[#484C52] text-[12px] text-white"
         >
-          {step === 4 ? "완료" : "다음"}
+          {submitCheckInMutation.isPending ? "저장 중..." : step === 4 ? "완료" : "다음"}
         </Button>
       </div>
 
