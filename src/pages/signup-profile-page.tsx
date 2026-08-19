@@ -51,15 +51,15 @@ export function SignupProfilePage() {
       setIsSubmitting(true)
 
       // 백엔드 회원정보 등록
-      await updateUserProfile({
+      const updatedProfile = await updateUserProfile({
         nickname: trimmedName,
         expectedDeliveryDate,
       })
 
       // 프론트 상태 저장
       updateProfile({
-        name: trimmedName,
-        dueDate: expectedDeliveryDate,
+        name: updatedProfile.nickname,
+        dueDate: updatedProfile.expectedDeliveryDate,
       })
 
       // 팝업 띄우기
