@@ -1,4 +1,4 @@
-import { apiClient, saveCsrfToken } from "./axios"
+import { apiClient, clearCsrfToken, saveCsrfToken } from "./axios"
 import  axios  from "axios"
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -73,4 +73,22 @@ export async function updateUserProfile(
   )
 
   return response.data
+}
+
+/**
+ * 현재 로그인 세션을 종료합니다.
+ */
+export async function logout(): Promise<void> {
+  const csrf = await getCsrf()
+  const response = await apiClient.post("/logout", null, {
+    headers: {
+      [csrf.headerName]: csrf.token,
+    },
+  })
+
+  if (response.status !== 204) {
+    throw new Error(`로그아웃 실패: ${response.status}`)
+  }
+
+  clearCsrfToken()
 }

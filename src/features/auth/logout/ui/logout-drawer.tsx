@@ -10,12 +10,14 @@ import {
 } from "@/shared/components/ui/drawer"
 
 type LogoutDrawerProps = {
+  isLoggingOut: boolean
   onConfirm: () => void
   onOpenChange: (open: boolean) => void
   open: boolean
 }
 
 export function LogoutDrawer({
+  isLoggingOut,
   onConfirm,
   onOpenChange,
   open,
@@ -47,10 +49,11 @@ export function LogoutDrawer({
         <div className="flex flex-col gap-3 px-6">
           <Button
             className="h-[52px] w-full rounded-[15px] bg-[#91ddcf] text-[16px] leading-6 font-semibold text-white shadow-none hover:bg-[#82d3c5] focus-visible:border-[#91ddcf] focus-visible:ring-[#91ddcf]/30"
+            disabled={isLoggingOut}
             onClick={onConfirm}
             type="button"
           >
-            로그아웃
+            {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
           </Button>
 
           <DrawerClose asChild>

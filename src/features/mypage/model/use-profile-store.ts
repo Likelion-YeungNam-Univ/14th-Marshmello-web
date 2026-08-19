@@ -3,7 +3,6 @@ import { persist } from "zustand/middleware"
 
 type ProfileState = {
   dueDate: string
-  email: string
   name: string
   reset: () => void
   updateProfile: (profile: Pick<ProfileState, "dueDate" | "name">) => void
@@ -11,7 +10,6 @@ type ProfileState = {
 
 const initialProfile = {
   dueDate: "",
-  email: "dami89@gmail.com",
   name: "",
 }
 
