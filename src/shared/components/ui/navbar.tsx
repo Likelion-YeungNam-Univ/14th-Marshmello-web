@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion } from "framer-motion"
 import {ChartPie, Clock3, House, UserRound} from "lucide-react"
 import {NavLink} from "react-router-dom"
 
@@ -28,15 +29,54 @@ export function Navbar() {
               //하단에 고정
               className={function ({ isActive }) {
                   return `
-                    flex flex-col items-center justify-center gap-1 text-[12px]
+                    relative flex items-center justify-center text-[12px] transition-colors duration-200
                     ${isActive ? "text-[#F19ED2]" : "text-[#484C52]"}
                   `
               }} 
             >
-              <Icon size={26} strokeWidth={2} />
-              <span>
-                {item.name}
-              </span>
+              {({ isActive }) => (
+                <motion.span
+                  className="relative flex h-full w-full flex-col items-center justify-center gap-1"
+                  whileTap={{ scale: 0.92 }}
+                >
+                  {isActive ? (
+                    <motion.span
+                      className="absolute top-2 h-1 w-7 rounded-full bg-[#F19ED2]"
+                      layoutId="navbar-active-indicator"
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                  ) : null}
+
+                  <motion.span
+                    animate={{
+                      scale: isActive ? 1.1 : 1,
+                      y: isActive ? -2 : 0,
+                    }}
+                    className="flex items-center justify-center"
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                    }}
+                  >
+                    <Icon size={26} strokeWidth={2} />
+                  </motion.span>
+
+                  <span
+                    className={`transition-[color,opacity] duration-200 ease-out ${
+                      isActive
+                        ? "text-[#F19ED2] opacity-100"
+                        : "text-[#484C52] opacity-80"
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+                </motion.span>
+              )}
             </NavLink>
           )
         })}
