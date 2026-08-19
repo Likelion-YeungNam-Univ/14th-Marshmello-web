@@ -96,8 +96,6 @@ export function RecordsPage() {
         const currentMonth =
           getCurrentMonth()
 
-        // 현재 월은 보고서 생성/조회 대상이 아니므로
-        // /api/reports 요청을 보내지 않는다.
         if (requestMonth !== currentMonth) {
           try {
             await createReport(

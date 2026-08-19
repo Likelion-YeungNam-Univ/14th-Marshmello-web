@@ -45,7 +45,7 @@ export function Summary({
     )
 
   return (
-    <section className="w-full bg-[rgba(232,197,229,0.75)] px-[19px] pb-[30px] pt-[25px]">
+    <section className="w-full bg-[rgba(232,197,229,0.75)] px-[19px] pb-[10px] pt-[13px]">
       <h2 className="text-center text-[18px] font-medium">
         {formatMonth(
           data.requestMonth,
