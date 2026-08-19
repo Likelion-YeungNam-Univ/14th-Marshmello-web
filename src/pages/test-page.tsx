@@ -238,6 +238,10 @@ export function TestPage() {
   const [checkInDate, setCheckInDate] =
     useState("2026-08-18")
 
+  // 체크인 생성 요청의 ?date=에 사용할 값
+  const [createCheckInDate, setCreateCheckInDate] =
+    useState("")
+
   // 감정 기록 조회에 사용할 YYYY-MM 값
   const [emotionMonth, setEmotionMonth] =
     useState("2026-08")
@@ -568,13 +572,13 @@ export function TestPage() {
         <ApiSection title="check-in-controller">
           <label>
             <span className="mb-1 block text-sm font-medium">
-              체크인 조회/생성 날짜
+              체크인 조회 날짜
             </span>
 
             {/* ↓ 제목 바로 아래에 날짜 설명 추가 */}
             <span className="mb-2 block text-xs text-gray-500">
-              GET 조회와 POST 생성의 date 값입니다.
-              YYYY-MM-DD 형식이며, 서버가 이 값을 checkInDate로 저장합니다.
+              GET 조회에 사용할 date 값입니다.
+              체크인 생성 날짜는 아래 생성 입력란에서 따로 선택합니다.
             </span>
 
             <input
@@ -678,13 +682,34 @@ export function TestPage() {
       checkInId는 서버와 DB가 자동 생성하므로 직접 입력하지 않습니다.
     </li>
     <li>
-      checkInDate는 위의 체크인 조회/생성 날짜가 사용됩니다.
+      date는 아래에서 직접 선택하며 체크인 생성 요청의 ?date=로 전송됩니다.
     </li>
     <li>
       생성 성공 후 받은 checkInId는 아래 케어카드 입력칸에 자동 입력됩니다.
     </li>
   </ul>
 </div>
+
+{/* date 입력 */}
+<label>
+  <span className="mb-1 block text-sm font-medium">
+    date
+  </span>
+
+  <span className="mb-2 block text-xs text-gray-500">
+    생성할 체크인의 날짜입니다. 오늘 날짜가 아닌 과거 날짜도 직접 선택할 수 있으며
+    YYYY-MM-DD 형식으로 전송됩니다.
+  </span>
+
+  <input
+    className={inputClassName}
+    onChange={(event) =>
+      setCreateCheckInDate(event.target.value)
+    }
+    type="date"
+    value={createCheckInDate}
+  />
+</label>
 
 {/* imageId 입력 */}
 <label>
@@ -834,7 +859,7 @@ export function TestPage() {
   currentApi={loadingApi}
   danger
   disabled={
-    checkInDate === "" ||
+    createCheckInDate === "" ||
     !isPositiveInteger(checkInImageId) ||
     !Number.isInteger(Number(checkInEmotion)) ||
     Number(checkInEmotion) < 1 ||
@@ -853,8 +878,8 @@ export function TestPage() {
 
         const response =
           await handleCreateCheckIn(
-            // ↓ 위쪽 날짜 입력값이 ?date=로 전송됨
-            checkInDate,
+            // ↓ 생성 폼의 date 입력값이 ?date=로 전송됨
+            createCheckInDate,
             {
               imageId:
                 Number(checkInImageId),
