@@ -4,6 +4,7 @@ import axios from "axios"
 // 입력값, 요청 결과 등을 화면에 저장하기 위해 사용
 import {
   useState,
+  type InputHTMLAttributes,
   type ReactNode,
 } from "react"
 
@@ -18,12 +19,19 @@ import {
   getcheckInCount,
   getcheckInRegion,
   handleCreateCheckIn,
+  handleDeleteCheckIn,
   handleGetCheckInEmotions,
   handleGetCheckInsByDate,
 
   // ↓ bodyDiaries JSON 검증 결과 타입으로 사용
   type bodyDiaryRequest,
 } from "@/features/test/checkin_Controller"
+
+import {
+  importMockCheckIns,
+  type BulkCheckInImportResult,
+  type BulkCheckInProgress,
+} from "@/features/test/bulk-checkin-importer"
 
 // check-in-image-controller 테스트 함수
 import {
@@ -95,6 +103,16 @@ type ApiButtonProps = {
 // 모든 input에서 공통으로 사용할 디자인
 const inputClassName =
   "w-full rounded-lg border border-gray-300 bg-white px-3 py-2"
+
+const bulkCheckInApiName =
+  "POST JSON 체크인 일괄 생성"
+
+// Chrome/Edge에서 폴더 전체를 선택하기 위한 input 속성
+const directoryInputProps = {
+  webkitdirectory: "",
+} as InputHTMLAttributes<HTMLInputElement> & {
+  webkitdirectory: string
+}
 
 // 컨트롤러별 API 버튼을 감싸는 공통 영역
 function ApiSection({
@@ -238,6 +256,9 @@ export function TestPage() {
   const [checkInDate, setCheckInDate] =
     useState("2026-08-18")
 
+  // GET 응답에서 받은 삭제 대상 checkInId
+  const [ deleteCheckInId, setDeleteCheckInId,] = useState("")
+
   // 체크인 생성 요청의 ?date=에 사용할 값
   const [createCheckInDate, setCreateCheckInDate] =
     useState("")
@@ -276,6 +297,14 @@ export function TestPage() {
     }
   ]`)
 
+  // JSON 기반 체크인 일괄 생성에 사용할 파일과 이미지 폴더
+  const [bulkJsonFile, setBulkJsonFile] =
+    useState<File | null>(null)
+  const [bulkImageFiles, setBulkImageFiles] =
+    useState<File[]>([])
+  const [bulkProgress, setBulkProgress] =
+    useState<BulkCheckInProgress | null>(null)
+
   // 이미지 input에서 선택한 실제 이미지 파일
   const [imageFile, setImageFile] =
     useState<File | null>(null)
@@ -307,6 +336,8 @@ export function TestPage() {
   const runRequest = async (
     apiName: string,
     request: () => Promise<unknown>,
+    isSuccessful: (data: unknown) => boolean =
+      () => true,
   ) => {
     // 현재 어떤 API가 실행 중인지 저장
     setLoadingApi(apiName)
@@ -321,7 +352,7 @@ export function TestPage() {
       // 요청이 성공하면 성공 결과 저장
       setResult({
         apiName,
-        isSuccess: true,
+        isSuccess: isSuccessful(data),
         data,
       })
     } catch (error) {
@@ -361,7 +392,7 @@ export function TestPage() {
       <div className="mx-auto max-w-2xl">
         {/* 테스트 페이지 제목 */}
         <h1 className="mb-3 text-2xl font-bold">
-          Swagger API 테스트
+          로컬 Swagger API 테스트
         </h1>
 
         {/* POST와 PATCH 버튼에 대한 안내 */}
@@ -583,9 +614,12 @@ export function TestPage() {
 
             <input
               className={inputClassName}
-              onChange={(event) =>
+              onChange={(event) => {
+                // ↓ 조회 및 삭제 날짜 변경
                 setCheckInDate(event.target.value)
-              }
+                // ↓ 이전 날짜에서 받은 ID 제거
+                setDeleteCheckInId("")
+              }}
               type="date"
               value={checkInDate}
             />
@@ -599,13 +633,101 @@ export function TestPage() {
             onClick={() => {
               void runRequest(
                 "GET /api/check-ins",
-                () =>
-                  handleGetCheckInsByDate(
-                    checkInDate,
-                  ),
+                 async () => { const response = await handleGetCheckInsByDate( checkInDate, )
+
+                  // ↓ 조회 결과의 첫 번째 checkInId 자동 입력
+                  const targetCheckIn = response[0]
+
+                  setDeleteCheckInId( targetCheckIn ? String(targetCheckIn.checkInId) : "", )
+
+                  return response
+                },
               )
             }}
           />
+
+          //체크인 삭제 영역
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="font-medium text-red-900">
+              체크인 삭제
+            </p>
+
+            <p className="mt-1 text-xs text-red-700">
+              위에서 날짜를 선택하고 GET 버튼을 누르면
+              조회된 checkInId가 자동으로 입력됩니다.
+            </p>
+
+            {/* 삭제 요청의 date query */}
+            <label className="mt-4 block">
+              <span className="mb-1 block text-sm font-medium">
+                삭제 날짜
+              </span>
+
+              <input
+                className={inputClassName}
+                onChange={(event) => {
+                  // 위의 조회 날짜와 같은 상태를 사용
+                  setCheckInDate(event.target.value)
+
+                  // 날짜 변경 시 기존 ID 초기화
+                  setDeleteCheckInId("")
+                }}
+                type="date"
+                value={checkInDate}
+              />
+            </label>
+
+            {/* 삭제 요청의 checkInId path */}
+            <label className="mt-4 block">
+              <span className="mb-1 block text-sm font-medium">
+                삭제할 checkInId
+              </span>
+
+              <input
+                className={inputClassName}
+                min="1"
+                onChange={(event) =>
+                  setDeleteCheckInId(
+                    event.target.value,
+                  )
+                }
+                placeholder="GET 조회 후 자동 입력"
+                type="number"
+                value={deleteCheckInId}
+              />
+            </label>
+
+            <div className="mt-4">
+              <ApiButton
+                currentApi={loadingApi}
+                danger
+                disabled={
+                  checkInDate === "" ||
+                  !isPositiveInteger(
+                    deleteCheckInId,
+                  )
+                }
+                label="DELETE /api/check-ins/{checkInId}"
+                onClick={() => {
+                  void runRequest(
+                    "DELETE /api/check-ins/{checkInId}",
+                    async () => {
+                      const response =
+                        await handleDeleteCheckIn(
+                          Number(deleteCheckInId),
+                          checkInDate,
+                        )
+
+                      // 삭제된 ID로 다시 누르는 것을 방지
+                      setDeleteCheckInId("")
+
+                      return response
+                    },
+                  )
+                }}
+              />
+            </div>
+          </div>
 
           <label>
             <span className="mb-2 block text-sm font-medium">
@@ -908,6 +1030,162 @@ export function TestPage() {
     )
   }}
 />
+
+{/* JSON과 이미지 폴더를 이용한 체크인 일괄 생성 */}
+<div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+  <p className="font-medium text-amber-900">
+    JSON 체크인 일괄 생성
+  </p>
+
+  <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-amber-800">
+    <li>
+      JSON에서 checkedIn이 true인 날짜만 순서대로 생성합니다.
+    </li>
+    <li>
+      이미지 폴더를 섞은 뒤 사용하지 않은 사진을 한 장씩 사용합니다.
+    </li>
+    <li>
+      이미지 분석에 실패하면 다른 사진으로 최대 5번 재시도합니다.
+    </li>
+    <li>
+      JSON의 checkInId는 사용하지 않고 POST 응답의 checkInId만 사용합니다.
+    </li>
+    <li>
+      satisfaction은 체크인 생성 API 필드가 아니므로 전송하지 않습니다.
+    </li>
+  </ul>
+
+  <label className="mt-4 block">
+    <span className="mb-1 block text-sm font-medium">
+      체크인 JSON 파일
+    </span>
+
+    <input
+      accept=".json,application/json"
+      className={inputClassName}
+      onChange={(event) => {
+        setBulkJsonFile(
+          event.target.files?.[0] ?? null,
+        )
+        setBulkProgress(null)
+      }}
+      type="file"
+    />
+
+    <span className="mt-1 block text-xs text-gray-600">
+      {bulkJsonFile?.name ?? "선택된 JSON 파일 없음"}
+    </span>
+  </label>
+
+  <label className="mt-4 block">
+    <span className="mb-1 block text-sm font-medium">
+      복부 이미지 폴더
+    </span>
+
+    <input
+      {...directoryInputProps}
+      accept="image/jpeg,image/png,image/webp"
+      className={inputClassName}
+      multiple
+      onChange={(event) => {
+        setBulkImageFiles(
+          Array.from(event.target.files ?? []),
+        )
+        setBulkProgress(null)
+      }}
+      type="file"
+    />
+
+    <span className="mt-1 block text-xs text-gray-600">
+      선택된 이미지: {bulkImageFiles.length}장
+    </span>
+  </label>
+
+  <div className="mt-4">
+    <ApiButton
+      currentApi={loadingApi}
+      danger
+      disabled={
+        bulkJsonFile === null ||
+        bulkImageFiles.length === 0
+      }
+      label={bulkCheckInApiName}
+      onClick={() => {
+        if (
+          bulkJsonFile === null ||
+          bulkImageFiles.length === 0
+        ) {
+          return
+        }
+
+        const confirmed = window.confirm(
+          `JSON의 체크인 데이터를 실제 서버에 순차 생성합니다.\n선택 이미지: ${bulkImageFiles.length}장\n계속하시겠습니까?`,
+        )
+
+        if (!confirmed) return
+
+        const jsonFile = bulkJsonFile
+        const imageFiles = bulkImageFiles
+        setBulkProgress(null)
+
+        void runRequest(
+          bulkCheckInApiName,
+          async () => {
+            const response = await importMockCheckIns({
+              jsonFile,
+              imageFiles,
+              onProgress: setBulkProgress,
+            })
+
+            const lastSuccess =
+              response.successes[
+                response.successes.length - 1
+              ]
+
+            if (lastSuccess) {
+              setCareCheckInId(
+                String(lastSuccess.checkInId),
+              )
+            }
+
+            return response
+          },
+          (data) => {
+            const response =
+              data as BulkCheckInImportResult
+
+            return (
+              !response.aborted &&
+              response.failureCount === 0
+            )
+          },
+        )
+      }}
+    />
+  </div>
+
+  {bulkProgress ? (
+    <div className="mt-3 rounded-lg bg-white p-3 text-sm text-amber-900">
+      <p>
+        진행: {bulkProgress.processedCount} / {bulkProgress.totalCount}
+      </p>
+      <p>
+        현재 날짜: {bulkProgress.currentDate}
+      </p>
+      <p>
+        현재 단계: {bulkProgress.stage === "image"
+          ? "이미지 분석"
+          : "체크인 생성"}
+      </p>
+      <p>
+        현재 이미지: {bulkProgress.currentImageName}
+      </p>
+      <p>
+        성공: {bulkProgress.successCount} / 실패: {bulkProgress.failureCount}
+      </p>
+    </div>
+  ) : null}
+</div>
 </ApiSection>  
 
         {/* 케어카드 조회, 생성 및 피드백 전송 */}
