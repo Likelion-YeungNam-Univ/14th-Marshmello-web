@@ -65,113 +65,137 @@ export function RecordsPage() {
       getCurrentMonth(),
     )
 
-  const [isLoading, setIsLoading] =
-    useState(true)
+  const [
+    isInitialLoading,
+    setIsInitialLoading,
+  ] = useState(true)
 
-  const [errorMessage, setErrorMessage] =
-    useState<string | null>(null)
+  const [
+    isMonthChanging,
+    setIsMonthChanging,
+  ] = useState(false)
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState<string | null>(
+    null,
+  )
 
   useEffect(() => {
     let cancelled = false
 
-    const loadRecords =
-      async () => {
-        try {
-          setIsLoading(true)
-          setErrorMessage(null)
+    const loadRecords = async () => {
+      try {
+        if (data === null) {
+          setIsInitialLoading(true)
+        } else {
+          setIsMonthChanging(true)
+        }
 
-          const count =
-            await getcheckInCount(
-              requestMonth,
-            )
+        setErrorMessage(null)
 
-          const [
-            emotionsResponse,
-            topBodyRegion,
-          ] = await Promise.all([
-            getCheckInEmotions(
-              requestMonth,
-            ),
-            getcheckInRegion(
-              requestMonth,
-            ),
-          ])
-
-          const emotions =
-            emotionsResponse as unknown as EmotionByDate[]
-
-          let report:
-            | ReportResponse
-            | null = null
-
-          const currentMonth =
-            getCurrentMonth()
-
-          if (
-            requestMonth !==
-            currentMonth
-          ) {
-            try {
-              await createReport(
-                requestMonth,
-              )
-
-              report =
-                await getReport(
-                  requestMonth,
-                )
-            } catch (
-              reportError
-            ) {
-              console.error(
-                "월간 리포트 조회 실패:",
-                reportError,
-              )
-            }
-          }
-
-          if (cancelled) {
-            return
-          }
-
-          setData({
+        const count =
+          await getcheckInCount(
             requestMonth,
-            count: count.count,
-            achievedCount:
-              count.achievedCount,
-            emotions,
-            topBodyRegion:
-              topBodyRegion.bodyRegion,
-            report,
-          })
-        } catch (error) {
-          console.error(
-            "기록 데이터 조회 실패:",
-            error,
           )
 
-          if (!cancelled) {
-            setErrorMessage(
-              "기록 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
+        const [
+          emotionsResponse,
+          topBodyRegion,
+        ] = await Promise.all([
+          getCheckInEmotions(
+            requestMonth,
+          ),
+          getcheckInRegion(
+            requestMonth,
+          ),
+        ])
+
+        const emotions =
+          emotionsResponse as unknown as EmotionByDate[]
+
+        let report:
+          | ReportResponse
+          | null = null
+
+        const currentMonth =
+          getCurrentMonth()
+
+        if (
+          requestMonth !==
+          currentMonth
+        ) {
+          try {
+            await createReport(
+              requestMonth,
+            )
+          } catch (createError) {
+            console.error(
+              "월간 리포트 생성 실패:",
+              createError,
             )
           }
-        } finally {
-          if (!cancelled) {
-            setIsLoading(false)
+
+          try {
+            report =
+              await getReport(
+                requestMonth,
+              )
+          } catch (getError) {
+            console.error(
+              "월간 리포트 조회 실패:",
+              getError,
+            )
           }
         }
+
+        if (cancelled) {
+          return
+        }
+
+        setData({
+          requestMonth,
+          count: count.count,
+          achievedCount:
+            count.achievedCount,
+          emotions,
+          topBodyRegion:
+            topBodyRegion.bodyRegion,
+          report,
+        })
+      } catch (error) {
+        console.error(
+          "기록 데이터 조회 실패:",
+          error,
+        )
+
+        if (!cancelled) {
+          setErrorMessage(
+            "기록 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setIsInitialLoading(false)
+          setIsMonthChanging(false)
+        }
       }
+    }
 
     void loadRecords()
 
     return () => {
       cancelled = true
     }
-  }, [requestMonth])
+  }, [requestMonth, data])
 
-  if (isLoading) {
+  if (
+    isInitialLoading ||
+    !data
+  ) {
     return (
-      <main className="mx-auto min-h-[852px] w-full max-w-[393px] bg-[#e8c5e5] px-[15px] pt-[110px]">
+      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-[15px]">
         <p className="text-center text-[14px] text-[#7a4e88]">
           기록을 불러오는 중이에요.
         </p>
@@ -179,15 +203,11 @@ export function RecordsPage() {
     )
   }
 
-  if (
-    errorMessage ||
-    !data
-  ) {
+  if (errorMessage) {
     return (
       <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-6">
         <p className="text-center text-[14px] leading-[1.6] text-[#6c7278]">
-          {errorMessage ??
-            "기록을 불러오지 못했어요."}
+          {errorMessage}
         </p>
       </main>
     )
@@ -209,7 +229,7 @@ export function RecordsPage() {
     "---"
 
   return (
-    <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-[#e8c5e5] text-black">
+    <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-[#e8c5e5] text-black">
       <section className="relative px-[15px] pb-[8px] pt-[20px]">
         <RecordsSummary
           monthText={monthText}
@@ -231,20 +251,22 @@ export function RecordsPage() {
         requestMonth={
           data.requestMonth
         }
-        emotions={
-          data.emotions
-        }
+        emotions={data.emotions}
         onMonthChange={
           setRequestMonth
         }
-        onDateClick={(
-          date,
-        ) => {
+        onDateClick={(date) => {
           navigate(
             `/records/timeline?date=${date}`,
           )
         }}
       />
+
+      {isMonthChanging && (
+        <div className="pointer-events-none absolute right-[20px] top-[20px] z-50 rounded-full bg-white/80 px-[10px] py-[5px] text-[10px] text-[#8b6986] shadow-sm">
+          불러오는 중
+        </div>
+      )}
     </main>
   )
 }

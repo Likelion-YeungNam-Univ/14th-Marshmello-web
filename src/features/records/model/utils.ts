@@ -4,13 +4,6 @@ import type {
   MoodType,
 } from "@/features/records/model/types"
 
-/**
- * 백엔드 emotion enum
- *
- * 0 = good
- * 1 = normal
- * 그 외 = bad
- */
 export function getMoodType(
   emotion: number | null,
 ): MoodType {
@@ -18,20 +11,25 @@ export function getMoodType(
     return "none"
   }
 
-  if (emotion === 0) {
-    return "good"
+  if (emotion === 1) {
+    return "bad"
   }
 
-  if (emotion === 1) {
+  if (emotion === 2) {
     return "normal"
   }
 
-  return "bad"
+  if (emotion === 3) {
+    return "good"
+  }
+
+  if (emotion === 4) {
+    return "great"
+  }
+
+  return "none"
 }
 
-/**
- * 백엔드 bodyRegion enum
- */
 export function getBodyRegionLabel(
   bodyRegion: number | null,
 ): string {
@@ -39,13 +37,22 @@ export function getBodyRegionLabel(
     return "---"
   }
 
-  const bodyRegionMap: Record<number, string> = {
-    0: "옆구리",
+  const bodyRegionMap: Record<
+    number,
+    string
+  > = {
+    1: "가슴",
+    2: "복부",
+    3: "골반",
+    4: "왼쪽 팔",
+    5: "오른쪽 팔",
+    6: "왼쪽 다리",
+    7: "오른쪽 다리",
   }
 
   return (
     bodyRegionMap[bodyRegion] ??
-    `부위 ${bodyRegion}`
+    "---"
   )
 }
 
@@ -53,7 +60,9 @@ export function getDaysInMonth(
   yearMonth: string,
 ): number {
   const [year, month] =
-    yearMonth.split("-").map(Number)
+    yearMonth
+      .split("-")
+      .map(Number)
 
   return new Date(
     year,
@@ -66,7 +75,9 @@ export function getFirstDayOfMonth(
   yearMonth: string,
 ): number {
   const [year, month] =
-    yearMonth.split("-").map(Number)
+    yearMonth
+      .split("-")
+      .map(Number)
 
   return new Date(
     year,
@@ -89,7 +100,9 @@ export function changeMonth(
   amount: number,
 ): string {
   const [year, month] =
-    yearMonth.split("-").map(Number)
+    yearMonth
+      .split("-")
+      .map(Number)
 
   const date = new Date(
     year,
@@ -106,34 +119,52 @@ export function buildCalendarDays(
   yearMonth: string,
   emotions: EmotionByDate[],
 ): CalendarDay[] {
-  const emotionMap = new Map(
-    emotions.map((item) => [
-      item.date,
-      item.emotion,
-    ]),
-  )
+  const emotionMap =
+    new Map(
+      emotions.map(
+        (item) => [
+          item.date,
+          item.emotion,
+        ],
+      ),
+    )
 
   const [year, month] =
-    yearMonth.split("-").map(Number)
+    yearMonth
+      .split("-")
+      .map(Number)
 
   const daysInMonth =
-    getDaysInMonth(yearMonth)
+    getDaysInMonth(
+      yearMonth,
+    )
 
   return Array.from(
-    { length: daysInMonth },
+    {
+      length: daysInMonth,
+    },
     (_, index) => {
-      const day = index + 1
+      const day =
+        index + 1
 
       const date = [
         year,
-        String(month).padStart(2, "0"),
-        String(day).padStart(2, "0"),
+        String(month).padStart(
+          2,
+          "0",
+        ),
+        String(day).padStart(
+          2,
+          "0",
+        ),
       ].join("-")
 
       return {
         date: day,
         emotion:
-          emotionMap.get(date) ?? null,
+          emotionMap.get(
+            date,
+          ) ?? null,
       }
     },
   )

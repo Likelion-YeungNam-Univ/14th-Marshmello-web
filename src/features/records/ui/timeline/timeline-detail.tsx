@@ -8,6 +8,10 @@ import type {
 } from "../../model/timeline-types"
 
 import {
+  TimelineBodyMap,
+} from "./body-map"
+
+import {
   TimelineImageSection,
 } from "./timeline-image-section"
 
@@ -51,16 +55,35 @@ export function TimelineDetail({
       <div className="mt-[30px]">
         <TimelineImageSection
           title="이 날의 배 다시보기"
-          imageUrl={data.imageUrl}
-        />
+        >
+          {data.imageUrl ? (
+            <img
+              alt="체크인 당시 배 사진"
+              className="h-[270px] w-full object-cover"
+              src={data.imageUrl}
+            />
+          ) : (
+            <div className="flex h-[270px] items-center justify-center text-[13px] text-[#8c8c8c]">
+              이미지를 불러오지 못했어요.
+            </div>
+          )}
+        </TimelineImageSection>
 
         <TimelineImageSection
           title="이 날의 바디맵 다시보기"
-          imageUrl={null}
-        />
+        >
+          <div className="flex min-h-[270px] items-center justify-center bg-white px-[20px] py-[20px]">
+            <TimelineBodyMap
+              bodyDiaries={
+                data.checkIn
+                  .bodyDiaries
+              }
+            />
+          </div>
+        </TimelineImageSection>
       </div>
 
-      <div className="px-[36px] pb-[72px] pt-[0px]">
+      <div className="px-[36px] pb-[72px] pt-0">
         <button
           className="flex h-[47px] w-full items-center justify-center gap-[12px] rounded-[15px] bg-[#484c52] text-white"
           type="button"

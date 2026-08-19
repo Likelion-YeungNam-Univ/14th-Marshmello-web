@@ -4,6 +4,11 @@ import {
 } from "lucide-react"
 import { useMemo } from "react"
 
+import goodMood from "@/assets/checkin/mood/good.svg"
+import greatMood from "@/assets/checkin/mood/great.svg"
+import neutralMood from "@/assets/checkin/mood/neutral.svg"
+import sadMood from "@/assets/checkin/mood/sad.svg"
+
 import type {
   EmotionByDate,
 } from "@/features/records/model/types"
@@ -27,6 +32,14 @@ type MoodFaceProps = {
   emotion: number | null
   size?: number
 }
+
+
+const moodImageMap = {
+  great: greatMood,
+  good: goodMood,
+  normal: neutralMood,
+  bad: sadMood,
+} as const
 
 function MoodFace({
   emotion,
@@ -214,7 +227,7 @@ export function RecordsCalendar({
           </span>
         ))}
       </div>
-
+a
       <div className="mt-[20px] grid grid-cols-7 gap-x-[11px] gap-y-[18px]">
         {Array.from({
           length: firstDayOfMonth,
