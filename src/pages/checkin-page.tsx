@@ -503,8 +503,8 @@ export function CheckinPage() {
 
               {/*바디맵, 팝업창 : 전신 svg에 각 부위 별 svg를 덧댐 / 원래대로 하고 싶다면 -translate-y-6만 삭제해 */}
               <div className="relative mx-auto mt-[25px] aspect-[262/411] w-[250px] max-w-full">
-                <span aria-hidden="true" className="absolute left-6 top-[82px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">R</span>
-                <span aria-hidden="true" className="absolute right-6 top-[85px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">L</span>
+                <span aria-hidden="true" className="absolute left-6 top-[82px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">L</span>
+                <span aria-hidden="true" className="absolute right-6 top-[85px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">R</span>
               
                 {/*바디맵 전신  svg*/}
                 <img
