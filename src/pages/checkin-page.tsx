@@ -105,8 +105,16 @@ export function CheckinPage() {
     (part) => part.id === selectedBodyPart,
   )
 
-  //tab을 터치하면 Zustand에 부위 값이 전달됨
+  //tab을 터치하면 기존 적용값을 임시 상태로 복사한 뒤 Drawer를 염
   const touchTabs = (part : number) => {
+
+    const savedAnswer = bodyPartAnswers[part]
+
+    // ↓ 아직 전역 상태를 변경하지 않고 임시 상태에만 복사
+    setDraftStretchMark(savedAnswer.hasStretchMarks)
+    setDraftBodymapMemo(savedAnswer.bodymapMemo)
+
+    // ↓ 임시값을 준비한 다음 Drawer 열기
     setSelectedBodyPart(part)
   }
 
@@ -223,6 +231,11 @@ export function CheckinPage() {
   const setMood = useCheckinFlowStore((state) => state.setMood)
   const bodyPartAnswers = useCheckinFlowStore((state) => state.bodyPartAnswers,)
   const setBodyPartAnswer = useCheckinFlowStore((state) => state.setBodyPartAnswer,)
+
+  // Drawer에서 편집 중인 값이며, 아직 Zustand에는 저장되지 않음
+  const [draftStretchMark, setDraftStretchMark] = useState<boolean | null>(null)
+
+  const [draftBodymapMemo, setDraftBodymapMemo] = useState("")
 
   const isCurrentStepValid = (() => {
     switch (step) {
@@ -361,8 +374,6 @@ export function CheckinPage() {
     )
   }
 
-  const selectedBodyPartAnswer = selectedBodyPart === null ? null : bodyPartAnswers[selectedBodyPart]
-
   if (latestCareCardQuery.isError) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
@@ -493,7 +504,7 @@ export function CheckinPage() {
           )}
 
           {(step === 3) && (
-            <div className="w-full max-w-[345px] pt-[30px]">
+            <div className="w-full mbodyPartAnswersax-w-[345px] pt-[30px]">
               <h2 className="text-[24px] font-medium leading-[31px] tracking-[-0.48px] text-black">
                 특별히 불편한 부위가 있었나요?
               </h2>
@@ -516,7 +527,16 @@ export function CheckinPage() {
 
                 {/* 실제 벡터 path를 이용한 부위별 hover/click 영역 */}
                 {BodyPart.map((part) => {
+                  //선택된 바디
                   const isSelected = selectedBodyPart === part.id
+                  
+                  //
+                  const answer = bodyPartAnswers[part.id]
+
+                  //적용된 부위
+                  const hasAppliedAnswer =
+                    answer.hasStretchMarks === true ||
+                    answer.bodymapMemo.trim() !== ""  
 
                   return (
                     //각 부위 별 svg 파일
@@ -554,10 +574,12 @@ export function CheckinPage() {
                           href={`${part.image}#body-part-path`}
                           aria-hidden="true"
                           className={`pointer-events-none text-[#F19ED2] transition-[opacity,filter] duration-200 ease-out group-hover:opacity-100 group-hover:[filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)] group-focus-within:opacity-100 group-focus-within:[filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)] ${
-                            isSelected || bodyPartAnswers[part.id]?.hasStretchMarks === true
-                              ? "opacity-100 [filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)]"
-                              : "opacity-0"
-                          }`}
+                          // ↓ 기존 조건을 hasAppliedAnswer로 교체
+                          // isSelected는 Drawer가 열린 동안만 임시로 빛나게 함
+                          isSelected || hasAppliedAnswer
+                            ? "opacity-100 [filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)]"
+                            : "opacity-0"
+                        }`}
                         />
                       </g>
                 </svg>
@@ -596,28 +618,28 @@ export function CheckinPage() {
                           <div className="flex gap-3">
                             {/*있음*/}
                             <Button 
-                              aria-pressed={selectedBodyPartAnswer?.hasStretchMarks === true}
-                              onClick={() => {
-                                {/*만약 선택이 안됐으면 그냥 null로 보내고 그게 아니라면 버튼 활성화 */}
-                                if (selectedBodyPart === null) return
-
-                                setBodyPartAnswer(selectedBodyPart, {hasStretchMarks: true,})
-                              }}
-                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${selectedBodyPartAnswer?.hasStretchMarks === true ? "border-[#F19ED2] text-[#F19ED2] hover:bg-[#FFF7FC]" : "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
+                              aria-pressed={draftStretchMark === true}
+                              //임시상태에 연결
+                              onClick={() => setDraftStretchMark(true)}
+                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${
+                                draftStretchMark === true
+                                  ? "border-[#F19ED2] text-[#F19ED2] hover:bg-[#FFF7FC]"
+                                  : "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"
+                              }`}
                             >
                               있음
                             </Button>
 
                             {/*없음*/}
                             <Button
-                              aria-pressed={selectedBodyPartAnswer?.hasStretchMarks === false}
-                              onClick={() => {
-                                {/*만약 선택이 안됐으면 그냥 null로 보내고 그게 아니라면 버튼 활성화 */}
-                                if (selectedBodyPart === null) return
-
-                                setBodyPartAnswer(selectedBodyPart, {hasStretchMarks: false,})
-                              }}
-                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${selectedBodyPartAnswer?.hasStretchMarks === false ? "border-[#F19ED2] text-[#F19ED2] hover:bg-[#FFF7FC]": "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"}`}
+                              aria-pressed={draftStretchMark === false}
+                              //임시상태에 연결
+                              onClick={() => setDraftStretchMark(false)}
+                              className={`h-10 w-[76px] rounded-full border bg-white text-[14px] font-normal shadow-none ${
+                                draftStretchMark === false
+                                  ? "border-[#F19ED2] text-[#F19ED2] hover:bg-[#FFF7FC]"
+                                  : "border-[#B7B7B7] text-[#666666] hover:bg-[#F8F8F8]"
+                              }`}
                             >
                               없음
                             </Button>
@@ -632,12 +654,10 @@ export function CheckinPage() {
                         </p>
 
                         <Textarea
-                          value={selectedBodyPartAnswer?.bodymapMemo ?? ""}
-                          onChange={(event) => {
-                            if (selectedBodyPart === null) return
-
-                            setBodyPartAnswer(selectedBodyPart, {bodymapMemo: event.target.value,})
-                          }}
+                           // ↓ Zustand 값 대신 임시 메모를 표시
+                          value={draftBodymapMemo}
+                          // ↓ 입력할 때는 임시 메모만 변경
+                          onChange={(event) => { setDraftBodymapMemo(event.target.value)}}
                           maxLength={50}
                           rows={4}
                           placeholder="메모를 입력하세요.. (50자 제한)"
@@ -663,7 +683,18 @@ export function CheckinPage() {
                           "
                           />
                           <DrawerClose asChild>
-                            <Button className="h-[54px] mt-6 w-full rounded-[16px] bg-[#F19ED2] text-[16px] font-semibold text-white hover:bg-[#A96EAA]">
+                            <Button
+                              // ↓ “적용”을 눌렀을 때만 임시값을 Zustand에 저장
+                              onClick={() => {
+                                if (selectedBodyPart === null) return
+
+                                setBodyPartAnswer(selectedBodyPart, {
+                                  hasStretchMarks: draftStretchMark,
+                                  bodymapMemo: draftBodymapMemo,
+                                })
+                              }}
+                              className="h-[54px] mt-6 w-full rounded-[16px] bg-[#F19ED2] text-[16px] font-semibold text-white hover:bg-[#A96EAA]"
+                            >
                               적용
                             </Button>
                           </DrawerClose>      
