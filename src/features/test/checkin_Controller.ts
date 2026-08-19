@@ -89,6 +89,12 @@ export type checkInRegion = {
   bodyRegion: number | null
 }
 
+// DELETE 요청에 필요한 값
+export type DeleteCheckInRequest = {
+  checkInId: number
+  date: string
+}
+
 //## 요청 함수
 
 // 날짜를 이용해 체크인 목록 조회
@@ -163,6 +169,12 @@ export async function getcheckInRegion(
   return response.data
 }
 
+//해당 날짜의 체크인 기록 지우기
+export async function deleteCheckIn({checkInId, date,}: DeleteCheckInRequest): Promise<void> {
+  await apiClient.delete(`/api/check-ins/${checkInId}`, {params: { date,}, },  )
+}
+
+
 //## API 실행 테스트 함수
 
 // GET /api/check-ins 테스트
@@ -178,6 +190,34 @@ export const handleGetCheckInsByDate =
 
     return result
   }
+
+//DELETE 테스트 핸들러
+export const handleDeleteCheckIn =
+  async (
+    checkInId: number,
+    date: string,
+  ) => {
+    await deleteCheckIn({
+      checkInId,
+      date,
+    })
+
+    // DELETE가 204 No Content여도
+    // 테스트 결과창에서 삭제 대상을 확인할 수 있도록 반환
+    const result = {
+      deleted: true,
+      checkInId,
+      date,
+    }
+
+    console.log(
+      "체크인 삭제 결과:",
+      result,
+    )
+
+    return result
+  }
+
 
 // POST /api/check-ins 테스트
 export const handleCreateCheckIn =

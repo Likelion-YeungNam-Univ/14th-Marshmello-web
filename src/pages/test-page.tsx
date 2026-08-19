@@ -19,6 +19,7 @@ import {
   getcheckInCount,
   getcheckInRegion,
   handleCreateCheckIn,
+  handleDeleteCheckIn,
   handleGetCheckInEmotions,
   handleGetCheckInsByDate,
 
@@ -255,6 +256,9 @@ export function TestPage() {
   const [checkInDate, setCheckInDate] =
     useState("2026-08-18")
 
+  // GET 응답에서 받은 삭제 대상 checkInId
+  const [ deleteCheckInId, setDeleteCheckInId,] = useState("")
+
   // 체크인 생성 요청의 ?date=에 사용할 값
   const [createCheckInDate, setCreateCheckInDate] =
     useState("")
@@ -388,7 +392,7 @@ export function TestPage() {
       <div className="mx-auto max-w-2xl">
         {/* 테스트 페이지 제목 */}
         <h1 className="mb-3 text-2xl font-bold">
-          Swagger API 테스트
+          로컬 Swagger API 테스트
         </h1>
 
         {/* POST와 PATCH 버튼에 대한 안내 */}
@@ -610,9 +614,12 @@ export function TestPage() {
 
             <input
               className={inputClassName}
-              onChange={(event) =>
+              onChange={(event) => {
+                // ↓ 조회 및 삭제 날짜 변경
                 setCheckInDate(event.target.value)
-              }
+                // ↓ 이전 날짜에서 받은 ID 제거
+                setDeleteCheckInId("")
+              }}
               type="date"
               value={checkInDate}
             />
@@ -626,13 +633,101 @@ export function TestPage() {
             onClick={() => {
               void runRequest(
                 "GET /api/check-ins",
-                () =>
-                  handleGetCheckInsByDate(
-                    checkInDate,
-                  ),
+                 async () => { const response = await handleGetCheckInsByDate( checkInDate, )
+
+                  // ↓ 조회 결과의 첫 번째 checkInId 자동 입력
+                  const targetCheckIn = response[0]
+
+                  setDeleteCheckInId( targetCheckIn ? String(targetCheckIn.checkInId) : "", )
+
+                  return response
+                },
               )
             }}
           />
+
+          //체크인 삭제 영역
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="font-medium text-red-900">
+              체크인 삭제
+            </p>
+
+            <p className="mt-1 text-xs text-red-700">
+              위에서 날짜를 선택하고 GET 버튼을 누르면
+              조회된 checkInId가 자동으로 입력됩니다.
+            </p>
+
+            {/* 삭제 요청의 date query */}
+            <label className="mt-4 block">
+              <span className="mb-1 block text-sm font-medium">
+                삭제 날짜
+              </span>
+
+              <input
+                className={inputClassName}
+                onChange={(event) => {
+                  // 위의 조회 날짜와 같은 상태를 사용
+                  setCheckInDate(event.target.value)
+
+                  // 날짜 변경 시 기존 ID 초기화
+                  setDeleteCheckInId("")
+                }}
+                type="date"
+                value={checkInDate}
+              />
+            </label>
+
+            {/* 삭제 요청의 checkInId path */}
+            <label className="mt-4 block">
+              <span className="mb-1 block text-sm font-medium">
+                삭제할 checkInId
+              </span>
+
+              <input
+                className={inputClassName}
+                min="1"
+                onChange={(event) =>
+                  setDeleteCheckInId(
+                    event.target.value,
+                  )
+                }
+                placeholder="GET 조회 후 자동 입력"
+                type="number"
+                value={deleteCheckInId}
+              />
+            </label>
+
+            <div className="mt-4">
+              <ApiButton
+                currentApi={loadingApi}
+                danger
+                disabled={
+                  checkInDate === "" ||
+                  !isPositiveInteger(
+                    deleteCheckInId,
+                  )
+                }
+                label="DELETE /api/check-ins/{checkInId}"
+                onClick={() => {
+                  void runRequest(
+                    "DELETE /api/check-ins/{checkInId}",
+                    async () => {
+                      const response =
+                        await handleDeleteCheckIn(
+                          Number(deleteCheckInId),
+                          checkInDate,
+                        )
+
+                      // 삭제된 ID로 다시 누르는 것을 방지
+                      setDeleteCheckInId("")
+
+                      return response
+                    },
+                  )
+                }}
+              />
+            </div>
+          </div>
 
           <label>
             <span className="mb-2 block text-sm font-medium">
