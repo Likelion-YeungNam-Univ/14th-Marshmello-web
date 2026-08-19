@@ -20,6 +20,7 @@ type RecordsCalendarProps = {
   requestMonth: string
   emotions: EmotionByDate[]
   onMonthChange: (month: string) => void
+  onDateClick: (date: string) => void
 }
 
 type MoodFaceProps = {
@@ -92,10 +93,19 @@ function MoodFace({
   )
 }
 
+function getCurrentMonth() {
+  const now = new Date()
+
+  return `${now.getFullYear()}-${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}`
+}
+
 export function RecordsCalendar({
   requestMonth,
   emotions,
   onMonthChange,
+  onDateClick,
 }: RecordsCalendarProps) {
   const calendarDays = useMemo(
     () =>
@@ -118,23 +128,38 @@ export function RecordsCalendar({
     formatMonth(requestMonth)
 
   const previousMonth =
-    changeMonth(requestMonth, -1)
+    changeMonth(
+      requestMonth,
+      -1,
+    )
 
   const nextMonth =
-    changeMonth(requestMonth, 1)
+    changeMonth(
+      requestMonth,
+      1,
+    )
+
+  const currentMonth =
+    getCurrentMonth()
+
+  const canGoNext =
+    requestMonth < currentMonth
 
   return (
-    <section className="relative z-30 mt-[24px] rounded-t-[5px] bg-white px-[25px] pb-[120px] pt-[22px]">
+    <section className="relative z-30 mt-[24px] rounded-t-[5px] bg-white px-[25px] pb-[35px] pt-[22px]">
       <div className="flex items-center justify-center gap-[5px]">
         <button
           aria-label={`${formatMonth(previousMonth)}로 이동`}
-          className="flex size-5 items-center justify-center"
+          className="flex size-5 items-center justify-center text-black"
           type="button"
           onClick={() =>
             onMonthChange(previousMonth)
           }
         >
-          <ChevronLeft size={12} />
+          <ChevronLeft
+            size={14}
+            strokeWidth={2.5}
+          />
         </button>
 
         <p className="text-[14px] font-medium">
@@ -142,14 +167,32 @@ export function RecordsCalendar({
         </p>
 
         <button
-          aria-label={`${formatMonth(nextMonth)}로 이동`}
-          className="flex size-5 items-center justify-center"
-          type="button"
-          onClick={() =>
-            onMonthChange(nextMonth)
+          aria-label={
+            canGoNext
+              ? `${formatMonth(nextMonth)}로 이동`
+              : "다음 달로 이동할 수 없습니다"
           }
+          className={`flex size-5 items-center justify-center ${
+            canGoNext
+              ? "text-black"
+              : "cursor-not-allowed text-[#d8d8d8]"
+          }`}
+          disabled={!canGoNext}
+          type="button"
+          onClick={() => {
+            if (canGoNext) {
+              onMonthChange(nextMonth)
+            }
+          }}
         >
-          <ChevronRight size={12} />
+          <ChevronRight
+            size={14}
+            strokeWidth={
+              canGoNext
+                ? 2.5
+                : 1.2
+            }
+          />
         </button>
       </div>
 
@@ -181,20 +224,32 @@ export function RecordsCalendar({
           />
         ))}
 
-        {calendarDays.map((day) => (
-          <div
-            className="flex flex-col items-center gap-[5px]"
-            key={day.date}
-          >
-            <MoodFace
-              emotion={day.emotion}
-            />
+        {calendarDays.map((day) => {
+          const fullDate =
+            `${requestMonth}-${String(
+              day.date,
+            ).padStart(2, "0")}`
 
-            <span className="text-[14px] text-[#80858a]">
-              {day.date}
-            </span>
-          </div>
-        ))}
+          return (
+            <button
+              key={day.date}
+              aria-label={`${fullDate} 기록 보기`}
+              className="flex flex-col items-center gap-[5px]"
+              type="button"
+              onClick={() =>
+                onDateClick(fullDate)
+              }
+            >
+              <MoodFace
+                emotion={day.emotion}
+              />
+
+              <span className="text-[14px] text-[#80858a]">
+                {day.date}
+              </span>
+            </button>
+          )
+        })}
       </div>
     </section>
   )

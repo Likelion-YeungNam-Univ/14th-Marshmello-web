@@ -10,12 +10,12 @@ export function RecordsSummary({
   topBodyRegionLabel,
 }: RecordsSummaryProps) {
   return (
-    <div className="mt-[15px]">
+    <div className="ml-[5px]">
       <p className="text-[10px] font-bold tracking-[-0.1px] text-[#7a4e88]">
         이번 달 이야기
       </p>
 
-      <h1 className="mt-[6px] max-w-[355px] text-[20px] font-medium leading-[1.4] tracking-[-0.2px]">
+      <h1 className="max-w-[355px] text-[20px] font-medium leading-[1.4] tracking-[-0.2px]">
         {monthText}엔 총{" "}
         {count}일 기록을 남겼고,
         <br />
