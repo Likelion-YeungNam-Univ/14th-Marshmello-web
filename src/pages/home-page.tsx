@@ -70,7 +70,7 @@ export function HomePage() {
   const pregnancyDays = PREGNANCY_TOTAL_DAYS - remainingDays
   const pregnancyWeek = Math.floor(pregnancyDays / 7)
   const currentWeekInfo =
-    pregnancyWeek >= 4 && pregnancyWeek <= 40
+    pregnancyWeek >= 1 && pregnancyWeek <= 40
       ? pregnancyWeekInfo[String(pregnancyWeek)]
       : undefined
 

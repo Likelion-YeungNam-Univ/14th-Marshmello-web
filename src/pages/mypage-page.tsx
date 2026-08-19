@@ -27,6 +27,9 @@ const menuItems: MyPageMenuItem[] = [
   { icon: Headphones, id: "support", label: "고객센터" },
 ]
 
+const DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24
+const PREGNANCY_TOTAL_DAYS = 40 * 7
+
 type MyPageMenuRowProps = MyPageMenuItem & {
   isLast: boolean
   onClick?: () => void
@@ -68,8 +71,26 @@ export function MyPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { restartSplash } = useOutletContext<AppOutletContext>()
-  const email = useProfileStore((state) => state.email)
   const name = useProfileStore((state) => state.name)
+  const dueDate = useProfileStore((state) => state.dueDate)
+  const today = new Date()
+  const todayInUtc = Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  )
+  const dueDateValue = new Date(dueDate)
+  const dueDateInUtc = Date.UTC(
+    dueDateValue.getFullYear(),
+    dueDateValue.getMonth(),
+    dueDateValue.getDate(),
+  )
+  const remainingDays = Math.max(
+    0,
+    Math.ceil((dueDateInUtc - todayInUtc) / DAY_IN_MILLISECONDS),
+  )
+  const pregnancyDays = PREGNANCY_TOTAL_DAYS - remainingDays
+  const pregnancyWeek = Math.floor(pregnancyDays / 7)
 
   const completeWithdrawal = useCallback(() => {
     queryClient.clear()
@@ -104,8 +125,8 @@ export function MyPage() {
           >
             {name}님
           </h1>
-          <p className="mt-[3px] text-[13px] leading-[19.5px] text-[#484c52]">
-            {email}
+          <p className="mt-[3px] text-[13px] leading-[19.5px] text-[#9d8d9d]">
+            아기와 함께한 지 {pregnancyWeek}주째
           </p>
         </div>
 
