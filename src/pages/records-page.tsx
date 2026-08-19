@@ -2,6 +2,9 @@ import {
   useEffect,
   useState,
 } from "react"
+import {
+  useNavigate,
+} from "react-router-dom"
 
 import {
   getCheckInEmotions,
@@ -49,11 +52,18 @@ function getCurrentMonth() {
 }
 
 export function RecordsPage() {
+  const navigate =
+    useNavigate()
+
   const [data, setData] =
-    useState<RecordsData | null>(null)
+    useState<RecordsData | null>(
+      null,
+    )
 
   const [requestMonth, setRequestMonth] =
-    useState(() => getCurrentMonth())
+    useState(() =>
+      getCurrentMonth(),
+    )
 
   const [isLoading, setIsLoading] =
     useState(true)
@@ -64,87 +74,93 @@ export function RecordsPage() {
   useEffect(() => {
     let cancelled = false
 
-    const loadRecords = async () => {
-      try {
-        setIsLoading(true)
-        setErrorMessage(null)
+    const loadRecords =
+      async () => {
+        try {
+          setIsLoading(true)
+          setErrorMessage(null)
 
-        const count =
-          await getcheckInCount(
-            requestMonth,
-          )
-
-        const [
-          emotionsResponse,
-          topBodyRegion,
-        ] = await Promise.all([
-          getCheckInEmotions(
-            requestMonth,
-          ),
-          getcheckInRegion(
-            requestMonth,
-          ),
-        ])
-
-        const emotions =
-          emotionsResponse as unknown as EmotionByDate[]
-
-        let report:
-          | ReportResponse
-          | null = null
-
-        const currentMonth =
-          getCurrentMonth()
-
-        if (requestMonth !== currentMonth) {
-          try {
-            await createReport(
+          const count =
+            await getcheckInCount(
               requestMonth,
             )
 
-            report =
-              await getReport(
+          const [
+            emotionsResponse,
+            topBodyRegion,
+          ] = await Promise.all([
+            getCheckInEmotions(
+              requestMonth,
+            ),
+            getcheckInRegion(
+              requestMonth,
+            ),
+          ])
+
+          const emotions =
+            emotionsResponse as unknown as EmotionByDate[]
+
+          let report:
+            | ReportResponse
+            | null = null
+
+          const currentMonth =
+            getCurrentMonth()
+
+          if (
+            requestMonth !==
+            currentMonth
+          ) {
+            try {
+              await createReport(
                 requestMonth,
               )
-          } catch (reportError) {
-            console.error(
-              "월간 리포트 조회 실패:",
-              reportError,
+
+              report =
+                await getReport(
+                  requestMonth,
+                )
+            } catch (
+              reportError
+            ) {
+              console.error(
+                "월간 리포트 조회 실패:",
+                reportError,
+              )
+            }
+          }
+
+          if (cancelled) {
+            return
+          }
+
+          setData({
+            requestMonth,
+            count: count.count,
+            achievedCount:
+              count.achievedCount,
+            emotions,
+            topBodyRegion:
+              topBodyRegion.bodyRegion,
+            report,
+          })
+        } catch (error) {
+          console.error(
+            "기록 데이터 조회 실패:",
+            error,
+          )
+
+          if (!cancelled) {
+            setErrorMessage(
+              "기록 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
             )
           }
-        }
-
-        if (cancelled) {
-          return
-        }
-
-        setData({
-          requestMonth,
-          count: count.count,
-          achievedCount:
-            count.achievedCount,
-          emotions,
-          topBodyRegion:
-            topBodyRegion.bodyRegion,
-          report,
-        })
-      } catch (error) {
-        console.error(
-          "기록 데이터 조회 실패:",
-          error,
-        )
-
-        if (!cancelled) {
-          setErrorMessage(
-            "기록 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
-          )
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false)
+        } finally {
+          if (!cancelled) {
+            setIsLoading(false)
+          }
         }
       }
-    }
 
     void loadRecords()
 
@@ -163,7 +179,10 @@ export function RecordsPage() {
     )
   }
 
-  if (errorMessage || !data) {
+  if (
+    errorMessage ||
+    !data
+  ) {
     return (
       <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-6">
         <p className="text-center text-[14px] leading-[1.6] text-[#6c7278]">
@@ -186,7 +205,8 @@ export function RecordsPage() {
     )
 
   const aiReport =
-    data.report?.content ?? "---"
+    data.report?.content ??
+    "---"
 
   return (
     <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-[#e8c5e5] text-black">
@@ -211,10 +231,19 @@ export function RecordsPage() {
         requestMonth={
           data.requestMonth
         }
-        emotions={data.emotions}
+        emotions={
+          data.emotions
+        }
         onMonthChange={
           setRequestMonth
         }
+        onDateClick={(
+          date,
+        ) => {
+          navigate(
+            `/records/timeline?date=${date}`,
+          )
+        }}
       />
     </main>
   )

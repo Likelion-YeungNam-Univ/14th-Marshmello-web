@@ -19,9 +19,8 @@ import {
 type RecordsCalendarProps = {
   requestMonth: string
   emotions: EmotionByDate[]
-  onMonthChange: (
-    month: string,
-  ) => void
+  onMonthChange: (month: string) => void
+  onDateClick: (date: string) => void
 }
 
 type MoodFaceProps = {
@@ -33,8 +32,7 @@ function MoodFace({
   emotion,
   size = 27,
 }: MoodFaceProps) {
-  const mood =
-    getMoodType(emotion)
+  const mood = getMoodType(emotion)
 
   if (mood === "none") {
     return (
@@ -95,37 +93,39 @@ function MoodFace({
   )
 }
 
+function getCurrentMonth() {
+  const now = new Date()
+
+  return `${now.getFullYear()}-${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}`
+}
+
 export function RecordsCalendar({
   requestMonth,
   emotions,
   onMonthChange,
+  onDateClick,
 }: RecordsCalendarProps) {
-  const calendarDays =
-    useMemo(
-      () =>
-        buildCalendarDays(
-          requestMonth,
-          emotions,
-        ),
-      [
+  const calendarDays = useMemo(
+    () =>
+      buildCalendarDays(
         requestMonth,
         emotions,
-      ],
-    )
+      ),
+    [requestMonth, emotions],
+  )
 
-  const firstDayOfMonth =
-    useMemo(
-      () =>
-        getFirstDayOfMonth(
-          requestMonth,
-        ),
-      [requestMonth],
-    )
+  const firstDayOfMonth = useMemo(
+    () =>
+      getFirstDayOfMonth(
+        requestMonth,
+      ),
+    [requestMonth],
+  )
 
   const monthLabel =
-    formatMonth(
-      requestMonth,
-    )
+    formatMonth(requestMonth)
 
   const previousMonth =
     changeMonth(
@@ -140,13 +140,7 @@ export function RecordsCalendar({
     )
 
   const currentMonth =
-    useMemo(() => {
-      const now = new Date()
-
-      return `${now.getFullYear()}-${String(
-        now.getMonth() + 1,
-      ).padStart(2, "0")}`
-    }, [])
+    getCurrentMonth()
 
   const canGoNext =
     requestMonth < currentMonth
@@ -159,9 +153,7 @@ export function RecordsCalendar({
           className="flex size-5 items-center justify-center text-black"
           type="button"
           onClick={() =>
-            onMonthChange(
-              previousMonth,
-            )
+            onMonthChange(previousMonth)
           }
         >
           <ChevronLeft
@@ -185,20 +177,20 @@ export function RecordsCalendar({
               ? "text-black"
               : "cursor-not-allowed text-[#d8d8d8]"
           }`}
-          type="button"
           disabled={!canGoNext}
+          type="button"
           onClick={() => {
             if (canGoNext) {
-              onMonthChange(
-                nextMonth,
-              )
+              onMonthChange(nextMonth)
             }
           }}
         >
           <ChevronRight
             size={14}
             strokeWidth={
-              canGoNext ? 2.5 : 1.2
+              canGoNext
+                ? 2.5
+                : 1.2
             }
           />
         </button>
@@ -226,32 +218,38 @@ export function RecordsCalendar({
       <div className="mt-[20px] grid grid-cols-7 gap-x-[11px] gap-y-[18px]">
         {Array.from({
           length: firstDayOfMonth,
-        }).map(
-          (_, index) => (
-            <div
-              key={`empty-${index}`}
-            />
-          ),
-        )}
+        }).map((_, index) => (
+          <div
+            key={`empty-${index}`}
+          />
+        ))}
 
-        {calendarDays.map(
-          (day) => (
-            <div
-              className="flex flex-col items-center gap-[5px]"
+        {calendarDays.map((day) => {
+          const fullDate =
+            `${requestMonth}-${String(
+              day.date,
+            ).padStart(2, "0")}`
+
+          return (
+            <button
               key={day.date}
+              aria-label={`${fullDate} 기록 보기`}
+              className="flex flex-col items-center gap-[5px]"
+              type="button"
+              onClick={() =>
+                onDateClick(fullDate)
+              }
             >
               <MoodFace
-                emotion={
-                  day.emotion
-                }
+                emotion={day.emotion}
               />
 
               <span className="text-[14px] text-[#80858a]">
                 {day.date}
               </span>
-            </div>
-          ),
-        )}
+            </button>
+          )
+        })}
       </div>
     </section>
   )
