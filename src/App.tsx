@@ -9,7 +9,9 @@ import {
 } from "react-router-dom"
 
 import { LogoutDrawer } from "@/features/auth/logout/ui/logout-drawer"
+import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 import { CarePage } from "@/pages/care-page"
+import { logout as logoutRequest } from "@/shared/api/auth"
 import {
   PageLayout,
   type PageLayoutConfig,
@@ -35,6 +37,9 @@ function hasSplashAlreadyShown() {
 
 export default function App() {
   const [isLogoutDrawerOpen, setIsLogoutDrawerOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [redirectToLoginAfterSplash, setRedirectToLoginAfterSplash] =
+    useState(false)
 
   const [pageHeaderBackAction, setPageHeaderBackAction] = useState<
     (() => void) | undefined
@@ -75,16 +80,25 @@ export default function App() {
     undefined,
   )
 
-  const logout = useCallback(() => {
-    queryClient.clear()
-    window.sessionStorage.clear()
+  const logout = useCallback(async () => {
+    setIsLoggingOut(true)
 
-    setIsLogoutDrawerOpen(false)
+    try {
+      await logoutRequest()
+      queryClient.clear()
+      useProfileStore.getState().reset()
+      window.localStorage.removeItem("loginStarted")
+      window.sessionStorage.clear()
 
-    navigate("/", { replace: true })
-
-    restartSplash()
-  }, [navigate, queryClient, restartSplash])
+      setIsLogoutDrawerOpen(false)
+      restartSplash()
+      setRedirectToLoginAfterSplash(true)
+    } catch (error) {
+      console.error("로그아웃 실패:", error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }, [queryClient, restartSplash])
 
   const isContentDetail = pageLayout?.variant === "content"
   const isCareFlow = isContentDetail || pageLayout?.variant === "care"
@@ -97,6 +111,11 @@ export default function App() {
         onFinish={() => {
           window.sessionStorage.setItem(SPLASH_SESSION_KEY, "1")
           setShowSplash(false)
+
+          if (redirectToLoginAfterSplash) {
+            setRedirectToLoginAfterSplash(false)
+            navigate("/login", { replace: true })
+          }
         }}
       />
     )
@@ -155,6 +174,7 @@ export default function App() {
       ) : null}
 
       <LogoutDrawer
+        isLoggingOut={isLoggingOut}
         onConfirm={logout}
         onOpenChange={setIsLogoutDrawerOpen}
         open={isLogoutDrawerOpen}
