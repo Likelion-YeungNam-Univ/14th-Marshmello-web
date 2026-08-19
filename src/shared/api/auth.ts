@@ -9,9 +9,14 @@ export type CsrfResponse = {
 }
 
 export type UserProfile = {
-  nickname: string | null
-  expectedDeliveryDate: string | null
+  nickname: string
+  expectedDeliveryDate: string
   profileCompleted: boolean
+}
+
+export type UpdateUserProfileRequest = {
+  nickname: string
+  expectedDeliveryDate: string
 }
 
 /**
@@ -59,10 +64,9 @@ Promise<UserProfile | null> {
  * 회원정보 등록 / 수정
  * csrf 토큰 조회 (axios 저장소에서 가져옴)
  */
-export async function updateUserProfile(data: {
-  nickname: string
-  expectedDeliveryDate: string
-}) {
+export async function updateUserProfile(
+  data: UpdateUserProfileRequest,
+): Promise<UserProfile> {
   const response = await apiClient.patch<UserProfile>(
     "/api/user", //url
     data, 

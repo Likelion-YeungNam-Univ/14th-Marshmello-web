@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react"
 import { AnimatePresence, motion, type Variants } from "framer-motion"
 import { ArrowLeft, CalendarDays, CircleCheck, UserRound } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useLoaderData, useNavigate } from "react-router-dom"
 
 import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 import {
@@ -10,6 +10,10 @@ import {
 } from "@/features/mypage/ui/date-wheel-picker"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
+import {
+  type UserProfile,
+  updateUserProfile,
+} from "@/shared/api/auth"
 
 const fadeUpVariants: Variants = {
   hidden: {
@@ -41,19 +45,19 @@ const SUCCESS_OVERLAY_EXIT_DURATION_MS = 180
 
 export function ProfileEditPage() {
   const navigate = useNavigate()
-  const currentName = useProfileStore((state) => state.name)
-  const currentDueDate = useProfileStore((state) => state.dueDate)
+  const userProfile = useLoaderData() as UserProfile
   const updateProfile = useProfileStore((state) => state.updateProfile)
-  const [initialYear, initialMonth, initialDay] = currentDueDate
+  const [initialYear, initialMonth, initialDay] = userProfile.expectedDeliveryDate
     .split("-")
     .map(Number)
 
-  const [name, setName] = useState(currentName)
+  const [name, setName] = useState(userProfile.nickname)
   const [date, setDate] = useState<WheelDate>({
     day: initialDay,
     month: initialMonth,
     year: initialYear,
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSaveSuccessVisible, setIsSaveSuccessVisible] = useState(false)
   const hideSuccessTimeoutRef = useRef<number | null>(null)
   const navigateTimeoutRef = useRef<number | null>(null)
@@ -71,20 +75,29 @@ export function ProfileEditPage() {
     [],
   )
 
-  const submitProfile = (event: FormEvent<HTMLFormElement>) => {
+  const submitProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const trimmedName = name.trim()
-    if (!trimmedName) return
+    if (!trimmedName || isSubmitting) return
+
+    const expectedDeliveryDate = [
+      date.year,
+      String(date.month).padStart(2, "0"),
+      String(date.day).padStart(2, "0"),
+    ].join("-")
 
     try {
+      setIsSubmitting(true)
+
+      const updatedProfile = await updateUserProfile({
+        expectedDeliveryDate,
+        nickname: trimmedName,
+      })
+
       updateProfile({
-        dueDate: [
-          date.year,
-          String(date.month).padStart(2, "0"),
-          String(date.day).padStart(2, "0"),
-        ].join("-"),
-        name: trimmedName,
+        dueDate: updatedProfile.expectedDeliveryDate,
+        name: updatedProfile.nickname,
       })
       setIsSaveSuccessVisible(true)
 
@@ -95,8 +108,12 @@ export function ProfileEditPage() {
       navigateTimeoutRef.current = window.setTimeout(() => {
         navigate("/mypage", { replace: true })
       }, SUCCESS_OVERLAY_DURATION_MS + SUCCESS_OVERLAY_EXIT_DURATION_MS)
-    } catch {
+    } catch (error) {
+      console.error("회원정보 수정 실패:", error)
       setIsSaveSuccessVisible(false)
+      alert("회원정보 수정에 실패했습니다.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -220,7 +237,7 @@ export function ProfileEditPage() {
         <motion.div className="mt-6" variants={fadeUpVariants}>
           <Button
             className="h-[52px] w-full rounded-xl bg-[#f19ed2] text-[15px] font-semibold tracking-[-0.2px] text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/30"
-            disabled={!name.trim() || isSaveSuccessVisible}
+            disabled={!name.trim() || isSubmitting || isSaveSuccessVisible}
             type="submit"
           >
             수정하기
