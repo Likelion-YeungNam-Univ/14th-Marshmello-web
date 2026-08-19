@@ -207,22 +207,6 @@ export const router = createBrowserRouter([
         }),
       },
 
-      // 로컬 UI 확인용 경로이며, 배포 번들에는 포함되지 않습니다.
-      ...(import.meta.env.DEV
-        ? [{
-            path: "checkin-preview/:previewStep",
-            element: <CheckinPage />,
-            handle: withPageLayout({
-              header: {
-                title: "오늘의 체크인",
-                variant: "back",
-              },
-              showNavbar: false,
-              variant: "checkin",
-            }),
-          }]
-        : []),
-
       /**
        * Body Map
        */

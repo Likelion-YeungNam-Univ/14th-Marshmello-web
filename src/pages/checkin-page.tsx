@@ -5,7 +5,7 @@ import { useMutation, useQuery,} from "@tanstack/react-query"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Check, CircleCheck } from "lucide-react"
-import { useNavigate, useOutletContext, useParams } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "@/shared/components/ui/button"
 import { Textarea } from "@/shared/components/ui/textarea"
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/shared/components/ui/drawer"
@@ -85,13 +85,7 @@ async function getPreviousCareCard() {
 export function CheckinPage() {
 
   const navigate = useNavigate()
-  const { previewStep: previewStepParam } = useParams()
   const { setHeaderBackAction } = useOutletContext<AppOutletContext>()
-  // previewStepParam이 1, 3, 4 중 하나이면 previewStep에 숫자로 저장, 아니면 null, 로컬 테스트용
-  const previewStep = import.meta.env.DEV && (previewStepParam === "1" || previewStepParam === "3" || previewStepParam === "4")
-    ? Number(previewStepParam)
-    : null
-  const isPreview = previewStep !== null
 
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
   const setSelectedBodyPart = useCheckinFlowStore((state) => state.setSelectedBodyPart)
@@ -157,7 +151,6 @@ export function CheckinPage() {
   // 최근 케어카드를 조회하여 전날 케어카드 존재 여부를 판단
   const latestCareCardQuery = useQuery({ queryKey: [ "care-card", "previous", getDateByOffset(),],
     queryFn: getPreviousCareCard,
-    enabled: !isPreview,
 
     // 체크인 진행 중 자동 조회로
     // 시작 단계가 바뀌는 것을 방지
@@ -184,13 +177,6 @@ export function CheckinPage() {
 
   // 어제 케어카드가 있으면 1단계, 없으면 2단계부터 체크인 시작
   useEffect(() => {
-    if (isPreview) {
-      setSelectedBodyPart(null)
-      setStep(previewStep)
-      setIsStepInitialized(true)
-      return
-    }
-
     if (!latestCareCardQuery.isSuccess ||isStepInitialized)  return
 
     if (hasPreviousCheckIn) {
@@ -202,7 +188,7 @@ export function CheckinPage() {
     }
 
     setIsStepInitialized(true)
-  }, [ hasPreviousCheckIn, isPreview, isStepInitialized, latestCareCardQuery.isSuccess, previewStep, setSelectedBodyPart, setStep,]
+  }, [ hasPreviousCheckIn, isStepInitialized, latestCareCardQuery.isSuccess, setStep,]
   )
 
   //뒤로가기 함수
@@ -386,7 +372,7 @@ export function CheckinPage() {
 
   const selectedBodyPartAnswer = selectedBodyPart === null ? null : bodyPartAnswers[selectedBodyPart]
 
-  if (!isPreview && latestCareCardQuery.isError) {
+  if (latestCareCardQuery.isError) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
         <p>
@@ -403,7 +389,7 @@ export function CheckinPage() {
     )
   }
 
-  if ((!isPreview && latestCareCardQuery.isPending) ||!isStepInitialized) {
+  if ( latestCareCardQuery.isPending ||!isStepInitialized) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
         전날 체크인 정보를 확인하고 있어요.
