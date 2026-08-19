@@ -87,6 +87,7 @@ export default function App() {
       await logoutRequest()
       queryClient.clear()
       useProfileStore.getState().reset()
+      useProfileStore.persist.clearStorage()
       window.localStorage.removeItem("loginStarted")
       window.sessionStorage.clear()
 

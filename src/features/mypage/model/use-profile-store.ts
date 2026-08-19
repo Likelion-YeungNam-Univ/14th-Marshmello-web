@@ -9,8 +9,8 @@ type ProfileState = {
 }
 
 const initialProfile = {
-  dueDate: "2027-02-03",
-  name: "김다미",
+  dueDate: "",
+  name: "",
 }
 
 export const useProfileStore = create<ProfileState>()(
