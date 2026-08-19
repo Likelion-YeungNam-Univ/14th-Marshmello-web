@@ -1,3 +1,8 @@
+import moodGood from "@/assets/checkin/mood/good.svg"
+import moodGreat from "@/assets/checkin/mood/great.svg"
+import moodNeutral from "@/assets/checkin/mood/neutral.svg"
+import moodSad from "@/assets/checkin/mood/sad.svg"
+
 import type {
   TimelineCheckIn,
 } from "../../model/timeline-types"
@@ -6,28 +11,40 @@ type TimelineSummaryProps = {
   checkIn: TimelineCheckIn
 }
 
-function getEmotionLabel(
-  emotion: number,
-) {
-  switch (emotion) {
-    case 1:
-      return "기분 최고에요"
-    case 2:
-      return "기분 좋아요"
-    case 3:
-      return "그냥 그래요"
-    case 4:
-      return "조금 속상해요"
-    default:
-      return "오늘의 기분"
-  }
+type EmotionConfig = {
+  label: string
+  image: string
+}
+
+const EMOTION_CONFIG: Record<
+  number,
+  EmotionConfig
+> = {
+  1: {
+    label: "우울해요",
+    image: moodSad,
+  },
+  2: {
+    label: "그냥 그래요",
+    image: moodNeutral,
+  },
+  3: {
+    label: "좋아요",
+    image: moodGood,
+  },
+  4: {
+    label: "최고에요",
+    image: moodGreat,
+  },
 }
 
 function formatTimelineDate(
   date: string,
 ) {
   const parsedDate =
-    new Date(`${date}T00:00:00`)
+    new Date(
+      `${date}T00:00:00`,
+    )
 
   const month =
     parsedDate.getMonth() + 1
@@ -49,32 +66,67 @@ function formatTimelineDate(
 export function TimelineSummary({
   checkIn,
 }: TimelineSummaryProps) {
-  const emotionLabel =
-    getEmotionLabel(
-      checkIn.emotion,
-    )
+  const emotionConfig =
+    EMOTION_CONFIG[
+      checkIn.emotion
+    ]
 
   return (
-    <>
-     
-     {checkIn.achieved && (
-          <div className="ml-[55px] mt-[20px] w-fit rounded-[15px] border border-[#91ddcf] bg-[rgba(145,221,207,0.66)] px-[12px] py-[7px]">
-            <span className="text-[11px] tracking-[-0.11px] text-black">
-              케어카드 실천 완료
-            </span>
-          </div>
-        )}
+    <section className="px-[59px]">
+      <div className="mt-[41px] flex items-center justify-center gap-[16px]">
+        <button
+          aria-label="이전 날짜"
+          className="text-[12px] font-semibold text-black"
+          type="button"
+        >
+          {"<"}
+        </button>
 
-      <div className="mt-[15px] px-[59px]">
+        <p className="text-[14px] font-semibold tracking-[-0.14px]">
+          {formatTimelineDate(
+            checkIn.checkInDate,
+          )}
+        </p>
+
+        <button
+          aria-label="다음 날짜"
+          className="text-[12px] font-semibold text-black"
+          type="button"
+        >
+          {">"}
+        </button>
+      </div>
+
+      {checkIn.achieved && (
+        <div className="ml-[-4px] mt-[20px] w-fit rounded-[15px] border border-[#91ddcf] bg-[rgba(145,221,207,0.66)] px-[12px] py-[7px]">
+          <span className="text-[11px] tracking-[-0.11px] text-black">
+            케어카드 실천 완료
+          </span>
+        </div>
+      )}
+
+      <div className="mt-[15px]">
         <div className="flex items-center gap-[16px]">
-          <div className="flex size-[44px] items-center justify-center rounded-full bg-[#f6c5df]">
-            <span className="text-[21px]">
-                여기에 emotion 넣기
-            </span>
+          <div className="flex size-[44px] shrink-0 items-center justify-center rounded-full bg-[#f6c5df]">
+            {emotionConfig ? (
+              <img
+                src={
+                  emotionConfig.image
+                }
+                alt=""
+                aria-hidden="true"
+                className="size-[34px] object-contain"
+              />
+            ) : (
+              <span className="text-[13px] text-[#9d8a96]">
+                -
+              </span>
+            )}
           </div>
 
           <p className="text-[24px] font-medium tracking-[-0.24px] text-[#ef9bce]">
-            {emotionLabel}
+            {emotionConfig?.label ??
+              "기분 기록"}
           </p>
         </div>
 
@@ -85,8 +137,7 @@ export function TimelineSummary({
             </p>
           </div>
         )}
-
       </div>
-    </>
+    </section>
   )
 }
