@@ -367,12 +367,12 @@ export function Chart({
             return (
               <div
                 key={item.requestMonth}
-                className="absolute top-0"
+                className="absolute top-0 h-[40px] w-[2px]"
                 style={{
-                  left: `${left}%`,
+                  left: `calc(${left}% - 1px)`,
                 }}
               >
-                <div className="absolute left-1/2 top-0 h-[14px] w-[2px] -translate-x-1/2 bg-[#54555a]" />
+                <div className="h-[14px] w-[2px] bg-[#54555a]" />
 
                 <button
                   aria-label={`${formatMonth(
