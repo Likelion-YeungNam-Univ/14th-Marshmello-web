@@ -33,6 +33,7 @@ export function CameraCapture() {
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
 
   {/*카메라 멈추기 */}
   const stopCamera = () => {
@@ -70,6 +71,28 @@ export function CameraCapture() {
       () => {streamRef.current?.getTracks().forEach((track) => track.stop())}
     )  
   }, [])
+
+  // 분석 요청에는 진행률 이벤트가 없으므로, 완료 전까지 92%에서 멈추고
+  // 응답을 받는 순간 100%로 마무리한다.
+  useEffect(() => {
+    if (cameraStatus !== "validating") {
+      setUploadProgress(0)
+      return
+    }
+
+    setUploadProgress(0)
+
+    const intervalId = window.setInterval(() => {
+      setUploadProgress((current) => {
+        if (current >= 92) return current
+
+        const increment = current < 60 ? 7 : current < 82 ? 3 : 1
+        return Math.min(current + increment, 92)
+      })
+    }, 120)
+
+    return () => window.clearInterval(intervalId)
+  }, [cameraStatus])
 
   {/*카메라 연결 함수*/}
   const startCamera = async () => {
@@ -180,6 +203,8 @@ export function CameraCapture() {
 
           if(result.detected && Number.isInteger(result.imageId) && result.imageId > 0){
             setImageId(result.imageId,)
+            setUploadProgress(100)
+            await new Promise((resolve) => window.setTimeout(resolve, 220))
             setCameraStatus("captured")
             return
           }
@@ -187,6 +212,8 @@ export function CameraCapture() {
           setCapturedFile(null)
           setImageId(null)
           setErrorMessage("사진에서 배 부위를 확인하지 못했어요. \n 다시 촬영해 주세요.")
+          setUploadProgress(100)
+          await new Promise((resolve) => window.setTimeout(resolve, 220))
           setCameraStatus("rejected")
         } catch (error){
           console.error(
@@ -195,7 +222,9 @@ export function CameraCapture() {
           )
           setCapturedFile(null)
           setImageId(null)
-          setErrorMessage("사진 전송에 실패하였습니다. 잠시 후 다시 시도해 주세요.",)
+          setErrorMessage("사진 전송에 실패하였습니다. \n 잠시 후 다시 시도해 주세요.",)
+          setUploadProgress(100)
+          await new Promise((resolve) => window.setTimeout(resolve, 220))
           setCameraStatus("error")
         }
         
@@ -222,19 +251,19 @@ export function CameraCapture() {
         <button
           disabled={cameraStatus === "opening"}
           onClick={() => void startCamera()}
-          className="flex aspect-[294/203] w-full max-w-[294px] flex-col items-center justify-center rounded-[10px] border border-dashed border-[#B9C0C9] bg-white disabled:cursor-wait"
+          className="flex h-[248px] w-full flex-col items-center justify-center gap-4 rounded-[20px] border border-dashed border-[#eea5d1] bg-[#fdeef7] disabled:cursor-wait"
         >
-          <span className="flex h-10 w-[90px] items-center justify-center rounded-lg ">
-            <Camera aria-hidden="true" className="size-6 text-[#484C52]" strokeWidth={2} />
+          <span className="flex size-16 items-center justify-center rounded-[18px] bg-white shadow-[0_6px_8px_rgba(238,165,209,0.35)]">
+            <Camera aria-hidden="true" className="size-[26px] text-[#7a3f63]" strokeWidth={1.8} />
           </span>
 
-          <span className="mt-7 font-['Pretendard'] text-[14px] text-[#484C52]">
+          <span className="text-[16px] font-semibold leading-6">
             {cameraStatus === "opening" ? (
               "카메라를 여는 중이에요..."
             ) : (
               <>
-                <p className="font-semibold text-[#397CB5]">클릭해서</p>{" "}
-                사진을 찍으세요
+                <span className="text-[#7a3f63]">클릭해서 </span>
+                <span className="text-[#484c52]">사진을 찍으세요</span>
               </>
             )}
           </span>
@@ -297,7 +326,7 @@ export function CameraCapture() {
 
       {/*촬영 후 */}
       {cameraStatus === "captured" && previewUrl ? (
-        <div className="relative aspect-[294/203] w-full max-w-[294px] overflow-hidden rounded-[10px] border border-[#E3E5E8] bg-[#F7F7FA]">
+        <div className="relative h-[248px] w-full overflow-hidden rounded-[20px] border border-[#eea5d1] bg-[#fdeef7]">
           {/*촬영한 사진*/}
           <img
             src={previewUrl}
@@ -318,24 +347,33 @@ export function CameraCapture() {
       ) : null}
 
       {cameraStatus === "validating" ? (
-        <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[393px] items-center justify-center bg-white">
-          {/*상태창 */}
+        <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[393px] flex-col items-center bg-white pt-[300px]">
           <div
             aria-live="polite"
-            className="flex -translate-y-8 flex-col items-center"
+            className="flex flex-col items-center"
           >
-            <div className="flex size-[60px] items-center justify-center bg-white">
+            <div className="flex size-[108px] items-center justify-center rounded-[24px] bg-[#fdeef7]">
               <img
                 src={loadingSpinner}
                 alt=""
                 aria-hidden="true"
-                className="size-8 animate-[spin_0.8s_steps(8)_infinite]"
+                className="size-[52px] animate-[spin_0.8s_steps(8)_infinite] [filter:invert(76%)_sepia(24%)_saturate(1001%)_hue-rotate(280deg)_brightness(99%)_contrast(88%)]"
               />
             </div>
 
-            <p className="mt-4 font-['Pretendard'] text-[16px] font-normal text-black">
+            <p className="mt-7 text-[18px] font-semibold leading-[27px] tracking-[-0.2px] text-[#2b2b2b]">
               이미지를 업로드하고 있어요
             </p>
+
+            <div className="mt-[26px] w-[240px]">
+              <div className="h-1.5 overflow-hidden rounded-full bg-[#f0e6ec]">
+                <div
+                  className="h-full rounded-full bg-[#eea5d1] transition-[width] duration-150 ease-out"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+              <p className="mt-2.5 text-center text-[12px] font-medium leading-[18px] text-[#7a3f63]">{uploadProgress}%</p>
+            </div>
           </div>
         </div>
       ) : null}
@@ -364,7 +402,7 @@ export function CameraCapture() {
 
       {/*오류 발생 시*/}
       {errorMessage ? (
-        <p role="alert" className="w-full max-w-[294px] text-center text-[12px] text-red-500">
+        <p role="alert" className="w-full text-center text-[12px] text-red-500">
           {errorMessage}
         </p>
       ) : null}
