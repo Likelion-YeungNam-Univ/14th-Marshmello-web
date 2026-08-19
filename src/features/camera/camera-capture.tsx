@@ -27,6 +27,10 @@ export function CameraCapture() {
   const setImageId = useCheckinFlowStore((state) => state.setImageId,)
 
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  // ↓ videoRef 바로 아래에 추가
+  // 실제 저장할 촬영 표시선 영역
+  const guideRef = useRef<HTMLDivElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
  const [cameraStatus,setCameraStatus,] = useState<CameraStatus>("idle")
@@ -146,16 +150,54 @@ export function CameraCapture() {
   const capturePhoto = () => {
     const video = videoRef.current
 
+    // ↓ video를 가져오는 코드 바로 아래에 추가
+    const guide = guideRef.current
+
     {/*비디오 생성이 안 되었다면 실행*/}
-    if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
+    if (!video || !guide || video.videoWidth === 0 || video.videoHeight === 0) {
       setErrorMessage("카메라 화면을 불러오는 중이에요. 잠시 후 다시 시도해주세요.")
       return
     }
 
-    {/*찍은 사진 canvas에 저장, canvas 너비와 높이*/}
+        {/*촬영 화면과 표시선의 실제 위치 계산*/}
+    const videoRect = video.getBoundingClientRect()
+    const guideRect = guide.getBoundingClientRect()
+
+    // ↓ object-cover로 영상이 확대된 비율
+    const coverScale = Math.max(
+      videoRect.width / video.videoWidth,
+      videoRect.height / video.videoHeight,
+    )
+
+    // ↓ object-cover로 화면 바깥으로 잘린 크기
+    const renderedVideoWidth = video.videoWidth * coverScale
+    const renderedVideoHeight = video.videoHeight * coverScale
+
+    const croppedOffsetX =
+      (renderedVideoWidth - videoRect.width) / 2
+
+    const croppedOffsetY =
+      (renderedVideoHeight - videoRect.height) / 2
+
+    // ↓ 화면에 보이는 표시선 위치를 원본 영상 좌표로 변환
+    const sourceX =
+      (guideRect.left - videoRect.left + croppedOffsetX) /
+      coverScale
+
+    const sourceY =
+      (guideRect.top - videoRect.top + croppedOffsetY) /
+      coverScale
+
+    const sourceWidth =
+      guideRect.width / coverScale
+
+    const sourceHeight =
+      guideRect.height / coverScale
+
+    {/*표시선 크기의 canvas 생성*/}
     const canvas = document.createElement("canvas")
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+    canvas.width = Math.max(1, Math.round(sourceWidth))
+    canvas.height = Math.max(1, Math.round(sourceHeight))
 
     const context = canvas.getContext("2d")
 
@@ -166,7 +208,13 @@ export function CameraCapture() {
     }
 
     {/*찍힌 canvas를 이미지로 생성 */}
-    context.drawImage(video, 0, 0, canvas.width, canvas.height)
+    context.drawImage(
+      video, 
+      // 원본 영상에서 자를 위치와 크기
+      sourceX,sourceY,sourceWidth,sourceHeight,
+       // canvas에 출력할 위치와 크기
+      0, 0, canvas.width, canvas.height
+    )
 
     {/*사진 처리 과정 */}
     canvas.toBlob(
@@ -177,7 +225,8 @@ export function CameraCapture() {
         }
 
         stopCamera()
-        setCameraStatus("validating")
+        // ↓ 미리보기 테스트 중에는 로딩 화면으로 전환하지 않음
+         setCameraStatus("validating")
 
         const imageFile =
           new File(
@@ -197,6 +246,13 @@ export function CameraCapture() {
           // 이전 이미지 ID 제거
           setImageId(null)
 
+          // ↓ 임시 추가: API 검증 없이 촬영 결과 미리보기로 전환
+          //setCameraStatus("captured")
+
+
+        
+// ↓ 바로 아래의 API 검증 코드는 삭제하지 않고 블록 주석 처리
+ 
         //일단 boolean으로 판단 데이터 받기로 함(이건 바뀔수도 )
         try{
           const result = await validatePhoto(imageFile)
@@ -234,6 +290,7 @@ export function CameraCapture() {
       0.9,
     )
   }
+
 
   {/*재촬영*/}
   const retakePhoto = () => {
@@ -281,14 +338,17 @@ export function CameraCapture() {
             className="absolute inset-0 h-full w-full object-cover"
           />
           
-          {/*안내 문구*/}
-          <p className="absolute inset-x-0 top-[calc(env(safe-area-inset-top)+150px)] z-20 text-center text-[19px] text-white">
-            표시선에 배꼽 위치를 맞춰 촬영해주세요.
-          </p>
+         
           {/*검은색 화면, 촬영가이드 */}
-          <div className="pointer-events-none absolute left-1/2 top-[46%] z-10 h-[360px] w-[280px]
-        -translate-x-1/2 -translate-y-1/2 rounded-[16px] border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.58)]">
-
+          <div // ↓ 이 표시선의 실제 화면 위치를 촬영 함수에서 사용
+            ref={guideRef}
+            className="pointer-events-none absolute left-1/2 top-[46%] z-10 h-[360px] w-[280px]
+              -translate-x-1/2 -translate-y-1/2 rounded-[16px] border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.58)]"
+          >
+             {/*안내 문구*/}
+            <p className="absolute bottom-[calc(100%+16px)] left-1/2 w-[calc(100vw-32px)] max-w-[345px] -translate-x-1/2 text-center text-[19px] text-white">
+              표시선에 배꼽 위치를 맞춰 촬영해주세요.
+            </p>
           {/*촬영 가이드 라인*/}
               {/* 세로 보조선 */}
             <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/40" />
@@ -326,7 +386,7 @@ export function CameraCapture() {
 
       {/*촬영 후 */}
       {cameraStatus === "captured" && previewUrl ? (
-        <div className="relative h-[248px] w-full overflow-hidden rounded-[20px] border border-[#eea5d1] bg-[#fdeef7]">
+        <div className="relative mx-auto aspect-[7/9] w-[min(70vw,280px)] overflow-hidden rounded-[20px] border border-[#eea5d1] bg-[#fdeef7]">
           {/*촬영한 사진*/}
           <img
             src={previewUrl}
