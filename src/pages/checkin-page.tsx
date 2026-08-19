@@ -640,7 +640,7 @@ export function CheckinPage() {
                           }}
                           maxLength={50}
                           rows={4}
-                          placeholder="메모를 입력하세요.."
+                          placeholder="메모를 입력하세요.. (50자 제한)"
                           className="
                             h-[104px]
                             min-h-[104px] 
