@@ -1,6 +1,6 @@
 import axios from "axios"
 import { getDateByOffset } from "@/shared/lib/date"
-import { useMutation, useQuery,} from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient,} from "@tanstack/react-query"
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
@@ -64,8 +64,8 @@ async function getPreviousCareCard() {
 }
 
 export function CheckinPage() {
-
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { setHeaderBackAction } = useOutletContext<AppOutletContext>()
 
   const selectedBodyPart = useCheckinFlowStore((state) => state.selectedBodyPart)
@@ -298,6 +298,12 @@ export function CheckinPage() {
   },
 
   onSuccess: (createdCareCard) => {
+     // 케어카드 POST 응답을 오늘의 케어카드 Query에 저장
+    queryClient.setQueryData(
+      [ "care-card", "today", getDateByOffset(), ],
+      createdCareCard,
+    )
+
     setIsCheckinSuccessVisible(true)
 
     hideSuccessTimeoutRef.current = window.setTimeout(() => {
@@ -308,7 +314,7 @@ export function CheckinPage() {
         // 체크인과 케어카드가 모두 생성된 뒤 초기화
         reset()
 
-        navigate("/", { replace: true, state: { careCard: createdCareCard, }, })
+        navigate("/", { replace: true })
       }, ( SUCCESS_OVERLAY_DURATION_MS + SUCCESS_OVERLAY_EXIT_DURATION_MS)
     )
   },
