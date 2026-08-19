@@ -76,6 +76,24 @@ export async function updateUserProfile(
 }
 
 /**
+ * 현재 사용자 계정을 탈퇴 처리합니다.
+ */
+export async function withdrawUser(): Promise<void> {
+  const csrf = await getCsrf()
+  const response = await apiClient.delete("/api/user", {
+    headers: {
+      [csrf.headerName]: csrf.token,
+    },
+  })
+
+  if (response.status !== 204) {
+    throw new Error(`회원 탈퇴 실패: ${response.status}`)
+  }
+
+  clearCsrfToken()
+}
+
+/**
  * 현재 로그인 세션을 종료합니다.
  */
 export async function logout(): Promise<void> {
