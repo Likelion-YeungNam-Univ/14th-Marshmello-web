@@ -1,5 +1,5 @@
 import axios from "axios"
-
+import { getDateByOffset } from "@/shared/lib/date"
 import { useMutation, useQuery,} from "@tanstack/react-query"
 
 import { useCallback, useEffect, useRef, useState } from "react"
@@ -40,21 +40,6 @@ const EMOTION_BY_MOOD = {
   good: 3,
   great: 4,
 } as const
-
-// 오늘을 기준으로 offsetDays만큼 이동한 날짜를 YYYY-MM-DD 형식으로 반환
-function getDateByOffset(offsetDays = 0) {
-  const date = new Date()
-
-    date.setDate(
-    date.getDate() + offsetDays,
-  )
-
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-")
-}
 
 // 가장 최근 케어카드를 조회하고, 케어카드가 없으면 null 반환
 async function getPreviousCareCard() {
