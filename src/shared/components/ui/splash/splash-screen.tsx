@@ -25,6 +25,7 @@ export default function SplashScreen({
       () => setIsFadingOut(true),
       Math.max(durationMs - FADE_OUT_MS, 0),
     )
+
     const finishTimer = window.setTimeout(() => {
       onFinish?.()
     }, durationMs)
@@ -37,27 +38,47 @@ export default function SplashScreen({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-7 transition-opacity duration-300 ease-out ${
+      className={`fixed left-1/2 top-0 z-50 flex h-[852px] w-[393px] -translate-x-1/2 flex-col items-center justify-center overflow-hidden transition-opacity duration-300 ease-out ${
         isFadingOut ? "opacity-0" : "opacity-100"
       }`}
       role="status"
       style={{
-        backgroundImage:
-          "linear-gradient(135deg, #fac3de 0%, #fac3de 30%, #fdf3dc 70%, #fdf3dc 100%)",
+        backgroundColor: "#fbebf5",
+        backgroundImage: `
+          radial-gradient(
+            circle 650px at 12% 21%,
+            #f8a2d8 0%,
+            #f8a9da 15%,
+            #f8bae1 30%,
+            #fad3eb 50%,
+            #fae2f1 70%,
+            #fae8f3 85%,
+            rgba(250, 234, 244, 0) 100%
+          )
+        `,
       }}
     >
-      <BrandFaceIcon
-        accentDotColor={ACCENT_DOT_COLOR}
-        circleColor={CIRCLE_COLOR}
-        className="size-[148px] overflow-visible"
-        haloColor={HALO_COLOR}
-        haloOpacity={0.65}
-        strokeColor={FACE_STROKE_COLOR}
-      />
-      <span aria-label="품결" className="logo text-[44px] leading-none">
-        품결
+      <div className="-translate-y-20 flex flex-col items-center">
+        <BrandFaceIcon
+          accentDotColor={ACCENT_DOT_COLOR}
+          circleColor={CIRCLE_COLOR}
+          className="size-[148px] overflow-visible"
+          haloColor={HALO_COLOR}
+          haloOpacity={0.65}
+          strokeColor={FACE_STROKE_COLOR}
+        />
+
+        <span
+          aria-label="품결"
+          className="logo mt-2 text-[44px] leading-none"
+        >
+          품결
+        </span>
+      </div>
+
+      <span className="sr-only">
+        품결 앱을 시작하는 중입니다
       </span>
-      <span className="sr-only">품결 앱을 시작하는 중입니다</span>
     </div>
   )
 }
