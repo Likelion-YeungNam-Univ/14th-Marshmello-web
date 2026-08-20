@@ -42,9 +42,7 @@ function formatTimelineDate(
   date: string,
 ) {
   const parsedDate =
-    new Date(
-      `${date}T00:00:00`,
-    )
+    new Date(`${date}T00:00:00`)
 
   const month =
     parsedDate.getMonth() + 1
@@ -73,14 +71,13 @@ export function TimelineSummary({
 
   return (
     <section className="px-[59px]">
-      <div className="mt-[41px] flex items-center justify-center gap-[16px]">
-        <button
-          aria-label="이전 날짜"
+      <div className="mt-[40px] ml-[-160px] flex items-center justify-center gap-[5px]">
+        <span
+          aria-hidden="true"
           className="text-[12px] font-semibold text-black"
-          type="button"
         >
-          {"<"}
-        </button>
+          {"["}
+        </span>
 
         <p className="text-[14px] font-semibold tracking-[-0.14px]">
           {formatTimelineDate(
@@ -88,17 +85,16 @@ export function TimelineSummary({
           )}
         </p>
 
-        <button
-          aria-label="다음 날짜"
+        <span
+          aria-hidden="true"
           className="text-[12px] font-semibold text-black"
-          type="button"
         >
-          {">"}
-        </button>
+          {"]"}
+        </span>
       </div>
 
       {checkIn.achieved && (
-        <div className="ml-[-4px] mt-[20px] w-fit rounded-[15px] border border-[#91ddcf] bg-[rgba(145,221,207,0.66)] px-[12px] py-[7px]">
+        <div className="ml-[-4px] mt-[40px] w-fit h-fit rounded-[15px] border border-[#91ddcf] bg-[rgba(145,221,207,0.66)] px-[12px] py-[7px]">
           <span className="text-[11px] tracking-[-0.11px] text-black">
             케어카드 실천 완료
           </span>
@@ -110,9 +106,7 @@ export function TimelineSummary({
           <div className="flex size-[44px] shrink-0 items-center justify-center rounded-full bg-[#f6c5df]">
             {emotionConfig ? (
               <img
-                src={
-                  emotionConfig.image
-                }
+                src={emotionConfig.image}
                 alt=""
                 aria-hidden="true"
                 className="size-[34px] object-contain"

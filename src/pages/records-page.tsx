@@ -240,8 +240,8 @@ export function RecordsPage() {
   const reportText =
     hasReportRecord
       ? data.report?.content ??
-        "기록이 없어서 리포트를 준비할 수 없어요"
-      : "기록이 없어서 리포트를 준비할 수 없어요"
+        "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
+      : "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
 
   return (
     <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden bg-[#e8c5e5] text-black">
