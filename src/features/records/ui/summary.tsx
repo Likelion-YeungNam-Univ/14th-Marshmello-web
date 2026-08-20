@@ -17,9 +17,9 @@ export function RecordsSummary({
 
       {count === 0 ? (
         <h1 className="max-w-[355px] text-[20px] font-medium leading-[1.4] tracking-[-0.2px]">
-          {monthText}엔 아직
+          {monthText}엔 아직 기록이 없어요.
           <br />
-          기록이 없어요.
+          이번 달도 열심히 기록해보아요!
         </h1>
       ) : (
         <h1 className="max-w-[355px] text-[20px] font-medium leading-[1.4] tracking-[-0.2px]">

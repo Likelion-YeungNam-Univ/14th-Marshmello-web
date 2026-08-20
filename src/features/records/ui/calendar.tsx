@@ -144,7 +144,7 @@ export function RecordsCalendar({
     currentMonth
 
   return (
-    <section className="relative z-30 mt-[20px] rounded-t-[5px] bg-white px-[25px] pb-[35px] pt-[22px]">
+    <section className="relative z-30 mt-[20px] rounded-t-[9px] bg-white px-[25px] pb-[65px] pt-[32px]">
       <div className="flex items-center justify-center gap-[5px]">
         <button
           aria-label={`${formatMonth(previousMonth)}로 이동`}
