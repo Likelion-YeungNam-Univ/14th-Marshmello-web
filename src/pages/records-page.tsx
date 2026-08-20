@@ -271,6 +271,17 @@ export function RecordsPage() {
             setRequestMonth
           }
           onDateClick={(date) => {
+            const hasCheckIn =
+              data.emotions.some(
+                (item) =>
+                  item.date ===
+                  date,
+              )
+
+            if (!hasCheckIn) {
+              return
+            }
+
             navigate(
               `/records/timeline?date=${date}`,
             )

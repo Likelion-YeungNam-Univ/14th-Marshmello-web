@@ -93,9 +93,18 @@ export function TimelineDetail({
     setIsDeleteDialogOpen,
   ] = useState(false)
 
-  const hasBodyMap =
-    data.checkIn.bodyDiaries
-      .length > 0
+  const visibleBodyDiaries =
+    (
+      data.checkIn
+        .bodyDiaries ?? []
+    ).filter(
+      (bodyDiary) =>
+        bodyDiary.stretchMark ===
+          true ||
+        Boolean(
+          bodyDiary.comment?.trim(),
+        ),
+    )
 
   return (
     <>
@@ -172,19 +181,21 @@ export function TimelineDetail({
             ) : (
               <EmptyMedia label="배 사진 다시보기" />
             )
-          ) : hasBodyMap ? (
+          ) : visibleBodyDiaries.length >
+            0 ? (
             <div className="flex w-full justify-center px-[20px] py-[20px]">
               <TimelineBodyMap
                 compact
                 bodyDiaries={
-                  data.checkIn
-                    .bodyDiaries
+                  visibleBodyDiaries
                 }
               />
             </div>
           ) : (
-            <div className="h-[345px]">
-              <EmptyMedia label="바디맵 다시보기" />
+            <div className="flex h-[345px] items-center justify-center">
+              <p className="text-[12px] leading-[18px] tracking-[-0.3px] text-[#b7a9b2]">
+                바디맵 기록 없음
+              </p>
             </div>
           )}
         </div>

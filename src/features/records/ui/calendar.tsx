@@ -110,6 +110,18 @@ export function RecordsCalendar({
       ],
     )
 
+  const checkInDates =
+    useMemo(
+      () =>
+        new Set(
+          emotions.map(
+            (item) =>
+              item.date,
+          ),
+        ),
+      [emotions],
+    )
+
   const firstDayOfMonth =
     useMemo(
       () =>
@@ -236,16 +248,31 @@ export function RecordsCalendar({
                 day.date,
               ).padStart(2, "0")}`
 
+            const hasCheckIn =
+              checkInDates.has(
+                fullDate,
+              )
+
             return (
               <button
                 key={day.date}
                 type="button"
-                aria-label={`${fullDate} 기록 보기`}
+                aria-label={
+                  hasCheckIn
+                    ? `${fullDate} 기록 보기`
+                    : `${fullDate} 기록 없음`
+                }
                 className="flex flex-col items-center gap-[10px]"
-                onClick={() =>
-                  onDateClick(
-                    fullDate,
-                  )
+                disabled={
+                  !hasCheckIn
+                }
+                onClick={
+                  hasCheckIn
+                    ? () =>
+                        onDateClick(
+                          fullDate,
+                        )
+                    : undefined
                 }
               >
                 <MoodFace
