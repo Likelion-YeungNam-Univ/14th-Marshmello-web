@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 
 import { Button } from "@/shared/components/ui/button"
-import svgPaths from "./imports/404페이지/svg-aqhnyybvxb"
+import svgPaths from "./imports/404page/svg-aqhnyybvxb"
 
 const BG_GRADIENT =
   "linear-gradient(114.6569940554643deg, rgb(253, 241, 248) 0%, rgb(253, 243, 249) 7.1429%, rgb(254, 245, 250) 14.286%, rgb(254, 247, 251) 21.429%, rgb(254, 249, 252) 28.571%, rgb(254, 251, 253) 35.714%, rgb(255, 253, 254) 42.857%, rgb(255, 255, 255) 50%, rgb(253, 250, 253) 57.143%, rgb(252, 244, 250) 64.286%, rgb(250, 239, 248) 71.429%, rgb(248, 233, 245) 78.571%, rgb(247, 228, 243) 85.714%, rgb(245, 222, 240) 92.857%, rgb(243, 217, 238) 100%)"
