@@ -505,7 +505,7 @@ export function CheckinPage() {
           )}
 
           {(step === 3) && (
-            <div className="w-full mbodyPartAnswersax-w-[345px] pt-[30px]">
+            <div className="w-full max-w-[345px] pt-[30px]">
               <h2 className="text-[24px] font-medium leading-[31px] tracking-[-0.48px] text-black">
                 특별히 불편한 부위가 있었나요?
               </h2>
@@ -514,9 +514,9 @@ export function CheckinPage() {
               </p>
 
               {/*바디맵, 팝업창 : 전신 svg에 각 부위 별 svg를 덧댐 / 원래대로 하고 싶다면 -translate-y-6만 삭제해 */}
-              <div className="relative mx-auto mt-[25px] aspect-[262/411] w-[250px] max-w-full">
-                <span aria-hidden="true" className="absolute left-6 top-[82px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">L</span>
-                <span aria-hidden="true" className="absolute right-6 top-[85px] z-50 text-[13px] font-medium tracking-[-0.11px] text-[#b3abb0]">R</span>
+              <div className="relative mx-auto mt-[25px] aspect-[262/411] w-[clamp(120px,calc(63.75dvh-244px),220px)] max-w-full">
+                <span aria-hidden="true" className="absolute left-[9.2%] top-[20%] z-50 text-[clamp(9px,1.6dvh,13px)] font-medium tracking-[-0.11px] text-[#b3abb0]">L</span>
+                <span aria-hidden="true" className="absolute right-[9.2%] top-[20.7%] z-50 text-[clamp(9px,1.6dvh,13px)] font-medium tracking-[-0.11px] text-[#b3abb0]">R</span>
               
                 {/*바디맵 전신  svg*/}
                 <img
