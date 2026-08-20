@@ -12,8 +12,8 @@ export function RecordsAiReport({
   content,
 }: RecordsAiReportProps) {
   return (
-    <div className="relative mx-auto mt-[28px] w-[336px]">
-      <div className="relative z-0 min-h-[124px] w-full overflow-visible rounded-[15px] bg-white/90 px-[18px] py-[15px]">
+    <div className="relative mx-auto mt-[28px] w-[348px] pb-[40px]">
+      <div className="relative z-0 min-h-[145px] w-full overflow-visible rounded-[15px] bg-white/90 px-[18px] py-[15px]">
         <p className="text-[13px] font-semibold tracking-[-0.13px] text-[#7a4e88]">
           품결 AI와 함께하는{" "}
           {monthText}
@@ -29,7 +29,7 @@ export function RecordsAiReport({
         />
       </div>
 
-      <div className="pointer-events-none absolute bottom-[-48px] left-[-5px] z-10 size-[92px]">
+      <div className="pointer-events-none absolute bottom-[-45px] left-[-5px] z-10 size-[92px]">
         <span className="absolute inset-[20px] rounded-full bg-[#f6cbe6]/55 animate-ping" />
 
         <span className="absolute inset-[14px] rounded-full bg-[#fde7f5]/50" />
