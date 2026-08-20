@@ -65,9 +65,11 @@ import type {
   PageLayoutConfig,
 } from "@/shared/components/layout/page-layout"
 
+/* testing을 위한 라우팅
 import {
   TestPage,
 } from "@/pages/test-page"
+*/ 
 
 import {
   StatusPage,
@@ -456,15 +458,14 @@ export const router =
       ],
     },
 
-    /**
-     * Test
-     */
+    /* 
+     * Test 라우팅 주소
     {
       path: "/test",
       loader: requireAuth,
       element: <TestPage />,
     },
-
+    */
     /**
      * 404
      */
