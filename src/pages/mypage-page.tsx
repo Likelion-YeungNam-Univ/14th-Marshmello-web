@@ -12,7 +12,7 @@ import { useNavigate, useOutletContext } from "react-router-dom"
 import type { AppOutletContext } from "@/App"
 import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 import { AccountWithdrawalDialog } from "@/features/mypage/ui/account-withdrawal-dialog"
-import { UnavailableFeatureDialog } from "@/features/mypage/ui/unavailable-feature-dialog"
+import { SupportDialog } from "@/features/mypage/ui/support-dialog"
 import { ProfileIllustration } from "@/pages/not-found-page"
 import { withdrawUser } from "@/shared/api/auth"
 
@@ -172,7 +172,7 @@ export function MyPage() {
         open={isWithdrawalDialogOpen}
       />
 
-      <UnavailableFeatureDialog
+      <SupportDialog
         onOpenChange={setIsSupportDialogOpen}
         open={isSupportDialogOpen}
       />
