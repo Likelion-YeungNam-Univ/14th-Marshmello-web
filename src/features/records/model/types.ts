@@ -7,7 +7,12 @@ export type EmotionByDate = {
   emotion: number
 }
 
-export type MoodType = "good" | "normal" | "bad" | "none"
+export type MoodType =
+  | "great"
+  | "good"
+  | "normal"
+  | "bad"
+  | "none"
 
 export type CalendarDay = {
   date: number

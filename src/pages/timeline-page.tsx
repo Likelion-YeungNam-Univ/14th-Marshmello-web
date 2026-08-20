@@ -2,12 +2,14 @@ import {
   useEffect,
   useState,
 } from "react"
+
 import {
   useLocation,
   useNavigate,
 } from "react-router-dom"
 
 import {
+  deleteTimelineCheckIn,
   getTimelineCheckIn,
   getTimelineImageUrl,
 } from "@/features/records/api/timeline-api"
@@ -57,6 +59,12 @@ export function TimelinePage() {
       null,
     )
 
+  const [
+    isDeleting,
+    setIsDeleting,
+  ] =
+    useState(false)
+
   useEffect(() => {
     let cancelled = false
 
@@ -100,11 +108,8 @@ export function TimelinePage() {
                 await getTimelineImageUrl(
                   checkIn.imageId,
                 )
-            } catch (imageError) {
-              console.error(
-                "체크인 이미지 URL 조회 실패:",
-                imageError,
-              )
+            } catch {
+              imageUrl = null
             }
           }
 
@@ -141,13 +146,44 @@ export function TimelinePage() {
     }
   }, [date])
 
+  const handleDelete =
+    async () => {
+      if (
+        !date ||
+        !data ||
+        isDeleting
+      ) {
+        return
+      }
+
+      try {
+        setIsDeleting(true)
+
+        await deleteTimelineCheckIn(
+          data.checkIn.checkInId,
+          date,
+        )
+
+        navigate("/records", {
+          replace: true,
+        })
+      } catch (error) {
+        console.error(
+          "기록 삭제 실패:",
+          error,
+        )
+
+        window.alert(
+          "기록을 삭제하지 못했어요. 잠시 후 다시 시도해주세요.",
+        )
+      } finally {
+        setIsDeleting(false)
+      }
+    }
+
   if (isLoading) {
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-[393px] items-center justify-center bg-white">
-        <p className="text-[14px] text-[#6c7278]">
-          기록을 불러오는 중이에요.
-        </p>
-      </main>
+      <main className="mx-auto min-h-dvh w-full max-w-[393px] bg-white" />
     )
   }
 
@@ -182,6 +218,12 @@ export function TimelinePage() {
       data={data}
       onBack={() =>
         navigate(-1)
+      }
+      onDelete={
+        handleDelete
+      }
+      isDeleting={
+        isDeleting
       }
     />
   )

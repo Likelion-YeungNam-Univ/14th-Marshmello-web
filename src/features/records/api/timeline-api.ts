@@ -68,3 +68,17 @@ export async function getTimelineImageUrl(
     "이미지 URL을 확인할 수 없습니다.",
   )
 }
+
+export async function deleteTimelineCheckIn(
+  checkInId: number,
+  date: string,
+): Promise<void> {
+  await apiClient.delete(
+    `/api/check-ins/${checkInId}`,
+    {
+      params: {
+        date,
+      },
+    },
+  )
+}

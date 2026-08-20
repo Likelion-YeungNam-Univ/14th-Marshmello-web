@@ -2,6 +2,7 @@ import {
   useEffect,
   useState,
 } from "react"
+
 import {
   useNavigate,
 } from "react-router-dom"
@@ -19,6 +20,7 @@ import {
 } from "@/features/test/report-Controller"
 
 import {
+  changeMonth,
   getBodyRegionLabel,
 } from "@/features/records/model/utils"
 
@@ -51,6 +53,16 @@ function getCurrentMonth() {
   ).padStart(2, "0")}`
 }
 
+function hasEmotionRecord(
+  emotions: EmotionByDate[],
+) {
+  return emotions.some(
+    (item) =>
+      item != null &&
+      item.emotion != null,
+  )
+}
+
 export function RecordsPage() {
   const navigate =
     useNavigate()
@@ -65,109 +77,113 @@ export function RecordsPage() {
       getCurrentMonth(),
     )
 
-  const [isLoading, setIsLoading] =
+  const [isInitialLoading, setIsInitialLoading] =
     useState(true)
 
   const [errorMessage, setErrorMessage] =
-    useState<string | null>(null)
+    useState<string | null>(
+      null,
+    )
 
   useEffect(() => {
     let cancelled = false
 
-    const loadRecords =
-      async () => {
-        try {
-          setIsLoading(true)
-          setErrorMessage(null)
+    const loadRecords = async () => {
+      try {
+        setErrorMessage(null)
 
-          const count =
-            await getcheckInCount(
-              requestMonth,
-            )
-
-          const [
-            emotionsResponse,
-            topBodyRegion,
-          ] = await Promise.all([
-            getCheckInEmotions(
-              requestMonth,
-            ),
-            getcheckInRegion(
-              requestMonth,
-            ),
-          ])
-
-          const emotions =
-            emotionsResponse as unknown as EmotionByDate[]
-
-          let report:
-            | ReportResponse
-            | null = null
-
-          const currentMonth =
-            getCurrentMonth()
-
-          
-          if (requestMonth !== currentMonth) {
-            // 1. 리포트 생성을 먼저 시도
-            try {
-              await createReport(
-                requestMonth,
-              )
-            } catch (createError) {
-              // 이미 생성되어 있거나 생성 요청이 실패해도
-              // 아래 GET은 계속 실행
-              console.error(
-                "월간 리포트 생성 실패:",
-                createError,
-              )
-            }
-
-            // 2. POST 성공 여부와 관계없이 항상 GET 실행
-            try {
-              report =
-                await getReport(
-                  requestMonth,
-                )
-            } catch (getError) {
-              console.error(
-                "월간 리포트 조회 실패:",
-                getError,
-              )
-            }
-          }
-          
-          if (cancelled) {
-            return
-          }
-
-          setData({
+        const reportMonth =
+          changeMonth(
             requestMonth,
-            count: count.count,
-            achievedCount:
-              count.achievedCount,
-            emotions,
-            topBodyRegion:
-              topBodyRegion.bodyRegion,
-            report,
-          })
-        } catch (error) {
-          console.error(
-            "기록 데이터 조회 실패:",
-            error,
+            -1,
           )
 
-          if (!cancelled) {
-            setErrorMessage(
-              "기록 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
+        const [
+          count,
+          emotionsResponse,
+          topBodyRegion,
+          reportCount,
+          reportEmotionsResponse,
+        ] = await Promise.all([
+          getcheckInCount(
+            requestMonth,
+          ),
+          getCheckInEmotions(
+            requestMonth,
+          ),
+          getcheckInRegion(
+            requestMonth,
+          ),
+          getcheckInCount(
+            reportMonth,
+          ),
+          getCheckInEmotions(
+            reportMonth,
+          ),
+        ])
+
+        const emotions =
+          emotionsResponse as unknown as EmotionByDate[]
+
+        const reportEmotions =
+          reportEmotionsResponse as unknown as EmotionByDate[]
+
+        const hasReportRecord =
+          reportCount.count > 0 &&
+          hasEmotionRecord(
+            reportEmotions,
+          )
+
+        let report:
+          | ReportResponse
+          | null = null
+
+        if (hasReportRecord) {
+          try {
+            await createReport(
+              reportMonth,
             )
+          } catch {
+            // 이미 생성된 리포트인 경우 그대로 조회
           }
-        } finally {
-          if (!cancelled) {
-            setIsLoading(false)
+
+          try {
+            report =
+              await getReport(
+                reportMonth,
+              )
+          } catch {
+            report = null
           }
         }
+
+        if (cancelled) {
+          return
+        }
+
+        setData({
+          requestMonth,
+          count:
+            count.count,
+          achievedCount:
+            count.achievedCount,
+          emotions,
+          topBodyRegion:
+            topBodyRegion.bodyRegion,
+          report,
+        })
+      } catch {
+        if (!cancelled) {
+          setErrorMessage(
+            "기록 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setIsInitialLoading(false)
+        }
       }
+    }
 
     void loadRecords()
 
@@ -176,25 +192,20 @@ export function RecordsPage() {
     }
   }, [requestMonth])
 
-  if (isLoading) {
-    return (
-      <main className="mx-auto min-h-[852px] w-full max-w-[393px] bg-[#e8c5e5] px-[15px] pt-[110px]">
-        <p className="text-center text-[14px] text-[#7a4e88]">
-          기록을 불러오는 중이에요.
-        </p>
-      </main>
-    )
-  }
-
   if (
-    errorMessage ||
+    isInitialLoading ||
     !data
   ) {
     return (
+      <main className="mx-auto min-h-[852px] w-full max-w-[393px] bg-[#e8c5e5]" />
+    )
+  }
+
+  if (errorMessage) {
+    return (
       <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-6">
         <p className="text-center text-[14px] leading-[1.6] text-[#6c7278]">
-          {errorMessage ??
-            "기록을 불러오지 못했어요."}
+          {errorMessage}
         </p>
       </main>
     )
@@ -206,52 +217,66 @@ export function RecordsPage() {
   const monthText =
     `${Number(monthNumber)}월`
 
+  const reportMonth =
+    changeMonth(
+      data.requestMonth,
+      -1,
+    )
+
+  const reportMonthNumber =
+    reportMonth.slice(5)
+
+  const reportMonthText =
+    `${Number(reportMonthNumber)}월`
+
   const topBodyRegionLabel =
     getBodyRegionLabel(
       data.topBodyRegion,
     )
 
-  const aiReport =
+  const reportText =
     data.report?.content ??
-    "---"
+    "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
 
   return (
-    <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-[#e8c5e5] text-black">
-      <section className="relative px-[15px] pb-[8px] pt-[20px]">
-        <RecordsSummary
-          monthText={monthText}
-          count={data.count}
-          topBodyRegionLabel={
-            topBodyRegionLabel
+    <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden bg-[#e8c5e5] text-black">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[20%] bg-white" />
+
+      <div className="relative z-10">
+        <section className="px-[15px] pb-[8px] pt-[20px]">
+          <RecordsSummary
+            monthText={monthText}
+            count={data.count}
+            topBodyRegionLabel={
+              topBodyRegionLabel
+            }
+          />
+
+          <RecordsMonthHeader />
+
+          <RecordsAiReport
+            monthText={
+              reportMonthText
+            }
+            content={reportText}
+          />
+        </section>
+
+        <RecordsCalendar
+          requestMonth={
+            data.requestMonth
           }
+          emotions={data.emotions}
+          onMonthChange={
+            setRequestMonth
+          }
+          onDateClick={(date) => {
+            navigate(
+              `/records/timeline?date=${date}`,
+            )
+          }}
         />
-
-        <RecordsMonthHeader />
-
-        <RecordsAiReport
-          monthText={monthText}
-          content={aiReport}
-        />
-      </section>
-
-      <RecordsCalendar
-        requestMonth={
-          data.requestMonth
-        }
-        emotions={
-          data.emotions
-        }
-        onMonthChange={
-          setRequestMonth
-        }
-        onDateClick={(
-          date,
-        ) => {
-          navigate(
-            `/records/timeline?date=${date}`,
-          )
-        }}
-      />
+      </div>
     </main>
   )
 }

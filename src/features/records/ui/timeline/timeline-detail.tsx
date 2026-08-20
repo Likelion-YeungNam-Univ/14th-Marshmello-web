@@ -8,6 +8,10 @@ import type {
 } from "../../model/timeline-types"
 
 import {
+  TimelineBodyMap,
+} from "./body-map"
+
+import {
   TimelineImageSection,
 } from "./timeline-image-section"
 
@@ -18,15 +22,19 @@ import {
 type TimelineDetailProps = {
   data: TimelineDetailData
   onBack: () => void
+  onDelete: () => void
+  isDeleting: boolean
 }
 
 export function TimelineDetail({
   data,
   onBack,
+  onDelete,
+  isDeleting,
 }: TimelineDetailProps) {
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-[393px] overflow-y-auto bg-white text-black">
-      <header className="relative flex h-[96px] items-end justify-center pb-[14px]">
+<main className="mt-[-20px] mx-auto min-h-dvh w-full max-w-[393px] overflow-y-auto bg-white text-black">
+  <header className="relative flex h-[96px] items-end justify-center pb-[14px]">
         <button
           aria-label="뒤로가기"
           className="absolute left-[14px] top-[44px] flex size-[36px] items-center justify-center"
@@ -45,28 +53,55 @@ export function TimelineDetail({
       </header>
 
       <TimelineSummary
-        checkIn={data.checkIn}
+        checkIn={
+          data.checkIn
+        }
       />
 
-      <div className="mt-[76px]">
+      <div className="mt-[30px]">
         <TimelineImageSection
           title="이 날의 배 다시보기"
-          imageUrl={data.imageUrl}
-        />
+        >
+          {data.imageUrl ? (
+            <img
+              alt="체크인 당시 배 사진"
+              className="h-[270px] w-full object-cover"
+              src={data.imageUrl}
+            />
+          ) : (
+            <div className="flex h-[270px] items-center justify-center text-[13px] text-[#8c8c8c]">
+              이미지를 불러오지 못했어요.
+            </div>
+          )}
+        </TimelineImageSection>
 
         <TimelineImageSection
           title="이 날의 바디맵 다시보기"
-          imageUrl={null}
-        />
+        >
+          <div className="flex min-h-[270px] items-center justify-center overflow-visible bg-white px-[20px] py-[20px]">
+            <div className="relative top-[-25px]">
+              <TimelineBodyMap
+                bodyDiaries={
+                  data.checkIn
+                    .bodyDiaries
+                }
+              />
+            </div>
+          </div>
+        </TimelineImageSection>
       </div>
 
-      <div className="px-[36px] pb-[72px] pt-[0px]">
+      <div className="px-[36px] pb-[72px] pt-0">
         <button
-          className="flex h-[47px] w-full items-center justify-center gap-[12px] rounded-[15px] bg-[#484c52] text-white"
+          className="flex h-[47px] w-full items-center justify-center gap-[12px] rounded-[15px] bg-[#484c52] text-white disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isDeleting}
           type="button"
+          onClick={onDelete}
         >
           <span className="text-[16px] font-semibold">
-            기록 삭제하기
+            {isDeleting
+              ? "삭제 중..."
+              : "기록 삭제하기"}
           </span>
 
           <Trash2
