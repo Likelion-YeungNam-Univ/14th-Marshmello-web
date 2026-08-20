@@ -53,8 +53,6 @@ import {
 
 import {
   SignupProfilePage,
-  TERMS_AGREED_KEY,
-  TERMS_PENDING_KEY,
 } from "@/pages/signup-profile-page"
 
 import {
@@ -94,37 +92,6 @@ function syncProfileStore(
     })
 }
 
-/**
- * 약관 동의 여부 확인
- *
- * 현재 MVP에서는 sessionStorage를 사용한다.
- */
-function hasAgreedToTerms() {
-  if (typeof window === "undefined") {
-    return false
-  }
-
-  return (
-    window.sessionStorage.getItem(
-      TERMS_AGREED_KEY,
-    ) === "1"
-  )
-}
-
-/**
- * 약관 동의 대기 상태 확인
- */
-function hasPendingTerms() {
-  if (typeof window === "undefined") {
-    return false
-  }
-
-  return (
-    window.sessionStorage.getItem(
-      TERMS_PENDING_KEY,
-    ) === "1"
-  )
-}
 
 /**
  * 로그인 상태 확인
@@ -163,28 +130,13 @@ async function requireAuth() {
 }
 
 /**
- * 로그인 + 회원정보 등록 + 약관 동의 완료 여부 확인
+ * 프로필 등록 완료 여부 확인
  */
 async function requireProfileComplete() {
   const profile =
     await requireAuth()
 
-  if (
-    !profile.profileCompleted
-  ) {
-    throw redirect(
-      "/signup/profile",
-    )
-  }
-
-  if (!hasAgreedToTerms()) {
-    if (!hasPendingTerms()) {
-      window.sessionStorage.setItem(
-        TERMS_PENDING_KEY,
-        "1",
-      )
-    }
-
+  if (!profile.profileCompleted) {
     throw redirect(
       "/signup/profile",
     )
@@ -200,32 +152,12 @@ async function signupProfileLoader() {
   const profile =
     await requireAuth()
 
-  /**
-   * 회원정보와 약관 동의가 모두 완료된 경우
-   * 서비스 첫 화면으로 이동한다.
-   */
-  if (
-    profile.profileCompleted &&
-    hasAgreedToTerms()
-  ) {
+  // 기존 회원은 회원정보 등록 화면을 건너뜀
+  if (profile.profileCompleted) {
     throw redirect("/")
   }
 
-  /**
-   * 회원정보는 등록되었지만
-   * 약관 동의가 아직 완료되지 않은 경우
-   * 약관 팝업을 다시 띄울 수 있도록 대기 상태를 저장한다.
-   */
-  if (
-    profile.profileCompleted &&
-    !hasAgreedToTerms()
-  ) {
-    window.sessionStorage.setItem(
-      TERMS_PENDING_KEY,
-      "1",
-    )
-  }
-
+  // 신규 회원은 회원정보 입력 화면 표시
   return profile
 }
 
@@ -248,35 +180,17 @@ async function homeLoader() {
     const profile =
       await getUserProfile()
 
-    if (!profile) {
-      localStorage.removeItem(
-        "loginStarted",
-      )
+      if (!profile) {
+        localStorage.removeItem(
+          "loginStarted",
+        )
 
-      throw redirect("/login")
-    }
+        throw redirect("/login")
+      }
 
-    syncProfileStore(profile)
+      syncProfileStore(profile)
 
-    if (
-      !profile.profileCompleted
-    ) {
-      throw redirect(
-        "/signup/profile",
-      )
-    }
-
-    /**
-     * 프로필은 완료됐지만
-     * 필수 약관 동의가 완료되지 않은 경우
-     * 서비스에 진입하지 못하도록 한다.
-     */
-    if (!hasAgreedToTerms()) {
-      window.sessionStorage.setItem(
-        TERMS_PENDING_KEY,
-        "1",
-      )
-
+    if (!profile.profileCompleted) {
       throw redirect(
         "/signup/profile",
       )

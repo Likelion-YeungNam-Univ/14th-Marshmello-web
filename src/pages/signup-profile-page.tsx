@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useState,
   type FormEvent,
 } from "react"
@@ -62,12 +61,6 @@ const formVariants: Variants = {
   },
 }
 
-export const TERMS_PENDING_KEY =
-  "poomgyeol:terms-pending"
-
-export const TERMS_AGREED_KEY =
-  "poomgyeol:terms-agreed"
-
 function getToday(): WheelDate {
   const today = new Date()
 
@@ -97,30 +90,7 @@ export function SignupProfilePage() {
   const [isTermsOpen, setIsTermsOpen] =
     useState(false)
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return
-    }
-
-    const termsPending =
-      window.sessionStorage.getItem(
-        TERMS_PENDING_KEY,
-      ) === "1"
-
-    const termsAgreed =
-      window.sessionStorage.getItem(
-        TERMS_AGREED_KEY,
-      ) === "1"
-
-    if (
-      termsPending &&
-      !termsAgreed
-    ) {
-      setIsTermsOpen(true)
-    }
-  }, [])
-
-  const submitProfile = async (
+  const submitProfile = (
     event: FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault()
@@ -134,6 +104,23 @@ export function SignupProfilePage() {
       return
     }
 
+    // 다음 버튼에서는 저장하지 않고 약관만 표시
+    setIsTermsOpen(true)
+  }  
+
+  const handleTermsComplete = async (
+    result: TermsAgreementResult,
+  ) => {
+     if (!result.requiredAgreed || isSubmitting) {
+      return
+    }
+
+    const trimmedName = name.trim()
+
+    if (!trimmedName) {
+      setIsTermsOpen(false)
+      return
+    }  
     const expectedDeliveryDate = [
       date.year,
       String(date.month).padStart(2, "0"),
@@ -155,16 +142,11 @@ export function SignupProfilePage() {
           updatedProfile.expectedDeliveryDate,
       })
 
-      window.sessionStorage.setItem(
-        TERMS_PENDING_KEY,
-        "1",
-      )
+      setIsTermsOpen(false)
 
-      window.sessionStorage.removeItem(
-        TERMS_AGREED_KEY,
-      )
-
-      setIsTermsOpen(true)
+      navigate("/", {
+        replace: true,
+      })
     } catch (error) {
       console.error(
         "회원정보 등록 실패:",
@@ -177,29 +159,7 @@ export function SignupProfilePage() {
     } finally {
       setIsSubmitting(false)
     }
-  }
 
-  const handleTermsComplete = (
-    result: TermsAgreementResult,
-  ) => {
-    if (!result.requiredAgreed) {
-      return
-    }
-
-    window.sessionStorage.setItem(
-      TERMS_AGREED_KEY,
-      "1",
-    )
-
-    window.sessionStorage.removeItem(
-      TERMS_PENDING_KEY,
-    )
-
-    setIsTermsOpen(false)
-
-    navigate("/", {
-      replace: true,
-    })
   }
 
   return (
