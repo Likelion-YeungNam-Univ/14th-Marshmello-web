@@ -128,7 +128,7 @@ export function RecordsPage() {
         const reportEmotions =
           reportEmotionsResponse as unknown as EmotionByDate[]
 
-        const hasReportMonthRecord =
+        const hasReportRecord =
           reportCount.count > 0 &&
           hasEmotionRecord(
             reportEmotions,
@@ -138,15 +138,13 @@ export function RecordsPage() {
           | ReportResponse
           | null = null
 
-        if (
-          hasReportMonthRecord
-        ) {
+        if (hasReportRecord) {
           try {
             await createReport(
               reportMonth,
             )
           } catch {
-            // 이미 생성된 리포트인 경우 무시
+            // 이미 생성된 리포트면 그대로 조회
           }
 
           try {
@@ -199,13 +197,13 @@ export function RecordsPage() {
     !data
   ) {
     return (
-      <main className="mx-auto min-h-[852px] w-full max-w-[393px] bg-white" />
+      <main className="mx-auto min-h-[852px] w-full max-w-[393px] bg-[#e8c5e5]" />
     )
   }
 
   if (errorMessage) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-white px-6">
+      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-6">
         <p className="text-center text-[14px] leading-[1.6] text-[#6c7278]">
           {errorMessage}
         </p>
@@ -236,63 +234,64 @@ export function RecordsPage() {
       data.topBodyRegion,
     )
 
-  const hasCurrentMonthRecord =
-    data.count > 0 &&
-    hasEmotionRecord(
-      data.emotions,
-    )
+  const hasReportRecord =
+    data.report != null
 
   const reportText =
-    data.report?.content ??
-    (hasCurrentMonthRecord
-      ? "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
-      : "저번 달 기록이 없어서 리포트를 준비할 수 없어요")
+    hasReportRecord
+      ? data.report?.content ??
+        "기록이 없어서 리포트를 준비할 수 없어요"
+      : "기록이 없어서 리포트를 준비할 수 없어요"
 
   return (
-    <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-white text-black">
-      <section className="relative bg-[#e8c5e5] px-[15px] pb-[8px] pt-[20px]">
-        <RecordsSummary
-          monthText={
-            monthText
+    <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden bg-[#e8c5e5] text-black">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[20%] bg-white" />
+
+      <div className="relative z-10">
+        <section className="px-[15px] pb-[8px] pt-[20px]">
+          <RecordsSummary
+            monthText={
+              monthText
+            }
+            count={
+              data.count
+            }
+            topBodyRegionLabel={
+              topBodyRegionLabel
+            }
+          />
+
+          <RecordsMonthHeader />
+
+          <RecordsAiReport
+            monthText={
+              reportMonthText
+            }
+            content={
+              reportText
+            }
+          />
+        </section>
+
+        <RecordsCalendar
+          requestMonth={
+            data.requestMonth
           }
-          count={
-            data.count
+          emotions={
+            data.emotions
           }
-          topBodyRegionLabel={
-            topBodyRegionLabel
+          onMonthChange={
+            setRequestMonth
           }
+          onDateClick={(
+            date,
+          ) => {
+            navigate(
+              `/records/timeline?date=${date}`,
+            )
+          }}
         />
-
-        <RecordsMonthHeader />
-
-        <RecordsAiReport
-          monthText={
-            reportMonthText
-          }
-          content={
-            reportText
-          }
-        />
-      </section>
-
-      <RecordsCalendar
-        requestMonth={
-          data.requestMonth
-        }
-        emotions={
-          data.emotions
-        }
-        onMonthChange={
-          setRequestMonth
-        }
-        onDateClick={(
-          date,
-        ) => {
-          navigate(
-            `/records/timeline?date=${date}`,
-          )
-        }}
-      />
+      </div>
     </main>
   )
 }
