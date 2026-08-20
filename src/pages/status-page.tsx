@@ -114,7 +114,7 @@ export function StatusPage() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-white">
+      <main className="mx-auto flex min-h-dvh w-full max-w-[393px] items-center justify-center bg-white">
         <p className="text-[14px] text-[#7a4e88]">
           관리 현황을 불러오는 중이에요.
         </p>
@@ -127,7 +127,7 @@ export function StatusPage() {
     monthlyData.length === 0
   ) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-white px-6">
+      <main className="mx-auto flex min-h-dvh w-full max-w-[393px] items-center justify-center bg-white px-6">
         <p className="text-center text-[14px] leading-[1.6] text-[#6c7278]">
           {errorMessage ??
             "관리 현황을 불러오지 못했어요."}
@@ -145,7 +145,7 @@ export function StatusPage() {
     ]
 
   return (
-    <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-white">
+    <main className="mx-auto min-h-dvh w-full max-w-[393px] overflow-y-auto bg-white">
       <header className="relative h-[87px]">
         <button
           aria-label="뒤로가기"

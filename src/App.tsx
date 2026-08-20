@@ -126,7 +126,7 @@ export default function App() {
   // PageLayout / Header / Navbar 전부 사용하지 않음
   if (isLoginPage) {
     return (
-      <main className="min-h-dvh w-full">
+      <main className="mx-auto min-h-dvh w-full max-w-[393px]">
         <Outlet context={{ restartSplash, setHeaderBackAction }} />
       </main>
     )

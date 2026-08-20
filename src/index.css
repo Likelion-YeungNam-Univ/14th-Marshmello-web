@@ -159,6 +159,7 @@
 
   html {
     font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    scrollbar-gutter: stable;
     @apply font-sans;
   }
 

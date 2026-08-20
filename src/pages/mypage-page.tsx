@@ -14,6 +14,7 @@ import { useProfileStore } from "@/features/mypage/model/use-profile-store"
 import { AccountWithdrawalDialog } from "@/features/mypage/ui/account-withdrawal-dialog"
 import { UnavailableFeatureDialog } from "@/features/mypage/ui/unavailable-feature-dialog"
 import { ProfileIllustration } from "@/pages/not-found-page"
+import { withdrawUser } from "@/shared/api/auth"
 
 type MyPageMenuItem = {
   icon: LucideIcon
@@ -68,6 +69,7 @@ function MyPageMenuRow({
 export function MyPage() {
   const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false)
   const [isWithdrawalDialogOpen, setIsWithdrawalDialogOpen] = useState(false)
+  const [isWithdrawing, setIsWithdrawing] = useState(false)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { restartSplash } = useOutletContext<AppOutletContext>()
@@ -101,11 +103,21 @@ export function MyPage() {
     restartSplash()
   }, [navigate, queryClient, restartSplash])
 
+  const withdraw = useCallback(async () => {
+    setIsWithdrawing(true)
+
+    try {
+      await withdrawUser()
+    } finally {
+      setIsWithdrawing(false)
+    }
+  }, [])
+
   return (
     <>
       <section
         aria-labelledby="mypage-user-name"
-        className="mx-auto min-h-[calc(100svh-82px)] w-full max-w-[393px] px-5 pt-[69px]"
+        className="mx-auto min-h-[calc(100dvh-82px)] w-full max-w-[393px] px-5 pt-[69px]"
       >
         <div className="flex flex-col items-center text-center">
           <div className="relative size-[100px] shrink-0">
@@ -153,8 +165,10 @@ export function MyPage() {
       </section>
 
       <AccountWithdrawalDialog
+        isWithdrawing={isWithdrawing}
         onComplete={completeWithdrawal}
         onOpenChange={setIsWithdrawalDialogOpen}
+        onWithdraw={withdraw}
         open={isWithdrawalDialogOpen}
       />
 

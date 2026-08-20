@@ -33,8 +33,8 @@ export function TimelineDetail({
   isDeleting,
 }: TimelineDetailProps) {
   return (
-    <main className="mt-[-20px] mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-white text-black">
-      <header className="relative flex h-[96px] items-end justify-center pb-[21px]">
+<main className="mt-[-20px] mx-auto min-h-dvh w-full max-w-[393px] overflow-y-auto bg-white text-black">
+  <header className="relative flex h-[96px] items-end justify-center pb-[14px]">
         <button
           aria-label="뒤로가기"
           className="absolute left-[14px] top-[44px] flex size-[36px] items-center justify-center"
