@@ -118,16 +118,14 @@ export function Chart({
         0,
         Math.min(
           relativeX,
-          rect.width,
+          width,
         ),
       )
 
-    const ratio =
-      clampedX / rect.width
-
     const index =
       Math.round(
-        ratio * (data.length - 1),
+        (clampedX / width) *
+          (data.length - 1),
       )
 
     return Math.max(
@@ -223,10 +221,6 @@ export function Chart({
     data[selectedIndex] ??
     data[data.length - 1]
 
-  const selectedLeft =
-    (selectedPoint.x / width) *
-    100
-
   return (
     <div className="relative mt-[80px] ml-[30px] h-[340px] w-[300px] touch-none select-none">
       <div
@@ -248,8 +242,8 @@ export function Chart({
           {[0, 1, 2, 3].map(
             (index) => (
               <div
-                className="absolute left-0 right-0 border-t border-[#d9dfe4]"
                 key={index}
+                className="absolute left-0 right-0 border-t border-[#d9dfe4]"
                 style={{
                   top: `${index * 33.333}%`,
                 }}
@@ -321,16 +315,16 @@ export function Chart({
         </svg>
 
         <div
-          className="pointer-events-none absolute top-0 h-[300px] w-[2px] bg-[#404040]"
+          className="pointer-events-none absolute top-0 h-[300px] w-[2px] -translate-x-1/2 bg-[#404040]"
           style={{
-            left: `${selectedLeft}%`,
+            left: `${selectedPoint.x}px`,
           }}
         />
 
         <div
           className="pointer-events-none absolute size-[10px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4a4a4a]"
           style={{
-            left: `${selectedLeft}%`,
+            left: `${selectedPoint.x}px`,
             top: `${selectedPoint.y}px`,
           }}
         />
@@ -338,7 +332,7 @@ export function Chart({
         <div
           className="pointer-events-none absolute -top-[53px] w-[96px] -translate-x-1/2 rounded-[15px] bg-[#d9d9d9] px-[8px] py-[12px] text-center"
           style={{
-            left: `${selectedLeft}%`,
+            left: `${selectedPoint.x}px`,
           }}
         >
           <p className="whitespace-nowrap text-[11px] leading-none text-[#404040]">
@@ -357,19 +351,17 @@ export function Chart({
       <div className="absolute left-0 top-[300px] h-[40px] w-[300px]">
         {data.map(
           (item, index) => {
-            const left =
-              data.length > 1
-                ? (index /
-                    (data.length - 1)) *
-                  100
-                : 50
+            const point =
+              points[index]
 
             return (
               <div
                 key={item.requestMonth}
                 className="absolute top-0 h-[40px] w-[2px]"
                 style={{
-                  left: `calc(${left}% - 1px)`,
+                  left: `${point.x}px`,
+                  transform:
+                    "translateX(-50%)",
                 }}
               >
                 <div className="h-[14px] w-[2px] bg-[#54555a]" />

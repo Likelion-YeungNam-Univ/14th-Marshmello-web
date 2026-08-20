@@ -53,7 +53,7 @@ export function Summary({
         요약
       </h2>
 
-      <div className="mx-auto mt-[28px] grid w-full max-w-[340px] grid-cols-2 gap-[19px]">
+      <div className="mx-auto ml-[5px] mt-[28px] grid w-full max-w-[340px] grid-cols-2 gap-[19px]">
         <div className="relative h-[110px] rounded-[15px] bg-white/80 px-[18px] pt-[16px]">
           <p className="text-[13px] font-semibold text-[#484c52]">
             체크인
