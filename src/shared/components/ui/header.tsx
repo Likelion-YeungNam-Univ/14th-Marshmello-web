@@ -8,6 +8,7 @@ export type HeaderVariant = "default" | "back"
 export type HeaderProps = ComponentPropsWithoutRef<"header"> & {
   variant?: HeaderVariant
   title?: string
+  titleClassName?: string
   showBackButton?: boolean
   onBack?: () => void
   rightAction?: ReactNode
@@ -21,6 +22,7 @@ export function Header({
   rightAction,
   showBackButton = false,
   title,
+  titleClassName,
   variant = "default",
   ...props
 }: HeaderProps) {
@@ -46,7 +48,12 @@ export function Header({
           </button>
 
           {title ? (
-            <h1 className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-medium text-black">
+            <h1
+              className={cn(
+                "pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-medium text-black",
+                titleClassName,
+              )}
+            >
               {title}
             </h1>
           ) : null}

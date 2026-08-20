@@ -15,6 +15,7 @@ type BodyDiary = {
 
 type TimelineBodyMapProps = {
   bodyDiaries: BodyDiary[]
+  compact?: boolean
 }
 
 const BODY_MAP_WIDTH = 262
@@ -109,6 +110,7 @@ const bodyParts = [
 
 export function TimelineBodyMap({
   bodyDiaries,
+  compact = false,
 }: TimelineBodyMapProps) {
   const selectedRegions =
     new Set(
@@ -127,8 +129,14 @@ export function TimelineBodyMap({
     )
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative aspect-[262/411] w-[250px]">
+    <div className="flex w-full flex-col items-center">
+      <div
+        className={
+          compact
+            ? "relative aspect-[262/411] w-[172px]"
+            : "relative aspect-[262/411] w-[250px]"
+        }
+      >
         <img
           alt=""
           aria-hidden="true"
@@ -188,21 +196,21 @@ export function TimelineBodyMap({
                     "기록 부위"}
                 </p>
 
-                {diary.comment && (
-                  <p className="mt-[4px] text-[12px] leading-[1.5] text-[#777]">
-                    {diary.comment}
-                  </p>
-                )}
-
-                {diary.stretchMark !==
-                  undefined && (
-                  <p className="mt-[4px] text-[11px] text-[#999]">
-                    튼살:{" "}
-                    {diary.stretchMark
+                <p className="mt-[6px] text-[12px] leading-[18px] text-[#777]">
+                  튼살 여부:{" "}
+                  {diary.stretchMark ===
+                  undefined
+                    ? "기록 없음"
+                    : diary.stretchMark
                       ? "있음"
                       : "없음"}
-                  </p>
-                )}
+                </p>
+
+                <p className="mt-[3px] text-[12px] leading-[18px] text-[#777]">
+                  메모:{" "}
+                  {diary.comment ||
+                    "기록 없음"}
+                </p>
               </div>
             ),
           )}

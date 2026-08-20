@@ -754,7 +754,7 @@ export function CheckinPage() {
                   </p>
                 </button>
 
-                {/*최고에요*/}
+                {/*최고예요*/}
                 <button
                   type="button"
                   onClick={() => setMood("great")}
@@ -763,7 +763,7 @@ export function CheckinPage() {
                 >
                   <img src={moodGreat} alt="" aria-hidden="true" className="size-[46px]" />
                   <p className={`text-[13px] font-medium tracking-[-0.26px] ${mood === "great" ? "text-[#7a3f63]" : "text-[#5a5560]"}`}>
-                    최고에요
+                    최고예요
                   </p>
                 </button>
               </div>  

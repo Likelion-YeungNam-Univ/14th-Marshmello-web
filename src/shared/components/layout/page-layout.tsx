@@ -24,6 +24,7 @@ export type PageLayoutHeaderConfig = Pick<
   | "rightAction"
   | "showBackButton"
   | "title"
+  | "titleClassName"
   | "variant"
 >
 

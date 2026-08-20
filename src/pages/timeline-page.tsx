@@ -22,6 +22,42 @@ import {
   TimelineDetail,
 } from "@/features/records/ui/timeline/timeline-detail"
 
+function shiftDate(
+  date: string,
+  offset: number,
+) {
+  const [
+    year,
+    month,
+    day,
+  ] = date
+    .split("-")
+    .map(Number)
+
+  const parsedDate =
+    new Date(
+      year,
+      month - 1,
+      day,
+    )
+
+  parsedDate.setDate(
+    parsedDate.getDate() +
+      offset,
+  )
+
+  return [
+    parsedDate.getFullYear(),
+    String(
+      parsedDate.getMonth() +
+        1,
+    ).padStart(2, "0"),
+    String(
+      parsedDate.getDate(),
+    ).padStart(2, "0"),
+  ].join("-")
+}
+
 export function TimelinePage() {
   const navigate =
     useNavigate()
@@ -181,9 +217,23 @@ export function TimelinePage() {
       }
     }
 
+  const handleDateChange =
+    (offset: number) => {
+      if (!date) {
+        return
+      }
+
+      navigate(
+        `/records/timeline?date=${shiftDate(
+          date,
+          offset,
+        )}`,
+      )
+    }
+
   if (isLoading) {
     return (
-      <main className="mx-auto min-h-dvh w-full max-w-[393px] bg-white" />
+      <main className="mx-auto min-h-[calc(100dvh-var(--header-layout-height))] w-full max-w-[393px] bg-white" />
     )
   }
 
@@ -192,7 +242,7 @@ export function TimelinePage() {
     !data
   ) {
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-[393px] items-center justify-center bg-white px-6">
+      <main className="mx-auto flex min-h-[calc(100dvh-var(--header-layout-height))] w-full max-w-[393px] items-center justify-center bg-white px-6">
         <div className="text-center">
           <p className="text-[14px] leading-[1.6] text-[#6c7278]">
             {errorMessage ??
@@ -216,11 +266,14 @@ export function TimelinePage() {
   return (
     <TimelineDetail
       data={data}
-      onBack={() =>
-        navigate(-1)
-      }
       onDelete={
         handleDelete
+      }
+      onNextDate={() =>
+        handleDateChange(1)
+      }
+      onPreviousDate={() =>
+        handleDateChange(-1)
       }
       isDeleting={
         isDeleting

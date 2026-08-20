@@ -347,7 +347,13 @@ export const router =
           element:
             <TimelinePage />,
           handle: withPageLayout({
-            showHeader: false,
+            header: {
+              title:
+                "타임라인 상세보기",
+              titleClassName:
+                "text-[16px] font-semibold tracking-[-0.16px] text-black",
+              variant: "back",
+            },
             showNavbar: false,
           }),
         },
