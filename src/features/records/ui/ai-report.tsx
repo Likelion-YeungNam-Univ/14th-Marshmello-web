@@ -11,15 +11,6 @@ export function RecordsAiReport({
   monthText,
   content,
 }: RecordsAiReportProps) {
-  const hasReport =
-    content.trim() !== "" &&
-    content.trim() !== "---"
-
-  const reportText =
-    hasReport
-      ? content
-      : "이번 달 열심히 해봅시다!"
-
   return (
     <div className="relative mx-auto mt-[28px] w-[336px]">
       <div className="relative z-0 min-h-[124px] w-full overflow-visible rounded-[15px] bg-white/90 px-[18px] py-[15px]">
@@ -29,7 +20,7 @@ export function RecordsAiReport({
         </p>
 
         <p className="mt-[7px] pr-[2px] text-[16px] leading-[1.5] tracking-[-0.16px]">
-          "{reportText}"
+          "{content}"
         </p>
 
         <div

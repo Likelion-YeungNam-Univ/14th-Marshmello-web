@@ -2,6 +2,7 @@ import {
   useEffect,
   useState,
 } from "react"
+
 import {
   useNavigate,
 } from "react-router-dom"
@@ -19,6 +20,7 @@ import {
 } from "@/features/test/report-Controller"
 
 import {
+  changeMonth,
   getBodyRegionLabel,
 } from "@/features/records/model/utils"
 
@@ -51,6 +53,16 @@ function getCurrentMonth() {
   ).padStart(2, "0")}`
 }
 
+function hasEmotionRecord(
+  emotions: EmotionByDate[],
+) {
+  return emotions.some(
+    (item) =>
+      item != null &&
+      item.emotion != null,
+  )
+}
+
 export function RecordsPage() {
   const navigate =
     useNavigate()
@@ -65,88 +77,85 @@ export function RecordsPage() {
       getCurrentMonth(),
     )
 
-  const [
-    isInitialLoading,
-    setIsInitialLoading,
-  ] = useState(true)
+  const [isInitialLoading, setIsInitialLoading] =
+    useState(true)
 
-  const [
-    isMonthChanging,
-    setIsMonthChanging,
-  ] = useState(false)
-
-  const [
-    errorMessage,
-    setErrorMessage,
-  ] = useState<string | null>(
-    null,
-  )
+  const [errorMessage, setErrorMessage] =
+    useState<string | null>(
+      null,
+    )
 
   useEffect(() => {
     let cancelled = false
 
     const loadRecords = async () => {
       try {
-        if (data === null) {
-          setIsInitialLoading(true)
-        } else {
-          setIsMonthChanging(true)
-        }
-
         setErrorMessage(null)
 
-        const count =
-          await getcheckInCount(
+        const reportMonth =
+          changeMonth(
             requestMonth,
+            -1,
           )
 
         const [
+          count,
           emotionsResponse,
           topBodyRegion,
+          reportCount,
+          reportEmotionsResponse,
         ] = await Promise.all([
+          getcheckInCount(
+            requestMonth,
+          ),
           getCheckInEmotions(
             requestMonth,
           ),
           getcheckInRegion(
             requestMonth,
           ),
+          getcheckInCount(
+            reportMonth,
+          ),
+          getCheckInEmotions(
+            reportMonth,
+          ),
         ])
 
         const emotions =
           emotionsResponse as unknown as EmotionByDate[]
 
+        const reportEmotions =
+          reportEmotionsResponse as unknown as EmotionByDate[]
+
+        const hasReportMonthRecord =
+          reportCount.count > 0 &&
+          hasEmotionRecord(
+            reportEmotions,
+          )
+
         let report:
           | ReportResponse
           | null = null
 
-        const currentMonth =
-          getCurrentMonth()
-
         if (
-          requestMonth !==
-          currentMonth
+          hasReportMonthRecord
         ) {
           try {
             await createReport(
-              requestMonth,
+              reportMonth,
             )
-          } catch (createError) {
-            console.error(
-              "월간 리포트 생성 실패:",
-              createError,
-            )
+          } catch {
+            // 이미 생성된 리포트인 경우 무시
           }
 
           try {
             report =
               await getReport(
-                requestMonth,
+                reportMonth,
               )
-          } catch (getError) {
-            console.error(
-              "월간 리포트 조회 실패:",
-              getError,
-            )
+          } catch {
+            report = null
           }
         }
 
@@ -156,7 +165,8 @@ export function RecordsPage() {
 
         setData({
           requestMonth,
-          count: count.count,
+          count:
+            count.count,
           achievedCount:
             count.achievedCount,
           emotions,
@@ -164,12 +174,7 @@ export function RecordsPage() {
             topBodyRegion.bodyRegion,
           report,
         })
-      } catch (error) {
-        console.error(
-          "기록 데이터 조회 실패:",
-          error,
-        )
-
+      } catch {
         if (!cancelled) {
           setErrorMessage(
             "기록 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
@@ -178,7 +183,6 @@ export function RecordsPage() {
       } finally {
         if (!cancelled) {
           setIsInitialLoading(false)
-          setIsMonthChanging(false)
         }
       }
     }
@@ -188,24 +192,20 @@ export function RecordsPage() {
     return () => {
       cancelled = true
     }
-  }, [requestMonth, data])
+  }, [requestMonth])
 
   if (
     isInitialLoading ||
     !data
   ) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-[15px]">
-        <p className="text-center text-[14px] text-[#7a4e88]">
-          기록을 불러오는 중이에요.
-        </p>
-      </main>
+      <main className="mx-auto min-h-[852px] w-full max-w-[393px] bg-white" />
     )
   }
 
   if (errorMessage) {
     return (
-      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-[#e8c5e5] px-6">
+      <main className="mx-auto flex min-h-[852px] w-full max-w-[393px] items-center justify-center bg-white px-6">
         <p className="text-center text-[14px] leading-[1.6] text-[#6c7278]">
           {errorMessage}
         </p>
@@ -219,21 +219,45 @@ export function RecordsPage() {
   const monthText =
     `${Number(monthNumber)}월`
 
+  const reportMonth =
+    changeMonth(
+      data.requestMonth,
+      -1,
+    )
+
+  const reportMonthNumber =
+    reportMonth.slice(5)
+
+  const reportMonthText =
+    `${Number(reportMonthNumber)}월`
+
   const topBodyRegionLabel =
     getBodyRegionLabel(
       data.topBodyRegion,
     )
 
-  const aiReport =
+  const hasCurrentMonthRecord =
+    data.count > 0 &&
+    hasEmotionRecord(
+      data.emotions,
+    )
+
+  const reportText =
     data.report?.content ??
-    "---"
+    (hasCurrentMonthRecord
+      ? "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
+      : "저번 달 기록이 없어서 리포트를 준비할 수 없어요")
 
   return (
-    <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-[#e8c5e5] text-black">
-      <section className="relative px-[15px] pb-[8px] pt-[20px]">
+    <main className="mx-auto min-h-[852px] w-full max-w-[393px] overflow-y-auto bg-white text-black">
+      <section className="relative bg-[#e8c5e5] px-[15px] pb-[8px] pt-[20px]">
         <RecordsSummary
-          monthText={monthText}
-          count={data.count}
+          monthText={
+            monthText
+          }
+          count={
+            data.count
+          }
           topBodyRegionLabel={
             topBodyRegionLabel
           }
@@ -242,8 +266,12 @@ export function RecordsPage() {
         <RecordsMonthHeader />
 
         <RecordsAiReport
-          monthText={monthText}
-          content={aiReport}
+          monthText={
+            reportMonthText
+          }
+          content={
+            reportText
+          }
         />
       </section>
 
@@ -251,22 +279,20 @@ export function RecordsPage() {
         requestMonth={
           data.requestMonth
         }
-        emotions={data.emotions}
+        emotions={
+          data.emotions
+        }
         onMonthChange={
           setRequestMonth
         }
-        onDateClick={(date) => {
+        onDateClick={(
+          date,
+        ) => {
           navigate(
             `/records/timeline?date=${date}`,
           )
         }}
       />
-
-      {isMonthChanging && (
-        <div className="pointer-events-none absolute right-[20px] top-[20px] z-50 rounded-full bg-white/80 px-[10px] py-[5px] text-[10px] text-[#8b6986] shadow-sm">
-          불러오는 중
-        </div>
-      )}
     </main>
   )
 }
