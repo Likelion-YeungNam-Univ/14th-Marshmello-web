@@ -53,6 +53,8 @@ import {
 
 import {
   SignupProfilePage,
+  TERMS_AGREED_KEY,
+  TERMS_PENDING_KEY,
 } from "@/pages/signup-profile-page"
 
 import {
@@ -93,6 +95,38 @@ function syncProfileStore(
 }
 
 /**
+ * 약관 동의 여부 확인
+ *
+ * 현재 MVP에서는 sessionStorage를 사용한다.
+ */
+function hasAgreedToTerms() {
+  if (typeof window === "undefined") {
+    return false
+  }
+
+  return (
+    window.sessionStorage.getItem(
+      TERMS_AGREED_KEY,
+    ) === "1"
+  )
+}
+
+/**
+ * 약관 동의 대기 상태 확인
+ */
+function hasPendingTerms() {
+  if (typeof window === "undefined") {
+    return false
+  }
+
+  return (
+    window.sessionStorage.getItem(
+      TERMS_PENDING_KEY,
+    ) === "1"
+  )
+}
+
+/**
  * 로그인 상태 확인
  *
  * GET /api/csrf
@@ -129,7 +163,7 @@ async function requireAuth() {
 }
 
 /**
- * 로그인 + 회원정보 등록 완료 여부 확인
+ * 로그인 + 회원정보 등록 + 약관 동의 완료 여부 확인
  */
 async function requireProfileComplete() {
   const profile =
@@ -138,6 +172,19 @@ async function requireProfileComplete() {
   if (
     !profile.profileCompleted
   ) {
+    throw redirect(
+      "/signup/profile",
+    )
+  }
+
+  if (!hasAgreedToTerms()) {
+    if (!hasPendingTerms()) {
+      window.sessionStorage.setItem(
+        TERMS_PENDING_KEY,
+        "1",
+      )
+    }
+
     throw redirect(
       "/signup/profile",
     )
@@ -153,8 +200,30 @@ async function signupProfileLoader() {
   const profile =
     await requireAuth()
 
-  if (profile.profileCompleted) {
+  /**
+   * 회원정보와 약관 동의가 모두 완료된 경우
+   * 서비스 첫 화면으로 이동한다.
+   */
+  if (
+    profile.profileCompleted &&
+    hasAgreedToTerms()
+  ) {
     throw redirect("/")
+  }
+
+  /**
+   * 회원정보는 등록되었지만
+   * 약관 동의가 아직 완료되지 않은 경우
+   * 약관 팝업을 다시 띄울 수 있도록 대기 상태를 저장한다.
+   */
+  if (
+    profile.profileCompleted &&
+    !hasAgreedToTerms()
+  ) {
+    window.sessionStorage.setItem(
+      TERMS_PENDING_KEY,
+      "1",
+    )
   }
 
   return profile
@@ -192,6 +261,22 @@ async function homeLoader() {
     if (
       !profile.profileCompleted
     ) {
+      throw redirect(
+        "/signup/profile",
+      )
+    }
+
+    /**
+     * 프로필은 완료됐지만
+     * 필수 약관 동의가 완료되지 않은 경우
+     * 서비스에 진입하지 못하도록 한다.
+     */
+    if (!hasAgreedToTerms()) {
+      window.sessionStorage.setItem(
+        TERMS_PENDING_KEY,
+        "1",
+      )
+
       throw redirect(
         "/signup/profile",
       )
@@ -429,6 +514,9 @@ export const router =
 
         /**
          * 기존 회원정보 수정
+         *
+         * 약관 동의 여부와 관계없이
+         * 로그인한 사용자가 접근할 수 있다.
          */
         {
           path: "mypage/edit",
