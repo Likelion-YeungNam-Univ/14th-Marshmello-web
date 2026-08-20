@@ -144,8 +144,8 @@ export function RecordsCalendar({
     currentMonth
 
   return (
-    <section className="relative z-30 mt-[24px] rounded-t-[5px] bg-white px-[25px] pb-[35px] pt-[22px]">
-    <div className="flex items-center justify-center gap-[5px]">
+    <section className="relative z-30 mt-[20px] rounded-t-[9px] bg-white px-[25px] pb-[65px] pt-[32px]">
+      <div className="flex items-center justify-center gap-[5px]">
         <button
           aria-label={`${formatMonth(previousMonth)}로 이동`}
           className="flex size-5 items-center justify-center text-black"
@@ -241,7 +241,7 @@ export function RecordsCalendar({
                 key={day.date}
                 type="button"
                 aria-label={`${fullDate} 기록 보기`}
-                className="flex flex-col items-center gap-[5px]"
+                className="flex flex-col items-center gap-[10px]"
                 onClick={() =>
                   onDateClick(
                     fullDate,
@@ -250,8 +250,9 @@ export function RecordsCalendar({
               >
                 <MoodFace
                   emotion={
-                    day.emotion}
+                    day.emotion }
                   />
+
 
                 <span className="text-[14px] text-[#80858a]">
                   {day.date}
