@@ -1,34 +1,124 @@
-import { useState, type FormEvent } from "react"
-import { ArrowLeft } from "lucide-react"
+import {
+  useEffect,
+  useState,
+  type FormEvent,
+} from "react"
+import {
+  motion,
+  type Variants,
+} from "framer-motion"
+import {
+  ArrowLeft,
+  CalendarDays,
+  UserRound,
+} from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
-import { useProfileStore } from "@/features/mypage/model/use-profile-store"
+import {
+  TermsDialog,
+} from "@/features/terms-agreement/ui/terms-dialog"
+import type {
+  TermsAgreementResult,
+} from "@/features/terms-agreement/model/types"
+import {
+  useProfileStore,
+} from "@/features/mypage/model/use-profile-store"
 import {
   DateWheelPicker,
   type WheelDate,
 } from "@/features/mypage/ui/date-wheel-picker"
-import { Button } from "@/shared/components/ui/button"
-import { Input } from "@/shared/components/ui/input"
-import { updateUserProfile } from "@/shared/api/auth"
-import { TermsDialog } from "@/features/terms-agreement/ui/terms-dialog"
+import {
+  updateUserProfile,
+} from "@/shared/api/auth"
+import {
+  Button,
+} from "@/shared/components/ui/button"
+import {
+  Input,
+} from "@/shared/components/ui/input"
+
+const fadeUpVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 14,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1],
+    },
+    y: 0,
+  },
+}
+
+const formVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.16,
+      staggerChildren: 0.1,
+    },
+  },
+}
+
+export const TERMS_PENDING_KEY =
+  "poomgyeol:terms-pending"
+
+export const TERMS_AGREED_KEY =
+  "poomgyeol:terms-agreed"
+
+function getToday(): WheelDate {
+  const today = new Date()
+
+  return {
+    day: today.getDate(),
+    month: today.getMonth() + 1,
+    year: today.getFullYear(),
+  }
+}
 
 export function SignupProfilePage() {
   const navigate = useNavigate()
 
-  const updateProfile = useProfileStore((state) => state.updateProfile)
+  const updateProfile =
+    useProfileStore(
+      (state) => state.updateProfile,
+    )
 
   const [name, setName] = useState("")
 
-  const [date, setDate] = useState<WheelDate>({
-    day: 1,
-    month: 1,
-    year: 2026,
-  })
+  const [date, setDate] =
+    useState<WheelDate>(getToday)
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] =
+    useState(false)
 
-  // 약관 팝업 표시 여부
-  const [isTermsOpen, setIsTermsOpen] = useState(false)
+  const [isTermsOpen, setIsTermsOpen] =
+    useState(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+
+    const termsPending =
+      window.sessionStorage.getItem(
+        TERMS_PENDING_KEY,
+      ) === "1"
+
+    const termsAgreed =
+      window.sessionStorage.getItem(
+        TERMS_AGREED_KEY,
+      ) === "1"
+
+    if (
+      termsPending &&
+      !termsAgreed
+    ) {
+      setIsTermsOpen(true)
+    }
+  }, [])
 
   const submitProfile = async (
     event: FormEvent<HTMLFormElement>,
@@ -37,7 +127,10 @@ export function SignupProfilePage() {
 
     const trimmedName = name.trim()
 
-    if (!trimmedName || isSubmitting) {
+    if (
+      !trimmedName ||
+      isSubmitting
+    ) {
       return
     }
 
@@ -50,29 +143,58 @@ export function SignupProfilePage() {
     try {
       setIsSubmitting(true)
 
-      // 백엔드 회원정보 등록
-      const updatedProfile = await updateUserProfile({
-        nickname: trimmedName,
-        expectedDeliveryDate,
-      })
+      const updatedProfile =
+        await updateUserProfile({
+          nickname: trimmedName,
+          expectedDeliveryDate,
+        })
 
-      // 프론트 상태 저장
       updateProfile({
         name: updatedProfile.nickname,
-        dueDate: updatedProfile.expectedDeliveryDate,
+        dueDate:
+          updatedProfile.expectedDeliveryDate,
       })
 
-      // 팝업 띄우기
+      window.sessionStorage.setItem(
+        TERMS_PENDING_KEY,
+        "1",
+      )
+
+      window.sessionStorage.removeItem(
+        TERMS_AGREED_KEY,
+      )
+
       setIsTermsOpen(true)
     } catch (error) {
-      console.error("회원정보 등록 실패:", error)
-      alert("회원정보 등록에 실패했습니다.")
+      console.error(
+        "회원정보 등록 실패:",
+        error,
+      )
+
+      alert(
+        "회원정보 등록에 실패했습니다.",
+      )
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleTermsComplete = () => {
+  const handleTermsComplete = (
+    result: TermsAgreementResult,
+  ) => {
+    if (!result.requiredAgreed) {
+      return
+    }
+
+    window.sessionStorage.setItem(
+      TERMS_AGREED_KEY,
+      "1",
+    )
+
+    window.sessionStorage.removeItem(
+      TERMS_PENDING_KEY,
+    )
+
     setIsTermsOpen(false)
 
     navigate("/", {
@@ -82,69 +204,166 @@ export function SignupProfilePage() {
 
   return (
     <>
-      <main className="relative mx-auto min-h-dvh w-full max-w-[393px] overflow-hidden px-5 pt-[27px] text-black">
-        <button
-          aria-label="로그인 화면으로 돌아가기"
-          className="flex size-6 items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/40"
-          onClick={() => navigate("/login")}
-          type="button"
+      <main className="relative mx-auto min-h-dvh w-full max-w-[393px] bg-[linear-gradient(180deg,#fdf8fc_0%,#ffffff_44%)] px-5 pb-8 pt-5 text-[#26292e]">
+        <motion.header
+          animate="visible"
+          className="relative flex h-11 items-center justify-center"
+          initial="hidden"
+          transition={{ delay: 0.04 }}
+          variants={fadeUpVariants}
         >
-          <ArrowLeft
-            aria-hidden="true"
-            className="size-6"
-            strokeWidth={1.8}
-          />
-        </button>
-
-        <h1 className="mt-8 text-[12px] leading-[1.4] font-medium tracking-[-0.12px]">
-          회원정보를 등록해주세요
-        </h1>
-
-        <form className="mt-8" onSubmit={submitProfile}>
-          <label
-            className="block text-[12px] leading-[1.6] font-medium tracking-[-0.24px] text-[#6c7278]"
-            htmlFor="signup-profile-name"
+          <button
+            aria-label="로그인 화면으로 돌아가기"
+            className="absolute left-0 flex size-10 items-center justify-center rounded-xl text-[#484c52] transition-colors hover:bg-[#f7eef4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f19ed2]/45"
+            onClick={() =>
+              navigate("/login")
+            }
+            type="button"
           >
-            닉네임을 입력해주세요
-          </label>
+            <ArrowLeft
+              aria-hidden="true"
+              className="size-5"
+              strokeWidth={1.9}
+            />
+          </button>
 
-          <Input
-            autoComplete="nickname"
-            className="mt-0.5 h-[46px] rounded-[10px] border-[#edf1f3] bg-white px-[14px] text-[14px] font-medium tracking-[-0.14px] text-[#1a1c1e] shadow-[0_1px_2px_rgba(228,229,231,0.24)] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/20"
-            id="signup-profile-name"
-            maxLength={20}
-            onChange={(event) => setName(event.target.value)}
-            required
-            value={name}
-          />
+          <span className="text-[16px] font-semibold leading-6 tracking-[-0.2px]">
+            회원정보 등록
+          </span>
+        </motion.header>
 
-          <fieldset className="mt-[46px]">
-            <legend className="text-[12px] leading-[1.6] font-medium tracking-[-0.24px] text-[#6c7278]">
-              출산예정일을 입력해주세요
-            </legend>
+        <motion.section
+          animate="visible"
+          aria-labelledby="signup-profile-title"
+          className="mt-8"
+          initial="hidden"
+          transition={{ delay: 0.1 }}
+          variants={fadeUpVariants}
+        >
+          <h1
+            className="text-[22px] font-semibold leading-[31px] tracking-[-0.45px] text-[#26292e]"
+            id="signup-profile-title"
+          >
+            회원정보를 등록해주세요
+          </h1>
 
-            <div className="mt-[23px] w-full">
+          <p className="mt-1 text-[14px] leading-[21px] tracking-[-0.2px] text-[#7c747a]">
+            정확한 정보를 입력하면 더 꼭 맞는 케어를 받을 수 있어요.
+          </p>
+        </motion.section>
+
+        <motion.form
+          animate="visible"
+          className="mt-8"
+          initial="hidden"
+          onSubmit={submitProfile}
+          variants={formVariants}
+        >
+          <motion.section
+            aria-labelledby="signup-profile-name-label"
+            className="rounded-2xl border border-[#eee9ed] bg-white p-5"
+            variants={fadeUpVariants}
+          >
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center text-[#e68ec2]">
+                <UserRound
+                  aria-hidden="true"
+                  className="size-[18px]"
+                  strokeWidth={1.8}
+                />
+              </span>
+
+              <div>
+                <label
+                  className="block text-[15px] font-semibold leading-[22.5px] tracking-[-0.2px] text-[#3d3d3d]"
+                  htmlFor="signup-profile-name"
+                  id="signup-profile-name-label"
+                >
+                  닉네임
+                </label>
+              </div>
+            </div>
+
+            <Input
+              aria-describedby="signup-profile-name-helper"
+              autoComplete="nickname"
+              className="mt-4 h-[50px] rounded-xl border-[#e8e2e6] bg-white px-4 text-[15px] font-medium tracking-[-0.2px] text-[#26292e] shadow-none placeholder:text-[#b6a6b1] focus-visible:border-[#f19ed2] focus-visible:ring-3 focus-visible:ring-[#f19ed2]/15"
+              id="signup-profile-name"
+              maxLength={15}
+              onChange={(event) =>
+                setName(
+                  event.target.value,
+                )
+              }
+              placeholder="닉네임을 입력해 주세요"
+              required
+              value={name}
+            />
+
+            <p
+              className="mt-2 text-right text-[11px] leading-[16.5px] text-[#aaa2a7]"
+              id="signup-profile-name-helper"
+            >
+              {name.length}/15
+            </p>
+          </motion.section>
+
+          <motion.section
+            aria-labelledby="signup-profile-due-date-label"
+            className="mt-4 rounded-2xl border border-[#eee9ed] bg-white p-5"
+            variants={fadeUpVariants}
+          >
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center text-[#e68ec2]">
+                <CalendarDays
+                  aria-hidden="true"
+                  className="size-[18px]"
+                  strokeWidth={1.8}
+                />
+              </span>
+
+              <div>
+                <h2
+                  className="text-[15px] font-semibold leading-[22.5px] tracking-[-0.2px] text-[#3d3d3d]"
+                  id="signup-profile-due-date-label"
+                >
+                  출산 예정일
+                </h2>
+              </div>
+            </div>
+
+            <div className="mt-5 border-t border-[#f1edf0] pt-5">
               <DateWheelPicker
                 onChange={setDate}
                 value={date}
               />
             </div>
-          </fieldset>
+          </motion.section>
 
-          <Button
-            className="mt-[101px] h-12 w-full rounded-[10px] bg-[#f19ed2] text-[15px] font-semibold tracking-[-0.15px] text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/30"
-            disabled={!name.trim() || isSubmitting}
-            type="submit"
+          <motion.div
+            className="mt-6"
+            variants={fadeUpVariants}
           >
-            {isSubmitting ? "등록 중..." : "다음"}
-          </Button>
-        </form>
+            <Button
+              className="h-[52px] w-full rounded-xl bg-[#f19ed2] text-[15px] font-semibold tracking-[-0.2px] text-white shadow-none hover:bg-[#ed8dca] focus-visible:border-[#f19ed2] focus-visible:ring-[#f19ed2]/30 disabled:bg-[#f5d7e9]"
+              disabled={
+                !name.trim() ||
+                isSubmitting
+              }
+              type="submit"
+            >
+              {isSubmitting
+                ? "등록 중..."
+                : "다음"}
+            </Button>
+          </motion.div>
+        </motion.form>
       </main>
 
       <TermsDialog
         open={isTermsOpen}
-        onOpenChange={setIsTermsOpen}
         onConfirm={handleTermsComplete}
+        onOpenChange={setIsTermsOpen}
       />
     </>
   )
