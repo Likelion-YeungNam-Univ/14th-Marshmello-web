@@ -18,6 +18,10 @@ import {
 } from "./body-map"
 
 import {
+  DeleteRecordDialog,
+} from "./delete-record-dialog"
+
+import {
   TimelineSummary,
 } from "./timeline-summary"
 
@@ -84,12 +88,18 @@ export function TimelineDetail({
       "belly",
     )
 
+  const [
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+  ] = useState(false)
+
   const hasBodyMap =
     data.checkIn.bodyDiaries
       .length > 0
 
   return (
-    <main className="mx-auto min-h-[calc(100dvh-var(--header-layout-height))] w-full max-w-[393px] overflow-x-hidden bg-white text-[#2a2c30]">
+    <>
+      <main className="mx-auto min-h-[calc(100dvh-var(--header-layout-height))] w-full max-w-[393px] overflow-x-hidden bg-white text-[#2a2c30]">
       <TimelineSummary
         checkIn={
           data.checkIn
@@ -185,7 +195,11 @@ export function TimelineDetail({
           className="flex h-[52px] w-full items-center justify-center gap-[8px] rounded-[16px] bg-[#484c52] text-white disabled:cursor-not-allowed disabled:opacity-60"
           disabled={isDeleting}
           type="button"
-          onClick={onDelete}
+          onClick={() =>
+            setIsDeleteDialogOpen(
+              true,
+            )
+          }
         >
           <span className="text-[15px] font-semibold leading-[22.5px] tracking-[-0.375px]">
             {isDeleting
@@ -200,6 +214,18 @@ export function TimelineDetail({
           />
         </button>
       </div>
-    </main>
+      </main>
+
+      <DeleteRecordDialog
+        isDeleting={isDeleting}
+        onDelete={onDelete}
+        onOpenChange={
+          setIsDeleteDialogOpen
+        }
+        open={
+          isDeleteDialogOpen
+        }
+      />
+    </>
   )
 }
