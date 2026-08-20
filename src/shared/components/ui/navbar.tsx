@@ -35,18 +35,6 @@ export function Navbar() {
             >
               {({ isActive }) => (
                 <span className="relative flex h-full w-full flex-col items-center justify-center gap-1">
-                  {isActive ? (
-                    <motion.span
-                      className="absolute top-2 h-1 w-7 rounded-full bg-[#F19ED2]"
-                      layoutId="navbar-active-indicator"
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 30,
-                      }}
-                    />
-                  ) : null}
-
                   <span className="flex h-[26px] items-center justify-center">
                     <motion.span
                       animate={{
@@ -74,6 +62,18 @@ export function Navbar() {
                   >
                     {item.name}
                   </span>
+
+                  {isActive ? (
+                    <motion.span
+                      className="absolute bottom-[8px] h-1 w-7 rounded-full bg-[#F19ED2]"
+                      layoutId="navbar-active-indicator"
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                  ) : null}
                 </span>
               )}
             </NavLink>
