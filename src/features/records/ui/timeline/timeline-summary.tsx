@@ -33,7 +33,7 @@ const EMOTION_CONFIG: Record<
     image: moodGood,
   },
   4: {
-    label: "최고에요",
+    label: "최고예요",
     image: moodGreat,
   },
 }
