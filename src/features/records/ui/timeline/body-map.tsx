@@ -15,6 +15,7 @@ type BodyDiary = {
 
 type TimelineBodyMapProps = {
   bodyDiaries: BodyDiary[]
+  compact?: boolean
 }
 
 const BODY_MAP_WIDTH = 262
@@ -109,6 +110,7 @@ const bodyParts = [
 
 export function TimelineBodyMap({
   bodyDiaries,
+  compact = false,
 }: TimelineBodyMapProps) {
   const selectedRegions =
     new Set(
@@ -127,8 +129,14 @@ export function TimelineBodyMap({
     )
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative aspect-[262/411] w-[250px]">
+    <div className="flex w-full flex-col items-center">
+      <div
+        className={
+          compact
+            ? "relative aspect-[262/411] w-[172px]"
+            : "relative aspect-[262/411] w-[250px]"
+        }
+      >
         <img
           alt=""
           aria-hidden="true"
@@ -171,7 +179,7 @@ export function TimelineBodyMap({
         )}
       </div>
 
-      {bodyDiaries.length > 0 && (
+      {!compact && bodyDiaries.length > 0 && (
         <div className="mt-[18px] w-full space-y-[10px]">
           {bodyDiaries.map(
             (diary, index) => (

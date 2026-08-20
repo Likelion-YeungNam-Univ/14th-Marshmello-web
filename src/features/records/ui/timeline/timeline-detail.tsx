@@ -1,7 +1,13 @@
 import {
-  ChevronLeft,
+  useState,
+} from "react"
+
+import {
+  ImageIcon,
   Trash2,
 } from "lucide-react"
+
+import { cn } from "@/shared/lib/utils"
 
 import type {
   TimelineDetailData,
@@ -12,100 +18,182 @@ import {
 } from "./body-map"
 
 import {
-  TimelineImageSection,
-} from "./timeline-image-section"
-
-import {
   TimelineSummary,
 } from "./timeline-summary"
 
 type TimelineDetailProps = {
   data: TimelineDetailData
-  onBack: () => void
-  onDelete: () => void
   isDeleting: boolean
+  onDelete: () => void
+  onNextDate: () => void
+  onPreviousDate: () => void
+}
+
+type TimelineTab =
+  | "belly"
+  | "bodyMap"
+
+const tabs: Array<{
+  id: TimelineTab
+  label: string
+}> = [
+  {
+    id: "belly",
+    label: "이 날의 배",
+  },
+  {
+    id: "bodyMap",
+    label: "이 날의 바디맵",
+  },
+]
+
+type EmptyMediaProps = {
+  label: string
+}
+
+function EmptyMedia({
+  label,
+}: EmptyMediaProps) {
+  return (
+    <div className="flex size-full flex-col items-center justify-center gap-[8px]">
+      <ImageIcon
+        aria-hidden="true"
+        className="size-[34px] text-[#b7a9b2]"
+        strokeWidth={1.8}
+      />
+
+      <p className="text-[12px] leading-[18px] tracking-[-0.3px] text-[#b7a9b2]">
+        {label}
+      </p>
+    </div>
+  )
 }
 
 export function TimelineDetail({
   data,
-  onBack,
-  onDelete,
   isDeleting,
+  onDelete,
+  onNextDate,
+  onPreviousDate,
 }: TimelineDetailProps) {
+  const [
+    activeTab,
+    setActiveTab,
+  ] =
+    useState<TimelineTab>(
+      "belly",
+    )
+
+  const hasBodyMap =
+    data.checkIn.bodyDiaries
+      .length > 0
+
   return (
-<main className="mt-[-20px] mx-auto min-h-dvh w-full max-w-[393px] overflow-y-auto bg-white text-black">
-  <header className="relative flex h-[96px] items-end justify-center pb-[14px]">
-        <button
-          aria-label="뒤로가기"
-          className="absolute left-[14px] top-[44px] flex size-[36px] items-center justify-center"
-          type="button"
-          onClick={onBack}
-        >
-          <ChevronLeft
-            size={22}
-            strokeWidth={2}
-          />
-        </button>
-
-        <h1 className="text-[16px] font-semibold tracking-[-0.16px]">
-          타임라인 상세보기
-        </h1>
-      </header>
-
+    <main className="mx-auto min-h-[calc(100dvh-var(--header-layout-height))] w-full max-w-[393px] overflow-x-hidden bg-white text-[#2a2c30]">
       <TimelineSummary
         checkIn={
           data.checkIn
         }
+        onNextDate={
+          onNextDate
+        }
+        onPreviousDate={
+          onPreviousDate
+        }
       />
 
-      <div className="mt-[30px]">
-        <TimelineImageSection
-          title="이 날의 배 다시보기"
+      <section className="px-[24px] pt-[32px]">
+        <div
+          aria-label="기록 이미지 종류"
+          className="flex h-[43.5px] w-full gap-[4px] rounded-full bg-[#f4eef3] p-[4px]"
+          role="tablist"
         >
-          {data.imageUrl ? (
-            <img
-              alt="체크인 당시 배 사진"
-              className="h-[270px] w-full object-cover"
-              src={data.imageUrl}
-            />
-          ) : (
-            <div className="flex h-[270px] items-center justify-center text-[13px] text-[#8c8c8c]">
-              이미지를 불러오지 못했어요.
-            </div>
-          )}
-        </TimelineImageSection>
+          {tabs.map((tab) => {
+            const isActive =
+              activeTab === tab.id
 
-        <TimelineImageSection
-          title="이 날의 바디맵 다시보기"
+            return (
+              <button
+                key={tab.id}
+                aria-controls={`timeline-${tab.id}-panel`}
+                aria-selected={
+                  isActive
+                }
+                className={cn(
+                  "flex min-w-0 flex-1 items-center justify-center rounded-full py-[8px] text-[13px] font-medium leading-[19.5px] tracking-[-0.325px]",
+                  isActive
+                    ? "bg-white text-[#b83c7c] shadow-[0_1px_1.5px_rgba(0,0,0,0.10),0_1px_1px_rgba(0,0,0,0.10)]"
+                    : "text-[#9a8e96]",
+                )}
+                id={`timeline-${tab.id}-tab`}
+                role="tab"
+                type="button"
+                onClick={() =>
+                  setActiveTab(
+                    tab.id,
+                  )
+                }
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <div
+          aria-labelledby={`timeline-${activeTab}-tab`}
+          className={cn(
+            "mt-[16px] aspect-square w-full overflow-hidden rounded-[16px]",
+            activeTab === "bodyMap"
+              ? "bg-white"
+              : "bg-[linear-gradient(135deg,#f3ecf1_0%,#e9e0e8_100%)]",
+          )}
+          id={`timeline-${activeTab}-panel`}
+          role="tabpanel"
         >
-          <div className="flex min-h-[270px] items-center justify-center overflow-visible bg-white px-[20px] py-[20px]">
-            <div className="relative top-[-25px]">
+          {activeTab ===
+          "belly" ? (
+            data.imageUrl ? (
+              <img
+                alt="체크인 당시 배 사진"
+                className="size-full object-cover"
+                src={data.imageUrl}
+              />
+            ) : (
+              <EmptyMedia label="배 사진 다시보기" />
+            )
+          ) : hasBodyMap ? (
+            <div className="flex size-full items-center justify-center">
               <TimelineBodyMap
+                compact
                 bodyDiaries={
                   data.checkIn
                     .bodyDiaries
                 }
               />
             </div>
-          </div>
-        </TimelineImageSection>
-      </div>
+          ) : (
+            <EmptyMedia label="바디맵 다시보기" />
+          )}
+        </div>
+      </section>
 
-      <div className="px-[36px] pb-[72px] pt-0">
+      <div className="px-[24px] pb-[calc(62px+env(safe-area-inset-bottom))] pt-[32px]">
         <button
-          className="flex h-[47px] w-full items-center justify-center gap-[12px] rounded-[15px] bg-[#484c52] text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-[52px] w-full items-center justify-center gap-[8px] rounded-[16px] bg-[#484c52] text-white disabled:cursor-not-allowed disabled:opacity-60"
           disabled={isDeleting}
           type="button"
           onClick={onDelete}
         >
-          <span className="text-[16px] font-semibold">
+          <span className="text-[15px] font-semibold leading-[22.5px] tracking-[-0.375px]">
             {isDeleting
               ? "삭제 중..."
               : "기록 삭제하기"}
           </span>
 
           <Trash2
-            size={20}
+            aria-hidden="true"
+            className="size-[18px]"
             strokeWidth={1.8}
           />
         </button>
