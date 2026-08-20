@@ -1,5 +1,185 @@
-import { Outlet } from "react-router-dom"
+import { useCallback, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import {
+  Outlet,
+  useLocation,
+  useMatches,
+  useNavigate,
+  useParams,
+} from "react-router-dom"
+
+import { LogoutDrawer } from "@/features/auth/logout/ui/logout-drawer"
+import { useProfileStore } from "@/features/mypage/model/use-profile-store"
+import { CarePage } from "@/pages/care-page"
+import { logout as logoutRequest } from "@/shared/api/auth"
+import {
+  PageLayout,
+  type PageLayoutConfig,
+} from "@/shared/components/layout/page-layout"
+import SplashScreen from "@/shared/components/ui/splash/splash-screen"
+
+export type AppOutletContext = {
+  restartSplash: () => void
+  setHeaderBackAction: (action?: () => void) => void
+}
+
+type RouteHandle = {
+  pageLayout?: PageLayoutConfig
+}
+
+const SPLASH_SESSION_KEY = "poomgyeol:splash-shown"
+
+function hasSplashAlreadyShown() {
+  if (typeof window === "undefined") return false
+
+  return window.sessionStorage.getItem(SPLASH_SESSION_KEY) === "1"
+}
 
 export default function App() {
-  return <Outlet />
+  const [isLogoutDrawerOpen, setIsLogoutDrawerOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [redirectToLoginAfterSplash, setRedirectToLoginAfterSplash] =
+    useState(false)
+
+  const [pageHeaderBackAction, setPageHeaderBackAction] = useState<
+    (() => void) | undefined
+  >()
+
+  const [showSplash, setShowSplash] = useState(
+    () => !hasSplashAlreadyShown(),
+  )
+
+  const { pathname } = useLocation()
+  const matches = useMatches()
+  const navigate = useNavigate()
+  const { checkInId: checkInIdParam } = useParams()
+  const queryClient = useQueryClient()
+
+  // 로그인 페이지에서는 PageLayout을 사용하지 않음
+  const isLoginPage = pathname === "/login"
+
+  const parsedCheckInId = Number(checkInIdParam)
+
+  const checkInId = Number.isInteger(parsedCheckInId)
+    ? parsedCheckInId
+    : undefined
+
+  const restartSplash = useCallback(() => {
+    window.sessionStorage.removeItem(SPLASH_SESSION_KEY)
+    setShowSplash(true)
+  }, [])
+
+  const setHeaderBackAction = useCallback((action?: () => void) => {
+    setPageHeaderBackAction(() => action)
+  }, [])
+
+  const pageLayout = matches.reduce<PageLayoutConfig | undefined>(
+    (currentLayout, match) =>
+      (match.handle as RouteHandle | undefined)?.pageLayout ??
+      currentLayout,
+    undefined,
+  )
+
+  const logout = useCallback(async () => {
+    setIsLoggingOut(true)
+
+    try {
+      await logoutRequest()
+      queryClient.clear()
+      useProfileStore.getState().reset()
+      useProfileStore.persist.clearStorage()
+      window.localStorage.removeItem("loginStarted")
+      window.sessionStorage.clear()
+
+      setIsLogoutDrawerOpen(false)
+      restartSplash()
+      setRedirectToLoginAfterSplash(true)
+    } catch (error) {
+      console.error("로그아웃 실패:", error)
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }, [queryClient, restartSplash])
+
+  const isContentDetail = pageLayout?.variant === "content"
+  const isCareFlow = isContentDetail || pageLayout?.variant === "care"
+
+  // Splash Screen
+  if (showSplash) {
+    return (
+      <SplashScreen
+        durationMs={5000}
+        onFinish={() => {
+          window.sessionStorage.setItem(SPLASH_SESSION_KEY, "1")
+          setShowSplash(false)
+
+          if (redirectToLoginAfterSplash) {
+            setRedirectToLoginAfterSplash(false)
+            navigate("/login", { replace: true })
+          }
+        }}
+      />
+    )
+  }
+
+  // 로그인 페이지
+  // PageLayout / Header / Navbar 전부 사용하지 않음
+  if (isLoginPage) {
+    return (
+      <main className="mx-auto min-h-dvh w-full max-w-[393px]">
+        <Outlet context={{ restartSplash, setHeaderBackAction }} />
+      </main>
+    )
+  }
+
+  return (
+    <>
+      {isCareFlow ? (
+        <PageLayout
+          onLogout={() => setIsLogoutDrawerOpen(true)}
+          variant="care"
+        >
+          <CarePage checkInId={checkInId} />
+        </PageLayout>
+      ) : (
+        <PageLayout
+          {...pageLayout}
+          header={
+            pageHeaderBackAction
+              ? {
+                  ...pageLayout?.header,
+                  onBack: pageHeaderBackAction,
+                }
+              : pageLayout?.header
+          }
+          onLogout={() => setIsLogoutDrawerOpen(true)}
+        >
+          <Outlet context={{ restartSplash, setHeaderBackAction }} />
+        </PageLayout>
+      )}
+
+      {isContentDetail ? (
+        <PageLayout
+          {...pageLayout}
+          header={
+            pageHeaderBackAction
+              ? {
+                  ...pageLayout?.header,
+                  onBack: pageHeaderBackAction,
+                }
+              : pageLayout?.header
+          }
+        >
+          <Outlet context={{ restartSplash, setHeaderBackAction }} />
+        </PageLayout>
+      ) : null}
+
+      <LogoutDrawer
+        isLoggingOut={isLoggingOut}
+        onConfirm={logout}
+        onOpenChange={setIsLogoutDrawerOpen}
+        open={isLogoutDrawerOpen}
+      />
+    </>
+  )
 }
