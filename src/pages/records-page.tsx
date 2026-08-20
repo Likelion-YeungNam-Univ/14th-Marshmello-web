@@ -144,7 +144,7 @@ export function RecordsPage() {
               reportMonth,
             )
           } catch {
-            // 이미 생성된 리포트면 그대로 조회
+            // 이미 생성된 리포트인 경우 그대로 조회
           }
 
           try {
@@ -234,14 +234,9 @@ export function RecordsPage() {
       data.topBodyRegion,
     )
 
-  const hasReportRecord =
-    data.report != null
-
   const reportText =
-    hasReportRecord
-      ? data.report?.content ??
-        "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
-      : "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
+    data.report?.content ??
+    "저번 달 기록이 없어서 리포트를 준비할 수 없어요"
 
   return (
     <main className="relative mx-auto min-h-[852px] w-full max-w-[393px] overflow-hidden bg-[#e8c5e5] text-black">
@@ -250,12 +245,8 @@ export function RecordsPage() {
       <div className="relative z-10">
         <section className="px-[15px] pb-[8px] pt-[20px]">
           <RecordsSummary
-            monthText={
-              monthText
-            }
-            count={
-              data.count
-            }
+            monthText={monthText}
+            count={data.count}
             topBodyRegionLabel={
               topBodyRegionLabel
             }
@@ -267,9 +258,7 @@ export function RecordsPage() {
             monthText={
               reportMonthText
             }
-            content={
-              reportText
-            }
+            content={reportText}
           />
         </section>
 
@@ -277,15 +266,11 @@ export function RecordsPage() {
           requestMonth={
             data.requestMonth
           }
-          emotions={
-            data.emotions
-          }
+          emotions={data.emotions}
           onMonthChange={
             setRequestMonth
           }
-          onDateClick={(
-            date,
-          ) => {
+          onDateClick={(date) => {
             navigate(
               `/records/timeline?date=${date}`,
             )

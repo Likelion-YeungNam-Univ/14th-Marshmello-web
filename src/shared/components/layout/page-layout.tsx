@@ -74,7 +74,8 @@ export function PageLayout({
   return (
     <div
       className={cn(
-        variant === "mypage" ? "h-dvh overflow-hidden" : "min-h-dvh",
+        "mx-auto min-h-dvh w-full max-w-[393px]",
+        variant === "mypage" ? "overflow-hidden" : undefined,
         backgroundClassByVariant[variant],
         className,
       )}
