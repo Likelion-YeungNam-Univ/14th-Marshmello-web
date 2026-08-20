@@ -143,10 +143,10 @@ export function TimelineDetail({
         <div
           aria-labelledby={`timeline-${activeTab}-tab`}
           className={cn(
-            "mt-[16px] aspect-square w-full overflow-hidden rounded-[16px]",
+            "mt-[16px] w-full rounded-[16px]",
             activeTab === "bodyMap"
-              ? "bg-white"
-              : "bg-[linear-gradient(135deg,#f3ecf1_0%,#e9e0e8_100%)]",
+              ? "min-h-[345px] bg-white"
+              : "aspect-square overflow-hidden bg-[linear-gradient(135deg,#f3ecf1_0%,#e9e0e8_100%)]",
           )}
           id={`timeline-${activeTab}-panel`}
           role="tabpanel"
@@ -163,7 +163,7 @@ export function TimelineDetail({
               <EmptyMedia label="배 사진 다시보기" />
             )
           ) : hasBodyMap ? (
-            <div className="flex size-full items-center justify-center">
+            <div className="flex w-full justify-center px-[20px] py-[20px]">
               <TimelineBodyMap
                 compact
                 bodyDiaries={
@@ -173,7 +173,9 @@ export function TimelineDetail({
               />
             </div>
           ) : (
-            <EmptyMedia label="바디맵 다시보기" />
+            <div className="h-[345px]">
+              <EmptyMedia label="바디맵 다시보기" />
+            </div>
           )}
         </div>
       </section>

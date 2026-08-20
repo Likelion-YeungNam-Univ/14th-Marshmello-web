@@ -179,7 +179,7 @@ export function TimelineBodyMap({
         )}
       </div>
 
-      {!compact && bodyDiaries.length > 0 && (
+      {bodyDiaries.length > 0 && (
         <div className="mt-[18px] w-full space-y-[10px]">
           {bodyDiaries.map(
             (diary, index) => (
@@ -196,21 +196,21 @@ export function TimelineBodyMap({
                     "기록 부위"}
                 </p>
 
-                {diary.comment && (
-                  <p className="mt-[4px] text-[12px] leading-[1.5] text-[#777]">
-                    {diary.comment}
-                  </p>
-                )}
-
-                {diary.stretchMark !==
-                  undefined && (
-                  <p className="mt-[4px] text-[11px] text-[#999]">
-                    튼살:{" "}
-                    {diary.stretchMark
+                <p className="mt-[6px] text-[12px] leading-[18px] text-[#777]">
+                  튼살 여부:{" "}
+                  {diary.stretchMark ===
+                  undefined
+                    ? "기록 없음"
+                    : diary.stretchMark
                       ? "있음"
                       : "없음"}
-                  </p>
-                )}
+                </p>
+
+                <p className="mt-[3px] text-[12px] leading-[18px] text-[#777]">
+                  메모:{" "}
+                  {diary.comment ||
+                    "기록 없음"}
+                </p>
               </div>
             ),
           )}
