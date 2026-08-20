@@ -34,6 +34,17 @@ import moodGreat from "@/assets/checkin/mood/great.svg"
 
 const BODY_MAP_WIDTH = 262
 const BODY_MAP_HEIGHT = 411
+
+const BODY_PART_HIGHLIGHT_ELLIPSES = {
+  1: { cx: 33, cy: 26, rx: 32, ry: 25 },
+  2: { cx: 32, cy: 19.5, rx: 32, ry: 18.5 },
+  3: { cx: 35, cy: 24, rx: 35, ry: 24 },
+  4: { cx: 29.5, cy: 86.8, rx: 29, ry: 83 },
+  5: { cx: 30, cy: 80, rx: 29, ry: 83 },
+  6: { cx: 22, cy: 106, rx: 21, ry: 106 },
+  7: { cx: 21, cy: 106, rx: 21, ry: 106 },
+} as const
+
 const SUCCESS_OVERLAY_DURATION_MS = 1200
 const SUCCESS_OVERLAY_EXIT_DURATION_MS = 180
 
@@ -539,6 +550,14 @@ export function CheckinPage() {
                     answer.hasStretchMarks === true ||
                     answer.bodymapMemo.trim() !== ""  
 
+                  const isHighlighted =
+                    isSelected || hasAppliedAnswer
+
+                  const highlightEllipse =
+                    BODY_PART_HIGHLIGHT_ELLIPSES[
+                      part.id as keyof typeof BODY_PART_HIGHLIGHT_ELLIPSES
+                    ]
+
                   return (
                     //각 부위 별 svg 파일
                     <svg
@@ -567,7 +586,7 @@ export function CheckinPage() {
                               touchTabs(part.id)
                             }
                           }}
-                          className="cursor-pointer fill-black opacity-[0.001] [pointer-events:visibleFill]"
+                          className="cursor-pointer fill-black opacity-[0.001] [pointer-events:visibleFill] focus:outline-none"
                         />
 
                         {/*핑크색으로 빛나는 */}
@@ -577,10 +596,26 @@ export function CheckinPage() {
                           className={`pointer-events-none text-[#F19ED2] transition-[opacity,filter] duration-200 ease-out group-hover:opacity-100 group-hover:[filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)] group-focus-within:opacity-100 group-focus-within:[filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)] ${
                           // ↓ 기존 조건을 hasAppliedAnswer로 교체
                           // isSelected는 Drawer가 열린 동안만 임시로 빛나게 함
-                          isSelected || hasAppliedAnswer
+                          isHighlighted
                             ? "opacity-100 [filter:drop-shadow(0_0_1px_#F19ED2)_drop-shadow(0_0_6px_#F19ED2CC)]"
                             : "opacity-0"
                         }`}
+                        />
+
+                        {/* 선택/적용된 부위의 SVG 영역을 좌우 대칭 타원으로 함께 표시 */}
+                        <ellipse
+                          cx={highlightEllipse.cx}
+                          cy={highlightEllipse.cy}
+                          rx={highlightEllipse.rx}
+                          ry={highlightEllipse.ry}
+                          fill="none"
+                          strokeWidth={1.25}
+                          vectorEffect="non-scaling-stroke"
+                          className={`pointer-events-none stroke-[#F19ED2] transition-[opacity,filter] duration-200 ease-out group-hover:opacity-100 group-hover:[filter:drop-shadow(0_0_3px_#F19ED299)] group-focus-within:opacity-100 group-focus-within:[filter:drop-shadow(0_0_3px_#F19ED299)] ${
+                            isHighlighted
+                              ? "opacity-100 [filter:drop-shadow(0_0_3px_#F19ED299)]"
+                              : "opacity-0"
+                          }`}
                         />
                       </g>
                 </svg>
