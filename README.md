@@ -263,6 +263,3 @@ npm run dev
 
 이 프로젝트는 [MIT License](./LICENSE)를 따릅니다.
 
-## License
-
-이 프로젝트는 [MIT License](./LICENSE)를 따릅니다.
